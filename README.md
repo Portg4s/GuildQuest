@@ -78,3 +78,40 @@ Dans `Parametres > Installer sur telephone`, GuildQuest affiche une aide pour co
 Pour un usage personnel avec assets prives, rester sur le reseau local ou un environnement prive.
 
 Attention : si `public/private-assets/` contient des images privees, elles peuvent etre copiees dans `dist` lors du build. Ne publie pas `dist` avec des assets prives. Pour un deploiement public, retire les assets prives ou utilise seulement les placeholders.
+
+## Deploiement GitHub Pages
+
+Le repo public cible est `Portg4s/GuildQuest` et l'URL attendue est :
+
+```text
+https://portg4s.github.io/GuildQuest/
+```
+
+Le workflow `.github/workflows/deploy-pages.yml` construit l'app avec :
+
+```bash
+npm run build:pages
+```
+
+Ce mode utilise la base Vite `/GuildQuest/`, afin que les assets, le manifest PWA et le service worker restent compatibles avec GitHub Pages.
+
+Pour activer le deploiement :
+
+1. Ouvrir le repo sur GitHub.
+2. Aller dans `Settings > Pages`.
+3. Choisir `Source: GitHub Actions`.
+4. Pousser sur `main` ou lancer le workflow manuellement.
+
+La version GitHub Pages est publique et ne doit contenir que les fichiers versionnes du repo. Les fichiers locaux suivants restent exclus :
+
+- `public/private-assets/`
+- `src/data/characters/characters.local.ts`
+
+La version publique utilise donc les placeholders generiques. Pour une version locale privee avec images personnelles, utiliser `npm run dev -- --host 0.0.0.0` sur le reseau local ou un environnement prive.
+
+Sur telephone, ouvrir `https://portg4s.github.io/GuildQuest/`, puis installer la PWA :
+
+- iPhone / Safari : Partager puis `Sur l'ecran d'accueil`.
+- Android / Chrome : menu puis `Ajouter a l'ecran d'accueil`.
+
+Les donnees de jeu restent stockees localement sur l'appareil via IndexedDB. Il est recommande d'exporter un JSON avant changement majeur, reset ou changement de telephone.

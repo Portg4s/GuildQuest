@@ -1,6 +1,17 @@
 import { motion } from "framer-motion";
 import { useState } from "react";
-import { ArrowLeft, Copy, Download, RotateCcw, Shield, Smartphone, SlidersHorizontal, Volume2, Zap } from "lucide-react";
+import {
+  ArrowLeft,
+  Copy,
+  Download,
+  ExternalLink,
+  RotateCcw,
+  Shield,
+  Smartphone,
+  SlidersHorizontal,
+  Volume2,
+  Zap
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { CharacterRegistryInfo } from "@/data/characters/characters.registry";
 import type { GameSettings, Player } from "@/domain/models";
@@ -184,6 +195,28 @@ export function SettingsScreen({
         <p className="mt-3 text-xs leading-5 text-amber-100">
           Attention : si `public/private-assets` contient des images privees, ne publie pas le build `dist` tel quel.
         </p>
+      </article>
+
+      <article className="guild-card border-cyan-200/20 bg-cyan-300/10 p-4">
+        <div className="flex items-center gap-2">
+          <ExternalLink className="size-5 text-cyan-100" aria-hidden="true" />
+          <h2 className="text-xl font-black text-white">Installation via GitHub Pages</h2>
+        </div>
+        <div className="mt-3 space-y-2 text-sm leading-6 text-slate-300">
+          <p>
+            Version publique prevue :{" "}
+            <span className="font-bold text-cyan-100">https://portg4s.github.io/GuildQuest/</span>
+          </p>
+          <p>iPhone/Safari : ouvre l'URL, puis Partager et Sur l'ecran d'accueil.</p>
+          <p>Android/Chrome : ouvre l'URL, puis menu et Ajouter a l'ecran d'accueil.</p>
+          <p>
+            Cette version publique utilise uniquement les placeholders du repo. Les images privees locales ne sont pas
+            publiees.
+          </p>
+          <p>
+            Les donnees restent sur l'appareil via IndexedDB. Pense a exporter un JSON pour sauvegarder ta progression.
+          </p>
+        </div>
       </article>
 
       <article className="rounded-xl border border-red-300/30 bg-red-400/10 p-4 shadow-[0_0_26px_rgba(248,113,113,0.1)]">
