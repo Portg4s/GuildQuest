@@ -1,5 +1,19 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="GuildQuest">
-  <rect width="64" height="64" rx="14" fill="#312e81"/>
-  <path d="M32 8 50 18v15c0 12-7.5 20-18 23C21.5 53 14 45 14 33V18L32 8Z" fill="#14b8a6"/>
-  <path d="M22 31h20M32 18v28" stroke="#f8fafc" stroke-width="5" stroke-linecap="round"/>
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="38%" r="75%">
+      <stop offset="0%" stop-color="#38f8ff"/>
+      <stop offset="42%" stop-color="#ef4444"/>
+      <stop offset="100%" stop-color="#050816"/>
+    </radialGradient>
+    <linearGradient id="gold" x1="14" y1="8" x2="50" y2="56" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#fff7cc"/>
+      <stop offset="0.5" stop-color="#facc15"/>
+      <stop offset="1" stop-color="#f97316"/>
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="14" fill="url(#bg)"/>
+  <circle cx="32" cy="33" r="23" fill="#070a18" opacity="0.78" stroke="url(#gold)" stroke-width="3"/>
+  <path d="M32 11c8 7 11 13 8 20 5-2 9 1 10 6-4 9-11 14-18 14S18 46 14 37c1-5 5-8 10-6-3-7 0-13 8-20Z" fill="#ef4444" stroke="#facc15" stroke-width="2.8" stroke-linejoin="round"/>
+  <path d="M32 20c4 5 5 9 3 14 3-1 6 1 7 4-2 5-6 8-10 8s-8-3-10-8c1-3 4-5 7-4-2-5-1-9 3-14Z" fill="#38f8ff" opacity="0.92"/>
+  <path d="M18 20c5 0 8 2 11 6M46 20c-5 0-8 2-11 6" fill="none" stroke="#fff7cc" stroke-width="3" stroke-linecap="round"/>
 </svg>

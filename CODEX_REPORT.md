@@ -4,92 +4,132 @@ Date : 17 juin 2026
 
 ## Resume
 
-Les images personnages ont ete remises dans la version publique GitHub Pages.
+Theme anime / guilde magique ajoute a GuildQuest, avec une direction visuelle plus proche d'un univers Fairy Tail sans recopier de logo officiel :
 
-Changements effectues :
-
-- `public/private-assets/` n'est plus ignore par Git ;
-- les 44 images `.webp` de `public/private-assets/characters/` sont de nouveau ajoutees a l'index Git ;
-- `src/data/characters/characters.public-pack.ts` a ete recree ;
-- `src/data/characters/characters.registry.ts` recharge le pack public versionne ;
-- `vite.config.ts` reinclut les `.webp` dans le build/PWA ;
-- le nettoyage `dist/private-assets` en mode Pages a ete retire ;
-- `src/data/characters/characters.local.ts` reste ignore et n'a pas ete modifie.
+- nouvelle icone originale de guilde/flamme pour favicon, PWA et iPhone ;
+- PNG PWA generes localement ;
+- theme global renforce : rouge flamme, or, turquoise magique, fond plus anime fantasy ;
+- Hall mis a jour avec un sceau de flamme original ;
+- cinematique gacha renforcee avec porte de guilde, cercle draconique et aura de flamme ;
+- cartes premium et effets de rarete plus flamboyants ;
+- manifest PWA mis a jour pour iPhone/GitHub Pages.
 
 Aucun commit et aucun push effectues.
-Aucune image n'a ete modifiee sur le disque.
-Aucun asset n'a ete telecharge.
+Aucun asset telecharge depuis Internet.
 
 ## Fichiers modifies
 
-- `.gitignore`
-- `CODEX_RULES.md`
-- `PRIVATE_ASSETS_GUIDE.md`
-- `README.md`
-- `src/data/characters/characters.public-pack.ts`
-- `src/data/characters/characters.registry.ts`
-- `src/features/settings/SettingsScreen.tsx`
+- `index.html`
+- `public/favicon.svg`
+- `public/pwa.svg`
+- `public/icons/guildquest-icon.svg`
+- `src/components/game/PremiumCharacterCard.tsx`
+- `src/components/game/rarity-effects.ts`
+- `src/features/gacha/GachaCinematic.tsx`
+- `src/features/gacha/GachaScreen.tsx`
+- `src/features/home/HomeScreen.tsx`
+- `src/styles/globals.css`
 - `vite.config.ts`
 - `CODEX_REPORT.md`
 
-## Pack public
+## Fichiers crees
 
-Le fichier suivant est de nouveau present :
+- `public/icons/apple-touch-icon.png`
+- `public/icons/icon-192.png`
+- `public/icons/icon-512.png`
+- `public/icons/maskable-512.png`
 
-```txt
-src/data/characters/characters.public-pack.ts
-```
+Les PNG ont ete generes localement via PowerShell/System.Drawing avec un emblème original.
 
-Il expose un pack public versionne :
+## Icone iPhone / PWA
 
-- `Fairy Tail Public Pack` ;
-- 44 personnages ;
-- chemins d'images vers `/private-assets/characters/*.webp` ;
-- `replacePlaceholders: true`.
+Nouvelle direction :
 
-En build GitHub Pages, `CharacterImage` resout ces chemins avec la base Vite `/GuildQuest/`, donc les images sont demandees sous :
+- flamme rouge/or ;
+- coeur turquoise magique ;
+- anneau de guilde ;
+- ailes/sceau stylises ;
+- aucun logo officiel copie.
 
-```txt
-/GuildQuest/private-assets/characters/...
-```
+`index.html` contient maintenant :
 
-## Images
+- `apple-touch-icon` ;
+- `apple-mobile-web-app-title` ;
+- `apple-mobile-web-app-capable` ;
+- `apple-mobile-web-app-status-bar-style`.
 
-Verification apres `npm run build:pages` :
+Verification Pages :
 
-- `dist/private-assets/characters/natsu-dragneel.webp` existe ;
-- `dist/private-assets/characters/` contient 44 fichiers ;
-- le precache PWA contient 71 entrees.
+- `dist/index.html` pointe vers `/GuildQuest/icons/apple-touch-icon.png` ;
+- `dist/icons/apple-touch-icon.png` existe ;
+- `dist/icons/icon-192.png` existe ;
+- `dist/icons/icon-512.png` existe ;
+- `dist/icons/maskable-512.png` existe.
 
-## Fichiers locaux ignores
+## Manifest PWA
 
-Verification :
+`vite.config.ts` :
 
-```bash
-git status --short --ignored src\data\characters\characters.local.ts public\private-assets
-```
+- `theme_color: "#ef4444"` ;
+- `background_color: "#050816"` ;
+- ajout des PNG :
+  - `icons/icon-192.png` ;
+  - `icons/icon-512.png` ;
+  - `icons/maskable-512.png`.
 
-Resultat :
+Le manifest Pages garde :
 
-```txt
-A  public/private-assets/characters/...
-!! src/data/characters/characters.local.ts
-```
+- `start_url: "/GuildQuest/"` ;
+- `scope: "/GuildQuest/"`.
 
-Conclusion :
+## Theme global
 
-- les images sont bien remises dans Git ;
-- `characters.local.ts` reste ignore ;
-- le fichier local prive n'a pas ete touche.
+`src/styles/globals.css` :
+
+- palette plus flamme/or/turquoise ;
+- fond global plus anime fantasy ;
+- cartes avec glow plus rouge/or ;
+- `magic-border` plus chaud ;
+- boutons primaires plus flamboyants ;
+- nouvelles classes :
+  - `guild-flame-sigil` ;
+  - `flame-aura`.
+
+## Gacha / Invocation
+
+`GachaCinematic` :
+
+- wording remplace par une porte de guilde et un cercle draconique ;
+- sceau de flamme dans la cinematique ;
+- aura plus spectaculaire ;
+- revelation x1/x10 conservee ;
+- skip et preferences animations conserves.
+
+`rarity-effects` :
+
+- Mythique : effet rouge/or type dragon ;
+- Legendaire : effet flamme legendaire ;
+- Epique : aura arcane plus chaude.
+
+`PremiumCharacterCard` :
+
+- aura de flamme autour des cartes ;
+- glow plus visible ;
+- rendu conserve pour nouveaux/doublons/fragments/poussiere.
+
+## Hall
+
+Le logo du Hall utilise maintenant le nouveau sceau de flamme original au lieu du bouclier generique.
 
 ## Commandes executees
 
-- `git add public/private-assets src/data/characters/characters.public-pack.ts`
-- `npm run lint`
-- `npm run build`
-- `npm run build:pages`
-- `git status --short`
-- `git status --short --ignored src\data\characters\characters.local.ts public\private-assets`
+- generation locale PNG via PowerShell/System.Drawing ;
+- `npm run lint` ;
+- `npm run build` ;
+- `npm run build:pages` ;
+- verification de `dist/index.html` ;
+- verification de `dist/manifest.webmanifest` ;
+- verification de `dist/icons`.
 
 ## Resultat lint
 
@@ -109,34 +149,48 @@ OK.
 
 Details :
 
-- manifest compatible `/GuildQuest/` ;
-- images `.webp` incluses ;
-- `dist/private-assets/characters/` contient 44 fichiers ;
-- avertissement Vite non bloquant : chunk principal superieur a 500 kB apres minification.
+- icone iPhone correctement prefixee sous `/GuildQuest/` ;
+- PNG PWA presents dans `dist/icons` ;
+- manifest compatible GitHub Pages ;
+- images personnages toujours incluses dans le build public.
 
 ## Etat Git notable
 
-Les images apparaissent maintenant comme ajoutees :
+Fichiers modifies :
 
 ```txt
-A  public/private-assets/characters/acnologia.webp
-A  public/private-assets/characters/...
-A  src/data/characters/characters.public-pack.ts
+ M index.html
+ M public/favicon.svg
+ M public/icons/guildquest-icon.svg
+ M public/pwa.svg
+ M src/components/game/PremiumCharacterCard.tsx
+ M src/components/game/rarity-effects.ts
+ M src/features/gacha/GachaCinematic.tsx
+ M src/features/gacha/GachaScreen.tsx
+ M src/features/home/HomeScreen.tsx
+ M src/styles/globals.css
+ M vite.config.ts
 ```
 
-`src/data/characters/characters.local.ts` reste ignore :
+Nouveaux fichiers :
 
 ```txt
-!! src/data/characters/characters.local.ts
+?? public/icons/apple-touch-icon.png
+?? public/icons/icon-192.png
+?? public/icons/icon-512.png
+?? public/icons/maskable-512.png
 ```
+
+`src/data/characters/characters.local.ts` reste ignore.
 
 ## Points a verifier manuellement
 
-- Apres push/deploiement GitHub Pages, vider le cache de la PWA ou faire un hard refresh.
-- Ouvrir Collection.
-- Verifier que les requetes pointent vers `/GuildQuest/private-assets/characters/*.webp`.
-- Verifier que les 404 d'images ont disparu.
+- Installer la PWA sur iPhone apres redeploiement.
+- Verifier que la nouvelle icone apparait sur l'ecran d'accueil.
+- Tester une invocation x1 et x10.
+- Verifier le rendu des cartes mythiques/legendaires.
+- Faire un hard refresh si l'ancien service worker garde l'ancienne icone.
 
 ## Prochaine etape recommandee
 
-Committer les changements avec les images remises dans l'index, puis pousser pour redeployer GitHub Pages.
+Apres push/deploiement, supprimer l'ancienne PWA de l'iPhone puis la reinstaller si iOS garde l'ancienne icone en cache.

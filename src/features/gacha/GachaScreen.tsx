@@ -104,10 +104,10 @@ export function GachaScreen({
         <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_top,rgba(251,191,36,0.18),transparent_34%),radial-gradient(circle_at_bottom_right,rgba(20,184,166,0.14),transparent_30%)]" />
         <div className="flex items-start justify-between gap-3">
           <div>
-            <p className="text-xs font-black uppercase tracking-[0.2em] text-amber-100">Banniere active</p>
-            <h2 className="mt-1 text-lg font-black text-white">Serment des Fondations</h2>
+          <p className="text-xs font-black uppercase tracking-[0.2em] text-amber-100">Banniere active</p>
+            <h2 className="mt-1 text-lg font-black text-white">Serment de Fairy Guild</h2>
             <p className="mt-1 text-xs leading-5 text-slate-300">
-              Personnages placeholders generiques. Les assets prives locaux seront charges plus tard.
+              Tire une carte de guilde et reveille son aura de flamme, d'acier ou de magie celeste.
             </p>
           </div>
           <span className="rounded-md bg-teal-300 px-2 py-1 text-xs font-black text-slate-950">V1</span>

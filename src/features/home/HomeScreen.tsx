@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { CalendarDays, Crown, Gem, Map, Medal, Settings, Shield, Sparkles, UserRound, ScrollText, Trophy, Swords, Store } from "lucide-react";
+import { CalendarDays, Crown, Gem, Map, Medal, Settings, Sparkles, UserRound, ScrollText, Trophy, Swords, Store } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { CharacterImage } from "@/components/game/CharacterImage";
 import { CompactProgressCard } from "@/components/game/CompactProgressCard";
@@ -72,8 +72,8 @@ export function HomeScreen({
     >
       <header className="sticky top-0 z-10 -mx-4 flex items-center justify-between gap-3 border-b border-teal-200/15 bg-slate-950/80 px-4 py-3 shadow-[0_12px_30px_rgba(0,0,0,0.24)] backdrop-blur sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8">
         <div className="flex min-w-0 items-center gap-3">
-          <div className="magic-border rune-mark grid size-10 shrink-0 place-items-center rounded-xl border border-teal-300/30 bg-teal-300/10 shadow-glow">
-            <Shield className="size-5 text-teal-200" aria-hidden="true" />
+          <div className="magic-border flame-aura grid size-10 shrink-0 place-items-center rounded-xl border border-amber-300/40 bg-red-400/15 shadow-glow">
+            <div className="guild-flame-sigil size-6" aria-hidden="true" />
           </div>
           <div className="min-w-0">
             <p className="text-[0.68rem] font-semibold uppercase tracking-[0.18em] text-teal-200">Hall</p>

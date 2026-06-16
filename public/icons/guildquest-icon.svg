@@ -1,22 +1,35 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="GuildQuest">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="GuildQuest Flame Guild">
   <defs>
-    <radialGradient id="bg" cx="50%" cy="35%" r="70%">
-      <stop offset="0%" stop-color="#2dd4bf"/>
-      <stop offset="48%" stop-color="#312e81"/>
+    <radialGradient id="bg" cx="50%" cy="36%" r="82%">
+      <stop offset="0%" stop-color="#67e8f9"/>
+      <stop offset="28%" stop-color="#fb7185"/>
+      <stop offset="60%" stop-color="#7c2d12"/>
       <stop offset="100%" stop-color="#020617"/>
     </radialGradient>
-    <linearGradient id="gold" x1="120" y1="80" x2="392" y2="432" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#fef3c7"/>
-      <stop offset="0.45" stop-color="#facc15"/>
-      <stop offset="1" stop-color="#f59e0b"/>
+    <linearGradient id="gold" x1="112" y1="70" x2="408" y2="442" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#fff7cc"/>
+      <stop offset="0.45" stop-color="#fde047"/>
+      <stop offset="1" stop-color="#fb923c"/>
     </linearGradient>
+    <linearGradient id="aqua" x1="172" y1="144" x2="340" y2="392" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#ecfeff"/>
+      <stop offset="0.45" stop-color="#22d3ee"/>
+      <stop offset="1" stop-color="#0f766e"/>
+    </linearGradient>
+    <filter id="softGlow" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="12" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
   </defs>
   <rect width="512" height="512" rx="112" fill="url(#bg)"/>
-  <circle cx="256" cy="256" r="174" fill="none" stroke="#2dd4bf" stroke-width="16" opacity="0.55"/>
-  <circle cx="256" cy="256" r="124" fill="none" stroke="#facc15" stroke-width="10" opacity="0.65"/>
-  <path d="M256 88l122 64v91c0 82-48 144-122 181-74-37-122-99-122-181v-91L256 88z" fill="#020617" opacity="0.72" stroke="url(#gold)" stroke-width="18" stroke-linejoin="round"/>
-  <path d="M203 178h106c31 0 56 25 56 56v9c0 73-49 121-109 145-60-24-109-72-109-145v-9c0-31 25-56 56-56z" fill="#0f172a" stroke="#2dd4bf" stroke-width="12"/>
-  <path d="M198 253h116M198 305h86" stroke="url(#gold)" stroke-width="24" stroke-linecap="round"/>
-  <path d="M314 253l-38 52 58 56" fill="none" stroke="#f8fafc" stroke-width="24" stroke-linecap="round" stroke-linejoin="round"/>
-  <circle cx="256" cy="256" r="16" fill="#facc15"/>
+  <path d="M86 284c56-22 99-13 132 27M426 284c-56-22-99-13-132 27" fill="none" stroke="#67e8f9" stroke-width="18" stroke-linecap="round" opacity="0.72"/>
+  <circle cx="256" cy="262" r="184" fill="#050816" opacity="0.76" stroke="url(#gold)" stroke-width="18"/>
+  <circle cx="256" cy="262" r="142" fill="none" stroke="#67e8f9" stroke-width="8" opacity="0.55"/>
+  <path d="M256 70c71 62 94 122 64 180 46-19 85 7 97 56-35 84-96 134-161 134S130 390 95 306c12-49 51-75 97-56-30-58-7-118 64-180Z" fill="#ef4444" stroke="url(#gold)" stroke-width="20" stroke-linejoin="round" filter="url(#softGlow)"/>
+  <path d="M256 150c39 49 48 91 25 132 31-11 57 8 64 40-22 44-55 70-89 70s-67-26-89-70c7-32 33-51 64-40-23-41-14-83 25-132Z" fill="url(#aqua)"/>
+  <path d="M149 158c46 0 78 20 101 60M363 158c-46 0-78 20-101 60" fill="none" stroke="#fff7cc" stroke-width="22" stroke-linecap="round"/>
+  <path d="M206 305h100M226 350h60" stroke="#020617" stroke-width="24" stroke-linecap="round" opacity="0.72"/>
 </svg>

@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { Sparkles, X } from "lucide-react";
+import { X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { PremiumCharacterCard } from "@/components/game/PremiumCharacterCard";
 import { getBestRarity, rarityEffects } from "@/components/game/rarity-effects";
@@ -19,9 +19,9 @@ type GachaCinematicProps = {
 };
 
 const phaseCopy = [
-  "Les runes s'eveillent...",
-  "Le cercle choisit son aura...",
-  "La porte de guilde s'ouvre..."
+  "La marque de guilde s'embrase...",
+  "Le cercle draconique choisit son aura...",
+  "La porte de la guilde s'ouvre..."
 ];
 
 export function GachaCinematic({ results, open, animationSpeed, onComplete }: GachaCinematicProps) {
@@ -78,7 +78,7 @@ export function GachaCinematic({ results, open, animationSpeed, onComplete }: Ga
               <p className={cn("text-xs font-black uppercase tracking-[0.24em]", effect.text)}>
                 Invocation {isTenPull ? "x10" : "x1"}
               </p>
-              <h1 className="text-xl font-black sm:text-2xl">Autel des etoiles</h1>
+              <h1 className="text-xl font-black sm:text-2xl">Porte de la guilde</h1>
             </div>
             <Button variant="secondary" className="h-9" onClick={finish} aria-label="Passer la cinematique">
               <X className="mr-2 size-4" aria-hidden="true" />
@@ -95,13 +95,13 @@ export function GachaCinematic({ results, open, animationSpeed, onComplete }: Ga
                 transition={{ duration: reduced ? 0.25 : 0.6 }}
                 className="w-full max-w-md text-center"
               >
-                <div className={cn("mx-auto grid size-52 place-items-center rounded-full border bg-black/25", effect.border, effect.ring, "ring-4")}>
-                  <motion.div
-                    animate={reduced ? undefined : { rotate: 360, scale: [1, 1.08, 1] }}
+                  <div className={cn("flame-aura mx-auto grid size-56 place-items-center rounded-full border bg-black/25", effect.border, effect.ring, "ring-4")}>
+                    <motion.div
+                    animate={reduced ? undefined : { rotate: 360, scale: [1, 1.1, 1] }}
                     transition={{ repeat: Infinity, duration: animationSpeed === "fast" ? 2 : 3.2, ease: "linear" }}
-                    className={cn("grid size-36 place-items-center rounded-full border-2", effect.border, effect.backdrop)}
+                    className={cn("grid size-40 place-items-center rounded-full border-2", effect.border, effect.backdrop)}
                   >
-                    <Sparkles className={cn("size-12", effect.text)} aria-hidden="true" />
+                    <div className="guild-flame-sigil size-20" aria-hidden="true" />
                   </motion.div>
                 </div>
                 <p className="mt-6 text-lg font-black text-white">{phaseCopy[phase]}</p>
@@ -127,7 +127,7 @@ export function GachaCinematic({ results, open, animationSpeed, onComplete }: Ga
                   <p className={cn("text-xs font-black uppercase tracking-[0.24em]", effect.text)}>
                     Revelation {rarityLabels[bestRarity]}
                   </p>
-                  <h2 className="mt-1 text-2xl font-black">{isTenPull ? "Dix cartes revelees" : "Allie invoque"}</h2>
+                  <h2 className="mt-1 text-2xl font-black">{isTenPull ? "Dix cartes de guilde" : "Allie de guilde"}</h2>
                 </div>
 
                 <div className={cn(isTenPull ? "grid grid-cols-2 gap-2.5 sm:grid-cols-5" : "mx-auto max-w-sm")}>

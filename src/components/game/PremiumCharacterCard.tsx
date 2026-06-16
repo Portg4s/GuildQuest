@@ -23,14 +23,15 @@ export function PremiumCharacterCard({
   const content = (
     <article
       className={cn(
-        "relative isolate overflow-hidden rounded-xl border p-3 text-center",
+        "flame-aura relative isolate overflow-hidden rounded-xl border p-3 text-center",
         rarityCardClasses[result.character.rarity],
         rarityGlowClasses[result.character.rarity],
         effect.border,
         compact ? "min-h-56" : "min-h-[25rem] p-4"
       )}
     >
-      <div className={cn("absolute inset-0 -z-10 bg-gradient-to-br opacity-80", effect.aura)} />
+      <div className={cn("absolute inset-0 -z-10 bg-gradient-to-br opacity-85", effect.aura)} />
+      <div className="absolute inset-x-6 top-8 -z-10 h-24 rounded-full bg-amber-200/10 blur-2xl" />
       <div className="absolute -right-8 -top-10 -z-10 size-28 rounded-full bg-white/10 blur-2xl" />
       <div className="flex items-start justify-between gap-2">
         <span className={cn("rounded-md px-2.5 py-1 text-[0.68rem] font-black", rarityBadgeClasses[result.character.rarity])}>

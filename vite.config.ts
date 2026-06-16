@@ -17,13 +17,31 @@ export default defineConfig(({ mode }) => {
           name: "GuildQuest",
           short_name: "GuildQuest",
           description: "PWA offline-first d'apprentissage gamifiee avec quetes, quiz, gacha et duel.",
-          theme_color: "#0f766e",
-          background_color: "#020617",
+          theme_color: "#ef4444",
+          background_color: "#050816",
           display: "standalone",
           orientation: "portrait",
           start_url: base,
           scope: base,
           icons: [
+            {
+              src: "icons/icon-192.png",
+              sizes: "192x192",
+              type: "image/png",
+              purpose: "any"
+            },
+            {
+              src: "icons/icon-512.png",
+              sizes: "512x512",
+              type: "image/png",
+              purpose: "any"
+            },
+            {
+              src: "icons/maskable-512.png",
+              sizes: "512x512",
+              type: "image/png",
+              purpose: "maskable"
+            },
             {
               src: "pwa.svg",
               sizes: "any",
