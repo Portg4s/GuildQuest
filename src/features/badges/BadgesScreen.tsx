@@ -54,7 +54,7 @@ export function BadgesScreen({
       <header className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.22em] text-teal-200">Exploits de guilde</p>
-          <h1 className="text-2xl font-black text-white">Badges & Titres</h1>
+          <h1 className="guild-title text-2xl">Badges & Titres</h1>
           <p className="mt-1 text-sm text-slate-300">
             {unlockedBadges.length} badges - {unlockedTitles.length} titres debloques
           </p>
@@ -65,13 +65,13 @@ export function BadgesScreen({
         </Button>
       </header>
 
-      <div className="rounded-lg border border-white/10 bg-slate-950/50 p-2.5">
+      <div className="guild-panel p-2.5">
         <div className="grid grid-cols-2 gap-2">
           <button
             type="button"
             onClick={() => setActiveTab("badges")}
             className={cn(
-              "rounded-md border px-3 py-2 text-sm font-black transition",
+              "rounded-md border px-3 py-2 text-sm font-black transition active:scale-[0.98]",
               activeTab === "badges"
                 ? "border-teal-200 bg-teal-300 text-slate-950"
                 : "border-white/10 bg-white/[0.04] text-slate-300 hover:border-teal-200/50"
@@ -83,7 +83,7 @@ export function BadgesScreen({
             type="button"
             onClick={() => setActiveTab("titles")}
             className={cn(
-              "rounded-md border px-3 py-2 text-sm font-black transition",
+              "rounded-md border px-3 py-2 text-sm font-black transition active:scale-[0.98]",
               activeTab === "titles"
                 ? "border-amber-200 bg-amber-300 text-slate-950"
                 : "border-white/10 bg-white/[0.04] text-slate-300 hover:border-amber-200/50"
@@ -108,7 +108,7 @@ export function BadgesScreen({
                 type="button"
                 onClick={() => setBadgeFilter(filter.id)}
                 className={cn(
-                  "shrink-0 rounded-md border px-3 py-1.5 text-xs font-black transition",
+                  "shrink-0 rounded-md border px-3 py-1.5 text-xs font-black transition active:scale-[0.98]",
                   badgeFilter === filter.id
                     ? "border-teal-200 bg-teal-300 text-slate-950"
                     : "border-white/10 bg-white/[0.04] text-slate-300 hover:border-teal-200/50"
@@ -126,8 +126,8 @@ export function BadgesScreen({
                 <article
                   key={badge.id}
                   className={cn(
-                    "min-h-32 rounded-lg border p-3",
-                    unlocked ? "border-teal-200/30 bg-teal-300/10" : "border-white/10 bg-slate-900/70 text-slate-500"
+                    "min-h-32 rounded-xl border p-3 transition hover:-translate-y-0.5",
+                    unlocked ? "magic-border border-teal-200/30 bg-teal-300/10" : "border-white/10 bg-slate-900/70 text-slate-500"
                   )}
                 >
                   <div className="flex items-start justify-between gap-2">
@@ -153,8 +153,8 @@ export function BadgesScreen({
               <article
                 key={title.id}
                 className={cn(
-                  "rounded-lg border p-3",
-                  unlocked ? "border-amber-200/30 bg-amber-300/10" : "border-white/10 bg-slate-900/70 text-slate-500"
+                  "rounded-xl border p-3 transition hover:-translate-y-0.5",
+                  unlocked ? "magic-border border-amber-200/30 bg-amber-300/10" : "border-white/10 bg-slate-900/70 text-slate-500"
                 )}
               >
                 <div className="flex items-start justify-between gap-2">

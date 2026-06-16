@@ -44,7 +44,7 @@ export function MissionsScreen({ missions, onBackHome, onStartQuiz }: MissionsSc
       <header className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.22em] text-teal-200">Missions</p>
-          <h1 className="text-2xl font-black text-white">Plaine des Fondations</h1>
+          <h1 className="guild-title text-2xl">Plaine des Fondations</h1>
           <p className="mt-1 text-sm text-slate-300">Acces rapide aux quetes du pack Fondations Web.</p>
         </div>
         <Button variant="guild" onClick={onBackHome}>
@@ -53,15 +53,15 @@ export function MissionsScreen({ missions, onBackHome, onStartQuiz }: MissionsSc
         </Button>
       </header>
 
-      <div className="space-y-2 rounded-lg border border-white/10 bg-slate-950/50 p-2.5">
+      <div className="guild-panel space-y-2 p-2.5">
         <div className="flex gap-1.5 overflow-x-auto pb-1">
           {statusFilters.map((filter) => (
             <button
               key={filter.id}
               type="button"
               onClick={() => setStatusFilter(filter.id)}
-              className={cn(
-                "shrink-0 rounded-md border px-3 py-1.5 text-xs font-black transition",
+            className={cn(
+                "shrink-0 rounded-md border px-3 py-1.5 text-xs font-black transition active:scale-[0.98]",
                 statusFilter === filter.id
                   ? "border-teal-200 bg-teal-300 text-slate-950"
                   : "border-white/10 bg-white/[0.04] text-slate-300 hover:border-teal-200/50"
@@ -76,7 +76,7 @@ export function MissionsScreen({ missions, onBackHome, onStartQuiz }: MissionsSc
             type="button"
             onClick={() => setZoneFilter("all")}
             className={cn(
-              "shrink-0 rounded-md border px-3 py-1.5 text-xs font-bold transition",
+              "shrink-0 rounded-md border px-3 py-1.5 text-xs font-bold transition active:scale-[0.98]",
               zoneFilter === "all"
                 ? "border-amber-200 bg-amber-300 text-slate-950"
                 : "border-white/10 bg-white/[0.04] text-slate-300 hover:border-amber-200/50"
@@ -90,7 +90,7 @@ export function MissionsScreen({ missions, onBackHome, onStartQuiz }: MissionsSc
               type="button"
               onClick={() => setZoneFilter(zone)}
               className={cn(
-                "shrink-0 rounded-md border px-3 py-1.5 text-xs font-bold transition",
+                "shrink-0 rounded-md border px-3 py-1.5 text-xs font-bold transition active:scale-[0.98]",
                 zoneFilter === zone
                   ? "border-amber-200 bg-amber-300 text-slate-950"
                   : "border-white/10 bg-white/[0.04] text-slate-300 hover:border-amber-200/50"
@@ -109,7 +109,7 @@ export function MissionsScreen({ missions, onBackHome, onStartQuiz }: MissionsSc
         {filteredMissions.map((mission) => (
           <article
             key={mission.quiz.id}
-            className="rounded-lg border border-white/10 bg-slate-900/85 p-3 shadow-lg"
+            className="guild-card magic-border p-3 transition hover:-translate-y-0.5 hover:border-teal-200/35"
           >
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0">
@@ -118,17 +118,17 @@ export function MissionsScreen({ missions, onBackHome, onStartQuiz }: MissionsSc
                 </p>
                 <h2 className="mt-1 line-clamp-1 text-base font-black text-white">{mission.quiz.title}</h2>
               </div>
-              <span className="shrink-0 rounded-md bg-amber-300 px-2 py-1 text-xs font-black text-slate-950">
+              <span className="shrink-0 rounded-md border border-amber-100/50 bg-gradient-to-r from-amber-300 to-yellow-200 px-2 py-1 text-xs font-black text-slate-950 shadow-[0_0_18px_rgba(250,204,21,0.18)]">
                 Rang {mission.quiz.rank}
               </span>
             </div>
             <p className="mt-1 line-clamp-1 text-xs leading-5 text-slate-400">{mission.quiz.description}</p>
             <div className="mt-2 grid grid-cols-2 gap-2 text-xs">
-              <div className="rounded-md bg-white/[0.06] p-2">
+              <div className="rounded-md border border-white/10 bg-white/[0.06] p-2">
                 <p className="text-slate-400">Questions</p>
                 <p className="font-black text-white">{mission.quiz.questions.length}</p>
               </div>
-              <div className="rounded-md bg-white/[0.06] p-2">
+              <div className="rounded-md border border-white/10 bg-white/[0.06] p-2">
                 <p className="text-slate-400">Meilleur score</p>
                 <p className="font-black text-white">
                   {mission.progress ? `${mission.progress.bestScore}%` : "Non tentee"}

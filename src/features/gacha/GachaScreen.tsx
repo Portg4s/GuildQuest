@@ -83,7 +83,7 @@ export function GachaScreen({
       <header className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.22em] text-teal-200">Autel des etoiles</p>
-          <h1 className="text-2xl font-black text-white">Invocation</h1>
+          <h1 className="guild-title text-2xl">Invocation</h1>
           <p className="mt-1 text-sm text-slate-300">Invoque des allies et complete ta collection.</p>
         </div>
         <div className="flex flex-wrap gap-2">
@@ -100,7 +100,7 @@ export function GachaScreen({
         <ResourceCard icon={<Sparkles className="size-5" />} label="Poussiere" value={player.magicDust ?? 0} tone="teal" />
       </div>
 
-      <article className="relative isolate overflow-hidden rounded-xl border border-amber-200/20 bg-slate-900/90 p-4 shadow-2xl">
+      <article className="guild-panel magic-border relative isolate overflow-hidden p-4">
         <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_top,rgba(251,191,36,0.18),transparent_34%),radial-gradient(circle_at_bottom_right,rgba(20,184,166,0.14),transparent_30%)]" />
         <div className="flex items-start justify-between gap-3">
           <div>
@@ -123,7 +123,7 @@ export function GachaScreen({
             <span className="text-xs opacity-80">{gachaCosts.singlePullCost} gemmes</span>
           </Button>
           <Button
-            className="h-14 flex-col gap-1 border border-amber-200/30 bg-amber-300 text-slate-950 hover:bg-amber-200"
+            className="h-14 flex-col gap-1 border border-amber-200/50 bg-gradient-to-r from-amber-300 to-yellow-200 text-slate-950 hover:from-amber-200 hover:to-yellow-100"
             onClick={() => handleInvoke(10)}
             disabled={isInvoking || player.gems < gachaCosts.tenPullCost}
           >
@@ -143,7 +143,7 @@ export function GachaScreen({
           </p>
         )}
 
-        <details className="group mt-3 rounded-lg border border-white/10 bg-black/20 p-3">
+        <details className="group mt-3 rounded-lg border border-white/10 bg-black/25 p-3">
           <summary className="flex cursor-pointer list-none items-center justify-between text-sm font-black text-white">
             Taux de rarete
             <ChevronDown className="size-4 transition group-open:rotate-180" aria-hidden="true" />
@@ -176,7 +176,7 @@ export function GachaScreen({
         <motion.section
           initial={{ opacity: 0, y: 18 }}
           animate={{ opacity: 1, y: 0 }}
-          className={cn("space-y-3 rounded-xl border p-3", effect.border, effect.backdrop)}
+          className={cn("magic-border space-y-3 rounded-xl border p-3", effect.border, effect.backdrop)}
         >
           <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
             <div>
@@ -237,7 +237,7 @@ export function GachaScreen({
 
 function ResourceCard({ icon, label, value, tone }: { icon: ReactNode; label: string; value: number; tone: "amber" | "teal" }) {
   return (
-    <div className={cn("rounded-lg border p-3", tone === "amber" ? "border-amber-200/20 bg-amber-300/10" : "border-teal-200/20 bg-teal-300/10")}>
+    <div className={cn("rounded-lg border p-3 backdrop-blur", tone === "amber" ? "border-amber-200/25 bg-amber-300/10 shadow-[0_0_24px_rgba(250,204,21,0.12)]" : "border-teal-200/25 bg-teal-300/10 shadow-[0_0_24px_rgba(45,212,191,0.12)]")}>
       <div className="flex items-center gap-2 text-slate-300">
         {icon}
         <p className="text-sm">{label}</p>
@@ -249,7 +249,7 @@ function ResourceCard({ icon, label, value, tone }: { icon: ReactNode; label: st
 
 function SummaryStat({ label, value }: { label: string; value: number | string }) {
   return (
-    <div className="rounded-lg bg-black/25 p-2">
+    <div className="rounded-lg border border-white/10 bg-black/25 p-2">
       <p className="text-xs font-semibold text-slate-300">{label}</p>
       <p className="mt-1 text-lg font-black text-white">{value}</p>
     </div>

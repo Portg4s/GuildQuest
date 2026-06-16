@@ -5,11 +5,10 @@ export const buttonVariants = cva(
   {
     variants: {
       variant: {
-        default: "bg-primary text-primary-foreground hover:bg-primary/90",
-        secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/80",
-        ghost: "hover:bg-white/10 hover:text-white",
-        guild:
-          "border border-white/10 bg-white/[0.08] text-slate-100 hover:border-teal-200/50 hover:bg-teal-300/15 hover:text-white"
+        default: "guild-button-primary",
+        secondary: "guild-button-danger",
+        ghost: "hover:bg-white/10 hover:text-white active:scale-[0.98]",
+        guild: "guild-button-secondary"
       },
       size: {
         default: "h-10 px-4 py-2",

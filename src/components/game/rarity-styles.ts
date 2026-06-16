@@ -9,11 +9,11 @@ export const rarityLabels: Record<CharacterRarity, string> = {
 };
 
 export const rarityCardClasses: Record<CharacterRarity, string> = {
-  COMMON: "border-slate-300/25 bg-slate-300/10 text-slate-100",
-  RARE: "border-sky-300/35 bg-sky-300/10 text-sky-100",
-  EPIC: "border-violet-300/40 bg-violet-300/10 text-violet-100",
-  LEGENDARY: "border-amber-300/45 bg-amber-300/10 text-amber-100",
-  MYTHIC: "border-rose-300/45 bg-rose-300/10 text-rose-100"
+  COMMON: "rarity-frame-common text-slate-100",
+  RARE: "rarity-frame-rare text-sky-100",
+  EPIC: "rarity-frame-epic text-violet-100",
+  LEGENDARY: "rarity-frame-legendary text-amber-100",
+  MYTHIC: "rarity-frame-mythic text-rose-100"
 };
 
 export const rarityBadgeClasses: Record<CharacterRarity, string> = {

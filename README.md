@@ -42,6 +42,8 @@ Les images de personnages privees peuvent etre placees localement dans `public/p
 Pour declarer des personnages locaux, copier `src/data/characters/characters.local.template.ts` vers `src/data/characters/characters.local.ts`.
 Ce fichier local est ignore par Git. Si une image privee est absente, l'interface utilise automatiquement le placeholder du personnage.
 
+Voir aussi `PRIVATE_ASSETS_GUIDE.md` pour les formats recommandes, les chemins a utiliser et les precautions avant commit.
+
 ## Offline / PWA
 
 La V1 ne prevoit aucun backend. Les donnees locales sont destinees a IndexedDB via Dexie, et la configuration PWA est preparee avec `vite-plugin-pwa`.

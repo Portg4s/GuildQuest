@@ -26,7 +26,7 @@ export function CharacterDetailScreen({
       <header className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.22em] text-teal-200">Fiche personnage</p>
-          <h1 className="text-3xl font-black text-white">{character.name}</h1>
+          <h1 className="guild-title text-3xl">{character.name}</h1>
         </div>
         <Button variant="guild" onClick={onBackCollection}>
           <ArrowLeft className="mr-2 size-4" aria-hidden="true" />
@@ -38,7 +38,7 @@ export function CharacterDetailScreen({
         initial={{ opacity: 0, y: 18, rotate: -1 }}
         animate={{ opacity: 1, y: 0, rotate: 0 }}
         className={cn(
-          "rounded-lg border p-5 shadow-2xl",
+          "magic-border rounded-xl border p-5 shadow-2xl",
           rarityCardClasses[character.rarity],
           rarityGlowClasses[character.rarity]
         )}
@@ -56,7 +56,7 @@ export function CharacterDetailScreen({
         <CharacterImage
           character={character}
           className={cn(
-            "mx-auto mt-6 size-36 rounded-lg border border-white/10 bg-white/10 p-5",
+            "mx-auto mt-6 size-36 rounded-xl border border-white/10 bg-white/10 p-5",
             !owned && "grayscale opacity-45"
           )}
         />
@@ -86,7 +86,7 @@ export function CharacterDetailScreen({
 
 function InfoBlock({ label, value }: { label: string; value: string | number }) {
   return (
-    <div className="rounded-lg bg-black/20 p-3">
+    <div className="rounded-lg border border-white/10 bg-black/20 p-3">
       <p className="text-xs font-bold uppercase text-slate-300">{label}</p>
       <p className="mt-1 text-lg font-black text-white">{value}</p>
     </div>

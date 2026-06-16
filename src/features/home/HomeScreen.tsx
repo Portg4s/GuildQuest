@@ -55,14 +55,14 @@ export function HomeScreen({
       transition={{ duration: 0.42, ease: "easeOut" }}
       className="flex flex-1 flex-col gap-3 pb-3"
     >
-      <header className="sticky top-0 z-10 -mx-4 flex items-center justify-between gap-3 border-b border-white/10 bg-slate-950/85 px-4 py-3 backdrop-blur sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8">
+      <header className="sticky top-0 z-10 -mx-4 flex items-center justify-between gap-3 border-b border-teal-200/15 bg-slate-950/80 px-4 py-3 shadow-[0_12px_30px_rgba(0,0,0,0.24)] backdrop-blur sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8">
         <div className="flex min-w-0 items-center gap-3">
-          <div className="grid size-10 shrink-0 place-items-center rounded-lg border border-teal-300/30 bg-teal-300/10 shadow-glow">
+          <div className="magic-border rune-mark grid size-10 shrink-0 place-items-center rounded-xl border border-teal-300/30 bg-teal-300/10 shadow-glow">
             <Shield className="size-5 text-teal-200" aria-hidden="true" />
           </div>
           <div className="min-w-0">
             <p className="text-[0.68rem] font-semibold uppercase tracking-[0.18em] text-teal-200">Hall</p>
-            <h1 className="truncate text-2xl font-black text-white">GuildQuest</h1>
+            <h1 className="guild-title truncate text-2xl">GuildQuest</h1>
           </div>
         </div>
         <div className="flex shrink-0 items-center gap-2">
@@ -70,7 +70,7 @@ export function HomeScreen({
           <button
             type="button"
             onClick={onGoToSettings}
-            className="grid size-10 place-items-center rounded-lg border border-white/10 bg-white/[0.06] text-slate-200"
+            className="guild-button-secondary grid size-10 place-items-center rounded-lg text-slate-200"
             aria-label="Parametres"
           >
             <Settings className="size-5" aria-hidden="true" />
@@ -78,13 +78,13 @@ export function HomeScreen({
         </div>
       </header>
 
-      <section className="rounded-lg border border-white/10 bg-white/[0.07] p-4 shadow-2xl backdrop-blur">
+      <section className="guild-panel magic-border p-4">
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
             <p className="text-sm text-slate-300">Bienvenue,</p>
-            <h2 className="truncate text-4xl font-black leading-none text-white">{player.username}</h2>
+            <h2 className="guild-title truncate text-4xl leading-none">{player.username}</h2>
             <div className="mt-3 flex flex-wrap gap-2">
-              <span className="rounded-md bg-teal-300 px-2.5 py-1 text-[0.68rem] font-black uppercase text-slate-950">
+              <span className="rounded-md bg-gradient-to-r from-teal-300 to-cyan-200 px-2.5 py-1 text-[0.68rem] font-black uppercase text-slate-950 shadow-glow">
                 {player.rank}
               </span>
               {activeTitle && (
@@ -105,9 +105,9 @@ export function HomeScreen({
                 {player.xp} / {player.nextLevelXp}
               </span>
             </div>
-            <div className="h-2.5 overflow-hidden rounded-full bg-slate-950">
+            <div className="h-2.5 overflow-hidden rounded-full bg-slate-950 shadow-inner">
               <div
-                className="h-full rounded-full bg-gradient-to-r from-teal-300 to-amber-300"
+                className="h-full rounded-full bg-gradient-to-r from-teal-300 via-cyan-200 to-amber-300 shadow-glow"
                 style={{ width: `${xpProgress}%` }}
               />
             </div>
@@ -128,11 +128,11 @@ export function HomeScreen({
           onOpenMap={onGoToMap}
         />
 
-        <section className="rounded-lg border border-white/10 bg-slate-900/80 p-3">
+        <section className="guild-card p-3">
           <div className="flex items-center gap-3">
             <CharacterImage
               character={activeCharacter}
-              className="size-16 shrink-0 rounded-lg border border-white/10 bg-white/10 p-2"
+              className="size-16 shrink-0 rounded-xl border border-white/10 bg-white/10 p-2"
             />
             <div className="min-w-0 flex-1">
               <p className="text-[0.68rem] font-semibold uppercase tracking-[0.16em] text-teal-200">Personnage actif</p>

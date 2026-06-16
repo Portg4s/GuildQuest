@@ -23,7 +23,7 @@ export const rarityEffects: Record<CharacterRarity, RarityEffect> = {
     intensityLabel: "Rune stable"
   },
   RARE: {
-    aura: "from-sky-300/28 via-cyan-400/12 to-slate-950",
+    aura: "from-sky-300/30 via-cyan-400/10 to-slate-950",
     backdrop: "bg-sky-300/10",
     border: "border-sky-200/40",
     flash: "bg-sky-200/45",
@@ -33,8 +33,8 @@ export const rarityEffects: Record<CharacterRarity, RarityEffect> = {
     intensityLabel: "Echo rare"
   },
   EPIC: {
-    aura: "from-violet-300/35 via-fuchsia-400/14 to-slate-950",
-    backdrop: "bg-violet-300/12",
+    aura: "from-violet-300/35 via-fuchsia-400/15 to-slate-950",
+    backdrop: "bg-violet-300/10",
     border: "border-violet-200/50",
     flash: "bg-violet-200/55",
     particle: "bg-fuchsia-200/80",
@@ -43,8 +43,8 @@ export const rarityEffects: Record<CharacterRarity, RarityEffect> = {
     intensityLabel: "Convergence epique"
   },
   LEGENDARY: {
-    aura: "from-amber-300/45 via-orange-400/18 to-slate-950",
-    backdrop: "bg-amber-300/14",
+    aura: "from-amber-300/45 via-orange-400/20 to-slate-950",
+    backdrop: "bg-amber-300/15",
     border: "border-amber-200/60",
     flash: "bg-amber-100/65",
     particle: "bg-amber-100/90",
@@ -53,8 +53,8 @@ export const rarityEffects: Record<CharacterRarity, RarityEffect> = {
     intensityLabel: "Impact legendaire"
   },
   MYTHIC: {
-    aura: "from-rose-300/45 via-fuchsia-400/22 to-slate-950",
-    backdrop: "bg-rose-300/14",
+    aura: "from-rose-300/45 via-fuchsia-400/20 to-slate-950",
+    backdrop: "bg-rose-300/15",
     border: "border-rose-200/70",
     flash: "bg-rose-100/70",
     particle: "bg-rose-100/95",

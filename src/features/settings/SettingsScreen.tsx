@@ -41,7 +41,7 @@ export function SettingsScreen({
       <header className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.22em] text-teal-200">GuildQuest</p>
-          <h1 className="text-2xl font-black text-white">Parametres</h1>
+          <h1 className="guild-title text-2xl">Parametres</h1>
           <p className="mt-1 text-sm text-slate-300">Preferences locales et sauvegardes offline.</p>
         </div>
         <Button variant="guild" onClick={onBackHome}>
@@ -50,7 +50,7 @@ export function SettingsScreen({
         </Button>
       </header>
 
-      <article className="rounded-lg border border-white/10 bg-slate-900/90 p-4">
+      <article className="guild-card p-4">
         <h2 className="text-xl font-black text-white">Profil local</h2>
         <div className="mt-3 grid grid-cols-2 gap-2">
           <SettingStat label="Pseudo" value={player.username} />
@@ -60,7 +60,7 @@ export function SettingsScreen({
         </div>
       </article>
 
-      <article className="rounded-lg border border-white/10 bg-slate-900/90 p-4">
+      <article className="guild-card p-4">
         <div className="flex items-center gap-2">
           <SlidersHorizontal className="size-5 text-teal-100" aria-hidden="true" />
           <h2 className="text-xl font-black text-white">Preferences</h2>
@@ -80,7 +80,7 @@ export function SettingsScreen({
             enabled={settings.animationsEnabled}
             onToggle={() => updateSettings({ animationsEnabled: !settings.animationsEnabled })}
           />
-          <div className="rounded-lg bg-white/[0.06] p-3">
+          <div className="rounded-lg border border-white/10 bg-white/[0.06] p-3">
             <p className="text-sm font-bold text-white">Vitesse animations</p>
             <div className="mt-3 grid grid-cols-3 gap-2">
               {(["normal", "fast", "reduced"] as const).map((speed) => (
@@ -102,7 +102,7 @@ export function SettingsScreen({
         </div>
       </article>
 
-      <article className="rounded-lg border border-teal-200/20 bg-teal-300/10 p-4">
+      <article className="guild-card magic-border border-teal-200/25 bg-teal-300/10 p-4">
         <h2 className="text-xl font-black text-white">Sauvegarde locale</h2>
         <p className="mt-2 text-sm leading-6 text-slate-200">
           GuildQuest fonctionne offline, sans backend ni synchronisation cloud. Les donnees sont stockees
@@ -114,7 +114,7 @@ export function SettingsScreen({
         </Button>
       </article>
 
-      <article className="rounded-lg border border-red-300/30 bg-red-400/10 p-4">
+      <article className="rounded-xl border border-red-300/30 bg-red-400/10 p-4 shadow-[0_0_26px_rgba(248,113,113,0.1)]">
         <h2 className="text-xl font-black text-white">Zone danger</h2>
         <p className="mt-2 text-sm leading-6 text-red-50">
           Le reset local efface progression, collection, gacha, badges, titres et preferences.
@@ -130,7 +130,7 @@ export function SettingsScreen({
 
 function SettingStat({ label, value }: { label: string; value: string | number }) {
   return (
-    <div className="rounded-lg bg-white/[0.06] p-2.5">
+    <div className="rounded-lg border border-white/10 bg-white/[0.06] p-2.5">
       <p className="text-sm text-slate-400">{label}</p>
       <p className="mt-1 font-black text-white">{value}</p>
     </div>
@@ -151,7 +151,7 @@ function ToggleRow({
   onToggle: () => void;
 }) {
   return (
-    <div className="flex items-center justify-between gap-3 rounded-lg bg-white/[0.06] p-3">
+    <div className="flex items-center justify-between gap-3 rounded-lg border border-white/10 bg-white/[0.06] p-3">
       <div className="flex items-center gap-3">
         <div className="text-teal-100">{icon}</div>
         <div>

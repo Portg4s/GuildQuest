@@ -67,7 +67,7 @@ export function QuizScreen({ quiz, onExit, onComplete }: QuizScreenProps) {
           <p className="text-xs font-semibold uppercase tracking-[0.22em] text-teal-200">
             Question {questionIndex + 1} / {quiz.questions.length}
           </p>
-          <h1 className="text-3xl font-black text-white">{quiz.title}</h1>
+          <h1 className="guild-title text-3xl">{quiz.title}</h1>
         </div>
         <Button variant="guild" onClick={onExit}>
           <ArrowLeft className="mr-2 size-4" aria-hidden="true" />
@@ -75,20 +75,20 @@ export function QuizScreen({ quiz, onExit, onComplete }: QuizScreenProps) {
         </Button>
       </header>
 
-      <div className="h-2 overflow-hidden rounded-full bg-slate-900">
+      <div className="h-2 overflow-hidden rounded-full bg-slate-950 shadow-inner">
         <div
-          className="h-full rounded-full bg-gradient-to-r from-teal-300 to-amber-300"
+          className="h-full rounded-full bg-gradient-to-r from-teal-300 via-cyan-200 to-amber-300 shadow-glow"
           style={{ width: `${((questionIndex + 1) / quiz.questions.length) * 100}%` }}
         />
       </div>
 
-      <article className="rounded-lg border border-white/10 bg-slate-900/90 p-5 shadow-2xl">
+      <article className="guild-panel magic-border p-5">
         <div className="flex flex-wrap gap-2">
           <span className="rounded-md bg-white/[0.07] px-2.5 py-1 text-xs font-bold text-slate-200">
             {currentQuestion.type === "MULTIPLE_CHOICE" ? "Choix multiples" : "Choix unique"}
           </span>
           {currentQuestion.type === "TRUE_FALSE" && (
-            <span className="rounded-md bg-teal-300/15 px-2.5 py-1 text-xs font-bold text-teal-100">
+            <span className="rounded-md border border-teal-200/25 bg-teal-300/15 px-2.5 py-1 text-xs font-bold text-teal-100">
               Vrai / Faux
             </span>
           )}
@@ -106,9 +106,9 @@ export function QuizScreen({ quiz, onExit, onComplete }: QuizScreenProps) {
                 type="button"
                 onClick={() => selectOption(option.id)}
                 className={cn(
-                  "flex min-h-14 items-center justify-between rounded-lg border px-4 py-3 text-left text-sm font-bold transition",
+                  "flex min-h-14 items-center justify-between rounded-lg border px-4 py-3 text-left text-sm font-bold transition active:scale-[0.99]",
                   "border-white/10 bg-white/[0.06] text-slate-100 hover:border-teal-200/50 hover:bg-teal-300/10",
-                  selected && "border-teal-200 bg-teal-300/15 text-white",
+                  selected && "border-teal-200 bg-teal-300/15 text-white shadow-glow",
                   shouldShowCorrect && "border-emerald-300 bg-emerald-300/15 text-emerald-50",
                   shouldShowWrong && "border-red-300 bg-red-400/15 text-red-50"
                 )}

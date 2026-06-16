@@ -38,7 +38,7 @@ export function ZoneDetailScreen({
       <header className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.22em] text-teal-200">Exploration de zone</p>
-          <h1 className="text-3xl font-black text-white">{zone.name}</h1>
+          <h1 className="guild-title text-3xl">{zone.name}</h1>
           <p className="mt-2 text-sm text-slate-300">{zone.description}</p>
         </div>
         <Button variant="guild" onClick={onBackMap}>
@@ -47,10 +47,10 @@ export function ZoneDetailScreen({
         </Button>
       </header>
 
-      <article className="rounded-lg border border-white/10 bg-slate-900/90 p-5">
+      <article className="guild-panel magic-border p-5">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-3">
-            <div className="grid size-11 place-items-center rounded-lg bg-teal-300/15 text-teal-100">
+            <div className="rune-mark grid size-11 place-items-center rounded-xl border border-teal-200/25 bg-teal-300/15 text-teal-100">
               <Route className="size-6" aria-hidden="true" />
             </div>
             <div>
@@ -60,9 +60,9 @@ export function ZoneDetailScreen({
           </div>
           <StatusBadge status={zoneProgress.status} />
         </div>
-        <div className="mt-4 h-3 overflow-hidden rounded-full bg-slate-950">
+        <div className="mt-4 h-3 overflow-hidden rounded-full bg-slate-950 shadow-inner">
           <div
-            className="h-full rounded-full bg-gradient-to-r from-teal-300 to-amber-300"
+            className="h-full rounded-full bg-gradient-to-r from-teal-300 via-cyan-200 to-amber-300 shadow-glow"
             style={{ width: `${zoneProgress.progressPercent}%` }}
           />
         </div>
@@ -75,7 +75,7 @@ export function ZoneDetailScreen({
             initial={{ opacity: 0, x: -16 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: index * 0.04, duration: 0.28 }}
-            className="relative rounded-lg border border-white/10 bg-white/[0.07] p-4"
+            className="guild-card relative p-4"
           >
             {index < nodes.length - 1 && (
               <div className="absolute left-8 top-full h-4 w-px bg-teal-300/30" aria-hidden="true" />
@@ -133,7 +133,7 @@ function QuizLaunchRow({
   onStartQuiz: (quiz: Quiz) => void;
 }) {
   return (
-    <div className="rounded-lg border border-white/10 bg-slate-950/50 p-3">
+    <div className="rounded-lg border border-white/10 bg-slate-950/55 p-3 transition hover:border-teal-200/30">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <p className="text-xs font-bold uppercase tracking-[0.16em] text-amber-200">Rang {quiz.rank}</p>

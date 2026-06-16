@@ -38,10 +38,10 @@ export function ResultsScreen({
     >
       <header>
         <p className="text-xs font-semibold uppercase tracking-[0.22em] text-teal-200">Rapport de mission</p>
-        <h1 className="text-3xl font-black text-white">{quiz.title}</h1>
+        <h1 className="guild-title text-3xl">{quiz.title}</h1>
       </header>
 
-      <article className="rounded-lg border border-white/10 bg-slate-900/90 p-5 text-center shadow-2xl">
+      <article className="guild-panel magic-border p-5 text-center">
         <p className="text-sm font-bold uppercase tracking-[0.18em] text-amber-200">
           {getResultStatus(scoreResult.score)}
         </p>
@@ -51,12 +51,12 @@ export function ResultsScreen({
         </p>
 
         <div className="mt-6 grid gap-3 sm:grid-cols-2">
-          <div className="rounded-lg border border-teal-200/20 bg-teal-300/10 p-4">
+          <div className="rounded-lg border border-teal-200/25 bg-teal-300/10 p-4 shadow-[0_0_28px_rgba(45,212,191,0.12)]">
             <Trophy className="mx-auto size-6 text-teal-100" aria-hidden="true" />
             <p className="mt-2 text-2xl font-black text-white">+{rewards.xpGained}</p>
             <p className="text-sm text-teal-100">XP gagnee</p>
           </div>
-          <div className="rounded-lg border border-amber-200/20 bg-amber-300/10 p-4">
+          <div className="rounded-lg border border-amber-200/25 bg-amber-300/10 p-4 shadow-[0_0_28px_rgba(250,204,21,0.12)]">
             <Gem className="mx-auto size-6 text-amber-100" aria-hidden="true" />
             <p className="mt-2 text-2xl font-black text-white">+{rewards.gemsGained}</p>
             <p className="text-sm text-amber-100">Gemmes gagnees</p>
@@ -73,7 +73,7 @@ export function ResultsScreen({
           initial={{ opacity: 0, scale: 0.92, y: 12 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           transition={{ delay: 0.12, duration: 0.38, ease: "easeOut" }}
-          className="rounded-lg border border-amber-200/30 bg-amber-300/10 p-5 text-center shadow-[0_0_42px_rgba(252,211,77,0.22)]"
+          className="magic-border rounded-xl border border-amber-200/30 bg-amber-300/10 p-5 text-center shadow-[0_0_42px_rgba(252,211,77,0.22)]"
         >
           <Sparkles className="mx-auto size-8 text-amber-100" aria-hidden="true" />
           <p className="mt-2 text-sm font-black uppercase tracking-[0.22em] text-amber-100">Niveau superieur !</p>
@@ -86,7 +86,7 @@ export function ResultsScreen({
         </motion.article>
       )}
 
-      <article className="rounded-lg border border-white/10 bg-slate-900/90 p-5">
+      <article className="guild-card p-5">
         <h2 className="text-xl font-black text-white">Resume des recompenses</h2>
         <div className="mt-4 grid gap-3 sm:grid-cols-2">
           <RewardLine label="XP de mission" value={`+${rewards.xpGained}`} />
@@ -122,7 +122,7 @@ export function ResultsScreen({
 
 function RewardLine({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-lg bg-white/[0.06] p-3">
+    <div className="rounded-lg border border-white/10 bg-white/[0.06] p-3">
       <p className="text-sm text-slate-400">{label}</p>
       <p className="mt-1 text-2xl font-black text-white">{value}</p>
     </div>

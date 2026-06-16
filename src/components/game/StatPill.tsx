@@ -10,14 +10,14 @@ type StatPillProps = {
 };
 
 const toneClasses = {
-  default: "border-white/10 bg-white/[0.06] text-slate-100",
-  gold: "border-amber-200/20 bg-amber-300/10 text-amber-100",
-  teal: "border-teal-200/20 bg-teal-300/10 text-teal-100"
+  default: "border-white/10 bg-white/[0.08] text-slate-100",
+  gold: "border-amber-200/30 bg-amber-300/10 text-amber-100 shadow-[0_0_22px_rgba(250,204,21,0.12)]",
+  teal: "border-teal-200/30 bg-teal-300/10 text-teal-100 shadow-[0_0_22px_rgba(45,212,191,0.12)]"
 };
 
 export function StatPill({ icon, label, value, tone = "default", className }: StatPillProps) {
   return (
-    <div className={cn("flex min-w-0 items-center gap-2 rounded-lg border px-3 py-2", toneClasses[tone], className)}>
+    <div className={cn("flex min-w-0 items-center gap-2 rounded-lg border px-3 py-2 backdrop-blur", toneClasses[tone], className)}>
       {icon && <span className="shrink-0">{icon}</span>}
       <div className="min-w-0">
         <p className="truncate text-[0.68rem] font-semibold uppercase tracking-[0.12em] opacity-75">{label}</p>

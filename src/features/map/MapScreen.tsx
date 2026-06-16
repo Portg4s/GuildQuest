@@ -16,7 +16,7 @@ export function MapScreen({ pack, regionProgress, onBackHome, onExploreZone }: M
       <header className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.22em] text-teal-200">Pack actif : {pack.name}</p>
-          <h1 className="text-3xl font-black text-white">Carte des regions</h1>
+          <h1 className="guild-title text-3xl">Carte des regions</h1>
           <p className="mt-2 text-sm text-slate-300">{pack.description}</p>
         </div>
         <Button variant="guild" onClick={onBackHome}>
@@ -25,10 +25,10 @@ export function MapScreen({ pack, regionProgress, onBackHome, onExploreZone }: M
         </Button>
       </header>
 
-      <article className="rounded-lg border border-white/10 bg-slate-900/90 p-5 shadow-2xl">
+      <article className="guild-panel magic-border p-5">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-3">
-            <div className="grid size-12 place-items-center rounded-lg bg-teal-300/15 text-teal-100 shadow-glow">
+            <div className="rune-mark grid size-12 place-items-center rounded-xl border border-teal-200/25 bg-teal-300/15 text-teal-100 shadow-glow">
               <Map className="size-6" aria-hidden="true" />
             </div>
             <div>
@@ -73,7 +73,7 @@ function ZoneCard({
   onExploreZone: (zoneId: string) => void;
 }) {
   return (
-    <article className="relative overflow-hidden rounded-lg border border-white/10 bg-white/[0.07] p-4 shadow-xl">
+    <article className="guild-card relative overflow-hidden p-4 transition hover:-translate-y-0.5">
       <div className="absolute right-4 top-4 text-6xl font-black text-white/[0.04]">{index + 1}</div>
       <div className="relative">
         <div className="flex items-start justify-between gap-3">
@@ -89,9 +89,9 @@ function ZoneCard({
             <span>{zoneProgress.validatedQuizCount} / {zoneProgress.quizCount} quiz valides</span>
             <span className="font-bold text-white">{zoneProgress.progressPercent}%</span>
           </div>
-          <div className="h-2 overflow-hidden rounded-full bg-slate-950">
+          <div className="h-2 overflow-hidden rounded-full bg-slate-950 shadow-inner">
             <div
-              className="h-full rounded-full bg-gradient-to-r from-teal-300 to-amber-300"
+              className="h-full rounded-full bg-gradient-to-r from-teal-300 via-cyan-200 to-amber-300 shadow-glow"
               style={{ width: `${zoneProgress.progressPercent}%` }}
             />
           </div>
@@ -107,7 +107,7 @@ function ZoneCard({
 
 function MapStat({ label, value }: { label: string; value: string | number }) {
   return (
-    <div className="rounded-lg bg-white/[0.06] p-3">
+    <div className="rounded-lg border border-white/10 bg-white/[0.06] p-3">
       <p className="text-sm text-slate-400">{label}</p>
       <p className="mt-1 text-2xl font-black text-white">{value}</p>
     </div>

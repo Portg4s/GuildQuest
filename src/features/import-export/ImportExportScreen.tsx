@@ -101,7 +101,7 @@ export function ImportExportScreen({ onBackSettings, onBackHome, onImported, onR
       <header className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.22em] text-teal-200">Donnees locales</p>
-          <h1 className="text-3xl font-black text-white">Import / Export</h1>
+          <h1 className="guild-title text-3xl">Import / Export</h1>
           <p className="mt-2 text-sm text-slate-300">Sauvegarde et restaure GuildQuest sans backend.</p>
         </div>
         <div className="flex flex-wrap gap-2">
@@ -113,7 +113,7 @@ export function ImportExportScreen({ onBackSettings, onBackHome, onImported, onR
         </div>
       </header>
 
-      <article className="rounded-lg border border-white/10 bg-slate-900/90 p-5">
+      <article className="guild-card p-5">
         <h2 className="text-xl font-black text-white">Export JSON complet</h2>
         <p className="mt-2 text-sm leading-6 text-slate-300">
           Inclut joueur, progression quiz, collection, gacha, badges, titres, preferences et packs installes.
@@ -125,7 +125,7 @@ export function ImportExportScreen({ onBackSettings, onBackHome, onImported, onR
         </Button>
       </article>
 
-      <article className="rounded-lg border border-white/10 bg-slate-900/90 p-5">
+      <article className="guild-card p-5">
         <h2 className="text-xl font-black text-white">Import JSON</h2>
         <p className="mt-2 text-sm leading-6 text-slate-300">
           Choisis un fichier `.json` GuildQuest. L'import ne sera applique qu'apres confirmation.
@@ -153,7 +153,7 @@ export function ImportExportScreen({ onBackSettings, onBackHome, onImported, onR
       </article>
 
       {state.summary && (
-        <article className="rounded-lg border border-teal-200/20 bg-teal-300/10 p-5">
+        <article className="guild-card magic-border border-teal-200/25 bg-teal-300/10 p-5">
           <h2 className="text-xl font-black text-white">Resume detecte</h2>
           <div className="mt-4 grid gap-3 sm:grid-cols-2">
             <SummaryLine label="Exportee le" value={new Date(state.summary.exportedAt).toLocaleString("fr-FR")} />
@@ -176,7 +176,7 @@ export function ImportExportScreen({ onBackSettings, onBackHome, onImported, onR
         </div>
       )}
 
-      <article className="rounded-lg border border-red-300/30 bg-red-400/10 p-5">
+      <article className="rounded-xl border border-red-300/30 bg-red-400/10 p-5 shadow-[0_0_26px_rgba(248,113,113,0.1)]">
         <h2 className="text-xl font-black text-white">Reset local</h2>
         <p className="mt-2 text-sm leading-6 text-red-50">
           Efface toutes les donnees GuildQuest locales et recree le joueur `leb` niveau 1 avec 200 gemmes.
@@ -191,7 +191,7 @@ export function ImportExportScreen({ onBackSettings, onBackHome, onImported, onR
 
 function SummaryLine({ label, value }: { label: string; value: string | number }) {
   return (
-    <div className="rounded-lg bg-white/[0.06] p-3">
+    <div className="rounded-lg border border-white/10 bg-white/[0.06] p-3">
       <p className="text-sm text-slate-400">{label}</p>
       <p className="mt-1 font-black text-white">{value}</p>
     </div>

@@ -451,8 +451,8 @@ function App() {
   };
 
   return (
-    <main className="min-h-screen overflow-hidden bg-slate-950 text-slate-50">
-      <div className="fixed inset-0 bg-[radial-gradient(circle_at_top_left,rgba(20,184,166,0.24),transparent_32%),linear-gradient(135deg,rgba(49,46,129,0.7),rgba(15,23,42,0.96)_48%,rgba(30,41,59,1))]" />
+    <main className="guild-background arcane-background min-h-screen overflow-hidden text-slate-50">
+      <div className="pointer-events-none fixed inset-0 bg-[radial-gradient(circle_at_50%_-10%,rgba(250,204,21,0.12),transparent_28%),radial-gradient(circle_at_10%_30%,rgba(45,212,191,0.16),transparent_26%),linear-gradient(180deg,rgba(2,6,23,0.1),rgba(2,6,23,0.74))]" />
       <div className="relative mx-auto flex min-h-screen w-full max-w-5xl flex-col px-4 py-5 sm:px-6 lg:px-8">
         {persistenceError && (
           <div className="mb-4 rounded-lg border border-amber-300/30 bg-amber-300/10 p-3 text-sm font-semibold text-amber-100">

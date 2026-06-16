@@ -56,7 +56,7 @@ export function ProfileScreen({
       <header className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.22em] text-teal-200">Profil</p>
-          <h1 className="text-2xl font-black text-white">{player.username}</h1>
+          <h1 className="guild-title text-2xl">{player.username}</h1>
         </div>
         <div className="flex flex-wrap gap-2">
           <Button variant="guild" onClick={onGoToBadges}>Badges</Button>
@@ -68,9 +68,9 @@ export function ProfileScreen({
         </div>
       </header>
 
-      <article className="rounded-lg border border-white/10 bg-slate-900/90 p-4 shadow-2xl">
+      <article className="guild-panel magic-border p-4">
         <div className="flex items-center gap-3">
-          <div className="grid size-12 place-items-center rounded-lg bg-teal-300/15 text-teal-100">
+          <div className="rune-mark grid size-12 place-items-center rounded-xl border border-teal-200/25 bg-teal-300/15 text-teal-100">
             <UserRound className="size-6" aria-hidden="true" />
           </div>
           <div>
@@ -86,9 +86,9 @@ export function ProfileScreen({
               {player.xp} / {player.nextLevelXp} XP
             </span>
           </div>
-          <div className="h-3 overflow-hidden rounded-full bg-slate-950">
+          <div className="h-3 overflow-hidden rounded-full bg-slate-950 shadow-inner">
             <div
-              className="h-full rounded-full bg-gradient-to-r from-teal-300 to-amber-300"
+              className="h-full rounded-full bg-gradient-to-r from-teal-300 via-cyan-200 to-amber-300 shadow-glow"
               style={{ width: `${xpProgress}%` }}
             />
           </div>
@@ -110,17 +110,17 @@ export function ProfileScreen({
         </div>
       </article>
 
-      <article className="rounded-lg border border-amber-200/20 bg-amber-300/10 p-4">
+      <article className="guild-card magic-border border-amber-200/25 bg-amber-300/10 p-4">
         <p className="text-sm font-bold uppercase tracking-[0.18em] text-amber-100">Titre actif</p>
         <h2 className="mt-1 text-xl font-black text-white">{activeTitle?.label ?? "Aucun titre actif"}</h2>
         <p className="mt-1 text-sm text-slate-200">{activeTitle?.description ?? "Debloque un titre pour l'afficher ici."}</p>
       </article>
 
-      <article className="rounded-lg border border-white/10 bg-slate-900/90 p-4">
+      <article className="guild-card p-4">
         <p className="text-sm font-bold uppercase tracking-[0.18em] text-teal-200">Personnage actif</p>
         {activeCharacter ? (
           <div className="mt-4 flex items-center gap-4">
-            <CharacterImage character={activeCharacter} className="size-16 rounded-lg border border-white/10 bg-white/10 p-2" />
+            <CharacterImage character={activeCharacter} className="size-16 rounded-xl border border-white/10 bg-white/10 p-2" />
             <div>
               <h2 className="text-xl font-black text-white">{activeCharacter.name}</h2>
               <p className="mt-1 text-sm text-slate-300">{activeCharacter.element} - Puissance {activeCharacter.power}</p>
@@ -134,7 +134,7 @@ export function ProfileScreen({
         )}
       </article>
 
-      <article className="rounded-lg border border-red-300/20 bg-red-400/10 p-4">
+      <article className="rounded-xl border border-red-300/20 bg-red-400/10 p-4 shadow-[0_0_26px_rgba(248,113,113,0.1)]">
         <p className="text-sm font-bold uppercase tracking-[0.18em] text-red-100">Debug local</p>
         <p className="mt-1 text-sm text-slate-300">Outils locaux pour tester les invocations et les niveaux.</p>
         <div className="mt-3 grid grid-cols-2 gap-2">
@@ -150,7 +150,7 @@ export function ProfileScreen({
 
 function ProfileStat({ label, value, icon }: { label: string; value: string | number; icon?: React.ReactNode }) {
   return (
-    <div className="rounded-lg bg-white/[0.06] p-3">
+    <div className="rounded-lg border border-white/10 bg-white/[0.06] p-3">
       <div className="flex items-center gap-2 text-slate-400">
         {icon}
         <p className="text-sm">{label}</p>

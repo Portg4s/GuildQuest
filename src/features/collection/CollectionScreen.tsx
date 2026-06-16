@@ -40,7 +40,7 @@ export function CollectionScreen({
       <header className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.22em] text-teal-200">Archives de guilde</p>
-          <h1 className="text-2xl font-black text-white">Collection</h1>
+          <h1 className="guild-title text-2xl">Collection</h1>
           <p className="mt-1 text-sm text-slate-300">
             {collection.length} / {characters.length} personnages debloques
           </p>
@@ -60,7 +60,7 @@ export function CollectionScreen({
         ))}
       </div>
 
-      <div className="rounded-lg border border-teal-200/20 bg-teal-300/10 p-2.5 text-xs text-teal-50">
+      <div className="glass-panel p-2.5 text-xs text-teal-50">
         Les images privees locales sont chargees si elles existent dans /public/private-assets/characters/.
         Sinon, GuildQuest utilise les placeholders.
       </div>
@@ -74,8 +74,8 @@ export function CollectionScreen({
             <article
               key={character.id}
               className={cn(
-                "rounded-lg border p-3 transition",
-                owned ? rarityCardClasses[character.rarity] : "border-white/10 bg-slate-900/60 text-slate-500"
+                "rounded-xl border p-3 transition hover:-translate-y-0.5",
+                owned ? `${rarityCardClasses[character.rarity]} magic-border` : "border-white/10 bg-slate-900/60 text-slate-500"
               )}
             >
               <button type="button" className="block w-full text-left" onClick={() => onOpenCharacter(character)}>
@@ -88,7 +88,7 @@ export function CollectionScreen({
                 <CharacterImage
                   character={character}
                   className={cn(
-                    "mx-auto mt-3 size-20 rounded-lg border border-white/10 bg-white/10 p-2.5",
+                    "mx-auto mt-3 size-20 rounded-xl border border-white/10 bg-white/10 p-2.5",
                     !owned && "grayscale opacity-35"
                   )}
                 />
@@ -120,7 +120,7 @@ function FilterButton({ active, onClick, children }: { active: boolean; onClick:
       type="button"
       onClick={onClick}
       className={cn(
-        "shrink-0 rounded-lg border px-2.5 py-1.5 text-xs font-bold transition",
+        "shrink-0 rounded-lg border px-2.5 py-1.5 text-xs font-bold transition active:scale-[0.98]",
         active ? "border-teal-200 bg-teal-300 text-slate-950" : "border-white/10 bg-white/[0.06] text-slate-200"
       )}
     >

@@ -19,11 +19,11 @@ export function CompactProgressCard({
   onOpenMap
 }: CompactProgressCardProps) {
   return (
-    <section className="rounded-lg border border-white/10 bg-slate-900/80 p-3">
+    <section className="guild-card magic-border p-3">
       <div className="flex items-center justify-between gap-3">
         <div className="min-w-0">
-          <p className="text-[0.68rem] font-semibold uppercase tracking-[0.16em] text-amber-200">Progression</p>
-          <h3 className="truncate text-lg font-black text-white">{title}</h3>
+          <p className="text-[0.68rem] font-semibold uppercase tracking-[0.16em] text-amber-200">Tableau de quete</p>
+          <h3 className="guild-title truncate text-lg">{title}</h3>
           <p className="truncate text-xs text-slate-300">
             {regionName} - {validatedQuizCount} / {quizCount} quiz
           </p>
@@ -36,9 +36,9 @@ export function CompactProgressCard({
           </Button>
         </div>
       </div>
-      <div className="mt-3 h-2 overflow-hidden rounded-full bg-slate-950">
+      <div className="mt-3 h-2 overflow-hidden rounded-full bg-slate-950 shadow-inner">
         <div
-          className="h-full rounded-full bg-gradient-to-r from-teal-300 to-amber-300"
+          className="h-full rounded-full bg-gradient-to-r from-teal-300 via-cyan-200 to-amber-300 shadow-glow"
           style={{ width: `${progressPercent}%` }}
         />
       </div>

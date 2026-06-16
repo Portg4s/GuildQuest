@@ -4,111 +4,171 @@ Date : 16 juin 2026
 
 ## Resume
 
-Ajout d'une cinematique gacha plein ecran pour transformer l'invocation en experience plus proche d'un jeu mobile :
+Refonte visuelle globale de GuildQuest effectuee pour renforcer l'identite guilde magique / anime fantasy / RPG, sans ajouter d'asset externe ni d'image protegee.
 
-- overlay plein ecran ;
-- sequence de suspense ;
-- effets visuels selon la meilleure rarete obtenue ;
-- revelation x1 ou x10 ;
-- bouton `Passer` ;
-- bouton `Reveler maintenant` ;
-- carte personnage premium ;
-- resume post-invocation enrichi.
-
-La logique metier de tirage, la deduction des gemmes, les doublons, la poussiere magique, la collection, Dexie et Zustand n'ont pas ete changes en profondeur.
+La logique metier n'a pas ete modifiee en profondeur : quiz, gacha, Dexie, Zustand, import/export, reset, progression et persistance restent bases sur les mecanismes existants.
 
 ## Fichiers crees
 
-- `src/components/game/rarity-effects.ts`
-- `src/components/game/PremiumCharacterCard.tsx`
-- `src/features/gacha/GachaCinematic.tsx`
+- `PRIVATE_ASSETS_GUIDE.md`
 
 ## Fichiers modifies
 
-- `src/features/gacha/GachaScreen.tsx`
+- `src/styles/globals.css`
+- `src/components/ui/button-variants.ts`
 - `src/app/App.tsx`
+- `src/components/game/CharacterImage.tsx`
+- `src/components/game/QuickActionGrid.tsx`
+- `src/components/game/CompactProgressCard.tsx`
+- `src/components/game/StatPill.tsx`
+- `src/components/game/rarity-styles.ts`
+- `src/components/game/rarity-effects.ts`
+- `src/features/home/HomeScreen.tsx`
+- `src/features/missions/MissionsScreen.tsx`
+- `src/features/quiz/QuizScreen.tsx`
+- `src/features/results/ResultsScreen.tsx`
+- `src/features/collection/CollectionScreen.tsx`
+- `src/features/character-detail/CharacterDetailScreen.tsx`
+- `src/features/gacha/GachaScreen.tsx`
+- `src/features/badges/BadgesScreen.tsx`
+- `src/features/profile/ProfileScreen.tsx`
+- `src/features/map/MapScreen.tsx`
+- `src/features/map/ZoneDetailScreen.tsx`
+- `src/features/settings/SettingsScreen.tsx`
+- `src/features/import-export/ImportExportScreen.tsx`
+- `README.md`
 - `CODEX_REPORT.md`
 
-## Comportement invocation x1
+## Changements de theme global
 
-- Apres une invocation x1 reussie, une cinematique plein ecran s'ouvre si les animations sont activees.
-- La sequence affiche :
-  - reveil des runes ;
-  - aura selon la rarete obtenue ;
-  - carte revelee ;
-  - nom du personnage ;
-  - rarete ;
-  - element ;
-  - puissance ;
-  - statut `Nouveau !` ou `Doublon`.
-- En cas de doublon, les fragments et la poussiere magique gagnes sont affiches.
-- Le bouton `Passer` permet de fermer la cinematique et d'afficher le resume.
+- Ajout de variables et classes globales dans `src/styles/globals.css` :
+  - `guild-card`
+  - `guild-panel`
+  - `guild-button-primary`
+  - `guild-button-secondary`
+  - `guild-button-danger`
+  - `guild-title`
+  - `magic-border`
+  - `magic-glow`
+  - `arcane-background`
+  - `guild-background`
+  - `glass-panel`
+  - `rarity-frame-common`
+  - `rarity-frame-rare`
+  - `rarity-frame-epic`
+  - `rarity-frame-legendary`
+  - `rarity-frame-mythic`
+- Fond global plus travaille : gradients sombres, halos turquoise/dore/violet, grille magique CSS legere.
+- Boutons shadcn harmonises via `button-variants.ts`.
 
-## Comportement invocation x10
+## Changements Hall
 
-- L'intro utilise la meilleure rarete presente dans les 10 tirages.
-- La revelation affiche les 10 cartes en grille responsive.
-- Le resume indique :
-  - nombre total de personnages ;
-  - nouveaux personnages ;
-  - doublons ;
-  - fragments gagnes ;
-  - poussiere gagnee ;
-  - meilleure rarete obtenue.
-- Les boutons `Refaire x1`, `Refaire x10`, `Collection` et `Hall` sont disponibles apres le tirage.
+- Header plus premium avec embleme GuildQuest original en CSS.
+- Carte joueur transformee en fiche de mage plus marquee.
+- Actions rapides plus visuelles avec icones encadrees.
+- Progression actuelle style tableau de quete.
+- Personnage actif en carte de compagnon plus premium.
+- Hall conserve compact et mobile-first.
 
-## Effets selon rarete
+## Changements Missions
 
-Les effets sont centralises dans `src/components/game/rarity-effects.ts`.
+- Les missions ressemblent davantage a des quetes de guilde.
+- Badges de rang plus visibles.
+- Cartes avec `guild-card`, `magic-border`, hover discret et recompenses en capsules.
+- Filtres par statut et zone conserves.
+- Aucune mission supprimee.
 
-- COMMON : aura sobre, glow discret.
-- RARE : bleu/turquoise, effet plus vif.
-- EPIC : violet/fuchsia, pulse plus marque.
-- LEGENDARY : dore/orange, flash plus intense.
-- MYTHIC : rose/arcane, aura la plus visible.
+## Changements Quiz / Resultat
 
-## Carte personnage premium
+- Quiz :
+  - panneau principal plus immersif ;
+  - progress bar avec glow ;
+  - choix de reponse plus interactifs ;
+  - selection plus visible.
+- Resultat :
+  - rapport de mission plus premium ;
+  - recompenses XP/gemmes plus satisfaisantes ;
+  - bloc level-up renforce ;
+  - resume de recompenses harmonise.
 
-`PremiumCharacterCard` affiche :
+## Changements Collection / Gacha
 
-- image via `CharacterImage` avec fallback placeholder ;
-- nom ;
-- rarete ;
-- element ;
-- puissance ;
-- statut nouveau/doublon ;
-- fragments et poussiere en cas de doublon ;
-- style selon rarete.
+- Collection :
+  - cartes personnage avec frames par rarete ;
+  - cartes possedees plus premium ;
+  - silhouettes non debloquees conservees ;
+  - message assets prives harmonise.
+- Detail personnage :
+  - carte detail avec bordure magique et frame de rarete ;
+  - image/fallback mieux mis en valeur.
+- Gacha :
+  - autel et banniere active harmonises avec le nouveau theme ;
+  - ressources gemmes/poussiere plus visuelles ;
+  - resume post-invocation harmonise ;
+  - cinematique existante conservee.
 
-## Respect des preferences animations
+## Changements Badges / Titres
 
-- Si les animations sont desactivees, la longue cinematique n'est pas jouee et le resume s'affiche directement.
-- Si la vitesse est `fast`, les delais de cinematique sont raccourcis.
-- Si la vitesse est `reduced`, les particules sont desactivees et les animations sont plus sobres.
+- Badges obtenus avec `magic-border`.
+- Badges verrouilles plus sombres.
+- Titres actifs et cartes titres plus proches d'exploits de guilde.
+- Onglets et filtres conserves.
 
-## Ecran Invocation
+## Changements Parametres / Import Export
 
-L'ecran a ete enrichi sans refonte totale :
+- Parametres harmonises avec `guild-card`.
+- Zone sauvegarde locale mise en valeur.
+- Zone danger gardee rouge sombre.
+- Import/export JSON rendu plus coherent visuellement.
+- Aucun changement de logique d'import, export ou reset.
 
-- zone banniere active generique ;
-- autel plus premium ;
-- gemmes et poussiere mises en avant ;
-- boutons x1/x10 differencies ;
-- taux de rarete dans un bloc compact repliable ;
-- resume post-invocation compact.
+## Assets prives
+
+- Creation de `PRIVATE_ASSETS_GUIDE.md`.
+- README mis a jour avec un lien vers ce guide.
+- Rappel documente :
+  - placer les images dans `public/private-assets/characters/` ;
+  - declarer les personnages dans `src/data/characters/characters.local.ts` ;
+  - ne pas commit les assets prives ;
+  - l'export JSON ne contient pas les images.
+
+## Placeholder personnages
+
+- `CharacterImage` affiche maintenant un placeholder magique CSS si l'image privee ou le fallback image echoue.
+- Le fallback utilise :
+  - initiales du personnage ;
+  - frame selon rarete ;
+  - rune CSS ;
+  - aura visuelle.
+
+## Cohérence raretes
+
+- `rarity-styles.ts` utilise maintenant les frames globales.
+- Les raretes restent centralisees pour :
+  - gacha ;
+  - collection ;
+  - detail personnage ;
+  - personnage actif ;
+  - cartes premium.
 
 ## Limites eventuelles
 
-- Pas de son ni vibration pour cette etape.
-- Pas encore de vraie cinematique differente image par image pour chaque rarete.
-- Pas de verification visuelle navigateur integre avec capture, seulement demarrage Vite confirme.
-- Le bundle Vite depasse toujours 500 kB, avertissement non bloquant deja connu.
+- Pas d'ajout de police externe.
+- Pas de son, vibration ou effets canvas.
+- Pas d'image ni texture externe.
+- Certaines classes visuelles sont appliquees largement, mais une passe pixel-perfect mobile reste recommandee.
+- Le navigateur integre n'a pas pu etre utilise : le plugin Browser ne contient pas le fichier attendu `scripts/browser-client.mjs` dans le cache local.
+- Une tentative de `Start-Process npm` a echoue sous Windows, car `npm` seul n'etait pas resolu comme executable ; la verification dev a ensuite ete faite avec `npm run dev`.
 
 ## Commandes executees
 
 - `npm run lint`
 - `npm run build`
+- `Start-Process npm -ArgumentList 'run dev -- --host 127.0.0.1'`
+- `Start-Process npm.cmd -ArgumentList 'run dev -- --host 127.0.0.1'`
+- `Invoke-WebRequest -Uri http://127.0.0.1:5173/ -UseBasicParsing`
 - `npm run dev -- --host 127.0.0.1`
+- `git status --short`
 
 ## Resultat de `npm run lint`
 
@@ -137,18 +197,26 @@ Vite a annonce :
 
 La commande a ete arretee par timeout apres quelques secondes, car le serveur reste ouvert en continu.
 
+## Erreurs ou limites de verification
+
+- `Start-Process npm ...` a echoue sous Windows : aucune application associee a `npm`.
+- `Invoke-WebRequest` a echoue apres la tentative de demarrage en arriere-plan, car le serveur n'ecoutait pas sur `127.0.0.1:5173`.
+- Verification navigateur integre non realisee : module Browser attendu absent du cache.
+
 ## Points a verifier manuellement
 
-- Faire une invocation x1 avec animations activees.
-- Tester le bouton `Passer`.
-- Tester `Reveler maintenant`.
-- Faire une invocation x10.
-- Verifier que la meilleure rarete influence l'aura.
-- Verifier l'affichage des doublons, fragments et poussiere.
-- Desactiver les animations dans Parametres puis refaire une invocation.
-- Tester la vitesse `rapide` et `reduite`.
-- Verifier que Collection, personnage actif et persistance restent corrects apres refresh.
+- Hall mobile : lisibilite du header, fiche joueur, actions rapides.
+- Missions : filtres, cartes, bouton Lancer.
+- Quiz : choix, validation, feedback bonne/mauvaise reponse.
+- Resultat : score, recompenses, level-up.
+- Gacha : autel, cinematique, resume, boutons refaire.
+- Collection : cartes possedees/non possedees, fallback placeholder.
+- Detail personnage : frame rarete et bouton actif.
+- Badges/Titres : filtres, onglets, changement de titre actif.
+- Parametres : toggles animations/sons/vitesse.
+- Import/export/reset : fonctionnement et lisibilite.
+- Ajout local d'une image privee dans `public/private-assets/characters/`.
 
 ## Prochaine etape recommandee
 
-Ajouter une vraie banniere gacha locale configurable avec pity soft/hard optionnel et historique detaille des invocations.
+Faire une passe de test mobile reelle dans le navigateur, puis ajuster finement les espacements et contrastes sur Hall, Collection et Gacha avant d'ajouter les vrais assets prives localement.
