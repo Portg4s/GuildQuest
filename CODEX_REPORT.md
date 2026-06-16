@@ -4,171 +4,159 @@ Date : 16 juin 2026
 
 ## Resume
 
-Refonte visuelle globale de GuildQuest effectuee pour renforcer l'identite guilde magique / anime fantasy / RPG, sans ajouter d'asset externe ni d'image protegee.
+Architecture locale des personnages prives renforcee sans ajouter d'asset protege ni de vraie image au repo.
 
-La logique metier n'a pas ete modifiee en profondeur : quiz, gacha, Dexie, Zustand, import/export, reset, progression et persistance restent bases sur les mecanismes existants.
+Le systeme permet maintenant :
+
+- de conserver les personnages placeholders publics ;
+- de charger un pack local optionnel `characters.local.ts` s'il existe ;
+- de construire un pack local avec metadata ;
+- de valider les entrees locales ;
+- d'ignorer les entrees incompletes sans casser l'app ;
+- d'afficher le statut du pack local dans Collection et Parametres ;
+- de garder un fallback visuel propre si une image locale est absente.
 
 ## Fichiers crees
 
-- `PRIVATE_ASSETS_GUIDE.md`
+- `src/data/characters/characters.local.example.ts`
 
 ## Fichiers modifies
 
-- `src/styles/globals.css`
-- `src/components/ui/button-variants.ts`
-- `src/app/App.tsx`
-- `src/components/game/CharacterImage.tsx`
-- `src/components/game/QuickActionGrid.tsx`
-- `src/components/game/CompactProgressCard.tsx`
-- `src/components/game/StatPill.tsx`
-- `src/components/game/rarity-styles.ts`
-- `src/components/game/rarity-effects.ts`
-- `src/features/home/HomeScreen.tsx`
-- `src/features/missions/MissionsScreen.tsx`
-- `src/features/quiz/QuizScreen.tsx`
-- `src/features/results/ResultsScreen.tsx`
+- `src/domain/models/Character.ts`
+- `src/data/characters/characters.registry.ts`
+- `src/data/characters/characters.local.template.ts`
 - `src/features/collection/CollectionScreen.tsx`
-- `src/features/character-detail/CharacterDetailScreen.tsx`
-- `src/features/gacha/GachaScreen.tsx`
-- `src/features/badges/BadgesScreen.tsx`
-- `src/features/profile/ProfileScreen.tsx`
-- `src/features/map/MapScreen.tsx`
-- `src/features/map/ZoneDetailScreen.tsx`
 - `src/features/settings/SettingsScreen.tsx`
-- `src/features/import-export/ImportExportScreen.tsx`
+- `src/app/App.tsx`
+- `PRIVATE_ASSETS_GUIDE.md`
 - `README.md`
 - `CODEX_REPORT.md`
 
-## Changements de theme global
+## Fonctionnement du pack local
 
-- Ajout de variables et classes globales dans `src/styles/globals.css` :
-  - `guild-card`
-  - `guild-panel`
-  - `guild-button-primary`
-  - `guild-button-secondary`
-  - `guild-button-danger`
-  - `guild-title`
-  - `magic-border`
-  - `magic-glow`
-  - `arcane-background`
-  - `guild-background`
-  - `glass-panel`
-  - `rarity-frame-common`
-  - `rarity-frame-rare`
-  - `rarity-frame-epic`
-  - `rarity-frame-legendary`
-  - `rarity-frame-mythic`
-- Fond global plus travaille : gradients sombres, halos turquoise/dore/violet, grille magique CSS legere.
-- Boutons shadcn harmonises via `button-variants.ts`.
+Le registre charge toujours `characters.placeholder.ts`.
 
-## Changements Hall
+Ensuite, il tente de charger optionnellement :
 
-- Header plus premium avec embleme GuildQuest original en CSS.
-- Carte joueur transformee en fiche de mage plus marquee.
-- Actions rapides plus visuelles avec icones encadrees.
-- Progression actuelle style tableau de quete.
-- Personnage actif en carte de compagnon plus premium.
-- Hall conserve compact et mobile-first.
+```txt
+src/data/characters/characters.local.ts
+```
 
-## Changements Missions
+via `import.meta.glob`, ce qui permet au build Vite de passer meme si le fichier local est absent.
 
-- Les missions ressemblent davantage a des quetes de guilde.
-- Badges de rang plus visibles.
-- Cartes avec `guild-card`, `magic-border`, hover discret et recompenses en capsules.
-- Filtres par statut et zone conserves.
-- Aucune mission supprimee.
+Le fichier local peut exporter :
 
-## Changements Quiz / Resultat
+- `localCharacterPack`
+- `localCharacters`
+- ou un export default.
 
-- Quiz :
-  - panneau principal plus immersif ;
-  - progress bar avec glow ;
-  - choix de reponse plus interactifs ;
-  - selection plus visible.
-- Resultat :
-  - rapport de mission plus premium ;
-  - recompenses XP/gemmes plus satisfaisantes ;
-  - bloc level-up renforce ;
-  - resume de recompenses harmonise.
+Le format recommande est :
 
-## Changements Collection / Gacha
+```ts
+export const localCharacterPack = {
+  packName: "Private Local Pack",
+  packVersion: 1,
+  author: "local",
+  replacePlaceholders: false,
+  characters: [...]
+}
+```
 
-- Collection :
-  - cartes personnage avec frames par rarete ;
-  - cartes possedees plus premium ;
-  - silhouettes non debloquees conservees ;
-  - message assets prives harmonise.
-- Detail personnage :
-  - carte detail avec bordure magique et frame de rarete ;
-  - image/fallback mieux mis en valeur.
-- Gacha :
-  - autel et banniere active harmonises avec le nouveau theme ;
-  - ressources gemmes/poussiere plus visuelles ;
-  - resume post-invocation harmonise ;
-  - cinematique existante conservee.
+Si `replacePlaceholders` vaut `true`, le pack local remplace la liste publique. Sinon, il s'ajoute aux placeholders. Un personnage local avec le meme `id` qu'un placeholder remplace ce placeholder.
 
-## Changements Badges / Titres
+## Strategie d'import local
 
-- Badges obtenus avec `magic-border`.
-- Badges verrouilles plus sombres.
-- Titres actifs et cartes titres plus proches d'exploits de guilde.
-- Onglets et filtres conserves.
+Les personnages locaux acceptent des champs enrichis :
 
-## Changements Parametres / Import Export
+- `imageUrl`
+- `portraitUrl`
+- `bannerUrl`
+- `quote`
+- `tags`
 
-- Parametres harmonises avec `guild-card`.
-- Zone sauvegarde locale mise en valeur.
-- Zone danger gardee rouge sombre.
-- Import/export JSON rendu plus coherent visuellement.
-- Aucun changement de logique d'import, export ou reset.
+Le registre normalise ensuite vers les champs internes deja utilises par l'app :
 
-## Assets prives
+- `image`
+- `placeholderImage`
+- `source`
+- `isPrivate`
 
-- Creation de `PRIVATE_ASSETS_GUIDE.md`.
-- README mis a jour avec un lien vers ce guide.
-- Rappel documente :
-  - placer les images dans `public/private-assets/characters/` ;
-  - declarer les personnages dans `src/data/characters/characters.local.ts` ;
-  - ne pas commit les assets prives ;
-  - l'export JSON ne contient pas les images.
+## Validation
 
-## Placeholder personnages
+Une entree locale est consideree valide si elle contient au minimum :
 
-- `CharacterImage` affiche maintenant un placeholder magique CSS si l'image privee ou le fallback image echoue.
-- Le fallback utilise :
-  - initiales du personnage ;
-  - frame selon rarete ;
-  - rune CSS ;
-  - aura visuelle.
+- `id`
+- `name`
+- `rarity`
+- `element`
+- `power`
+- `description`
+- `imageUrl` ou `image` ou `portraitUrl`
 
-## Cohérence raretes
+Les raretes acceptees restent :
 
-- `rarity-styles.ts` utilise maintenant les frames globales.
-- Les raretes restent centralisees pour :
-  - gacha ;
-  - collection ;
-  - detail personnage ;
-  - personnage actif ;
-  - cartes premium.
+- `COMMON`
+- `RARE`
+- `EPIC`
+- `LEGENDARY`
+- `MYTHIC`
+
+Les entrees invalides sont ignorees. Collection et Parametres affichent le nombre d'entrees locales ignorees si besoin.
+
+## Strategie fallback
+
+`CharacterImage` conserve le fallback magique CSS ajoute precedemment :
+
+- initiales ;
+- frame selon rarete ;
+- rune CSS ;
+- aucune image cassee visible.
+
+Si un personnage local est retire de `characters.local.ts` alors qu'il existe encore dans Dexie, Collection affiche une section `Personnages locaux indisponibles` avec l'ID sauvegarde et les fragments.
+
+## Etat `.gitignore`
+
+Les protections necessaires sont presentes :
+
+```txt
+/public/private-assets/
+/src/data/characters/characters.local.ts
+```
+
+Le fichier exemple versionne est volontairement commitable :
+
+```txt
+src/data/characters/characters.local.example.ts
+```
+
+## Guide assets prives
+
+`PRIVATE_ASSETS_GUIDE.md` a ete reecrit pour expliquer :
+
+- ou placer les images ;
+- les formats recommandes ;
+- comment creer `characters.local.ts` ;
+- le format `localCharacterPack` ;
+- la validation ;
+- le test local ;
+- la securite Git ;
+- les limites de l'export JSON ;
+- le fallback image.
+
+Le README pointe maintenant vers `characters.local.example.ts`.
 
 ## Limites eventuelles
 
-- Pas d'ajout de police externe.
-- Pas de son, vibration ou effets canvas.
-- Pas d'image ni texture externe.
-- Certaines classes visuelles sont appliquees largement, mais une passe pixel-perfect mobile reste recommandee.
-- Le navigateur integre n'a pas pu etre utilise : le plugin Browser ne contient pas le fichier attendu `scripts/browser-client.mjs` dans le cache local.
-- Une tentative de `Start-Process npm` a echoue sous Windows, car `npm` seul n'etait pas resolu comme executable ; la verification dev a ensuite ete faite avec `npm run dev`.
+- Pas de vraies images ajoutees.
+- Pas de validation runtime affichee en detail personnage par personnage.
+- Pas d'interface d'import JSON personnages dediee pour l'instant.
+- Si un personnage local est retire, l'app conserve la sauvegarde Dexie mais ne peut plus afficher ses vraies donnees tant que sa definition n'est pas restauree.
 
 ## Commandes executees
 
 - `npm run lint`
 - `npm run build`
-- `Start-Process npm -ArgumentList 'run dev -- --host 127.0.0.1'`
-- `Start-Process npm.cmd -ArgumentList 'run dev -- --host 127.0.0.1'`
-- `Invoke-WebRequest -Uri http://127.0.0.1:5173/ -UseBasicParsing`
 - `npm run dev -- --host 127.0.0.1`
-- `git status --short`
 
 ## Resultat de `npm run lint`
 
@@ -180,7 +168,7 @@ Aucune erreur et aucun avertissement ESLint.
 
 OK.
 
-Le build production Vite passe.
+Le build production Vite passe sans `characters.local.ts`.
 
 Avertissement restant non bloquant :
 
@@ -197,26 +185,16 @@ Vite a annonce :
 
 La commande a ete arretee par timeout apres quelques secondes, car le serveur reste ouvert en continu.
 
-## Erreurs ou limites de verification
-
-- `Start-Process npm ...` a echoue sous Windows : aucune application associee a `npm`.
-- `Invoke-WebRequest` a echoue apres la tentative de demarrage en arriere-plan, car le serveur n'ecoutait pas sur `127.0.0.1:5173`.
-- Verification navigateur integre non realisee : module Browser attendu absent du cache.
-
 ## Points a verifier manuellement
 
-- Hall mobile : lisibilite du header, fiche joueur, actions rapides.
-- Missions : filtres, cartes, bouton Lancer.
-- Quiz : choix, validation, feedback bonne/mauvaise reponse.
-- Resultat : score, recompenses, level-up.
-- Gacha : autel, cinematique, resume, boutons refaire.
-- Collection : cartes possedees/non possedees, fallback placeholder.
-- Detail personnage : frame rarete et bouton actif.
-- Badges/Titres : filtres, onglets, changement de titre actif.
-- Parametres : toggles animations/sons/vitesse.
-- Import/export/reset : fonctionnement et lisibilite.
-- Ajout local d'une image privee dans `public/private-assets/characters/`.
+- Copier `characters.local.example.ts` vers `characters.local.ts`.
+- Ajouter une image locale dans `public/private-assets/characters/`.
+- Lancer `npm run dev`.
+- Ouvrir Collection et verifier le statut du pack local.
+- Faire une invocation pour confirmer que les personnages locaux peuvent etre tires.
+- Tester une image manquante pour verifier le fallback magique.
+- Verifier `git status --short` avant commit : les assets prives et `characters.local.ts` ne doivent pas apparaitre.
 
 ## Prochaine etape recommandee
 
-Faire une passe de test mobile reelle dans le navigateur, puis ajuster finement les espacements et contrastes sur Hall, Collection et Gacha avant d'ajouter les vrais assets prives localement.
+Ajouter plus tard un ecran local d'import JSON personnages qui genere ou valide un pack local sans modifier manuellement le fichier TypeScript.

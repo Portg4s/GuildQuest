@@ -3,6 +3,7 @@ import { ArrowLeft, Check, Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { CharacterImage } from "@/components/game/CharacterImage";
 import { rarityBadgeClasses, rarityCardClasses, rarityLabels } from "@/components/game/rarity-styles";
+import type { CharacterRegistryInfo } from "@/data/characters/characters.registry";
 import type { Character, CharacterRarity, PlayerCharacter } from "@/domain/models";
 import { getRarityOrder } from "@/domain/gacha/gacha-rates.service";
 import { cn } from "@/lib/utils";
@@ -10,6 +11,7 @@ import { cn } from "@/lib/utils";
 type CollectionScreenProps = {
   collection: PlayerCharacter[];
   characters: Character[];
+  characterRegistryInfo: CharacterRegistryInfo;
   activeCharacterId?: string;
   onBackHome: () => void;
   onOpenCharacter: (character: Character) => void;
@@ -21,6 +23,7 @@ type Filter = CharacterRarity | "ALL";
 export function CollectionScreen({
   collection,
   characters,
+  characterRegistryInfo,
   activeCharacterId,
   onBackHome,
   onOpenCharacter,
@@ -34,6 +37,8 @@ export function CollectionScreen({
   const filteredCharacters = filter === "ALL"
     ? characters
     : characters.filter((character) => character.rarity === filter);
+  const characterIds = useMemo(() => new Set(characters.map((character) => character.id)), [characters]);
+  const unavailableOwnedCharacters = collection.filter((playerCharacter) => !characterIds.has(playerCharacter.characterId));
 
   return (
     <section className="space-y-3">
@@ -61,8 +66,16 @@ export function CollectionScreen({
       </div>
 
       <div className="glass-panel p-2.5 text-xs text-teal-50">
-        Les images privees locales sont chargees si elles existent dans /public/private-assets/characters/.
-        Sinon, GuildQuest utilise les placeholders.
+        {characterRegistryInfo.localPackDetected
+          ? `${characterRegistryInfo.localPackName ?? "Pack local"} detecte : ${characterRegistryInfo.localCount} personnage(s) prive(s) charge(s).`
+          : "Aucun pack local detecte. GuildQuest utilise les personnages placeholders."}
+        {" "}
+        Les images absentes utilisent un placeholder magique.
+        {characterRegistryInfo.invalidLocalCount > 0 && (
+          <span className="mt-1 block text-amber-100">
+            {characterRegistryInfo.invalidLocalCount} entree(s) locale(s) ignoree(s) car incomplete(s).
+          </span>
+        )}
       </div>
 
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-3">
@@ -110,6 +123,24 @@ export function CollectionScreen({
           );
         })}
       </div>
+
+      {unavailableOwnedCharacters.length > 0 && (
+        <section className="guild-card p-3">
+          <p className="text-xs font-black uppercase tracking-[0.18em] text-amber-200">Personnages locaux indisponibles</p>
+          <p className="mt-1 text-sm text-slate-300">
+            Ces personnages existent dans ta sauvegarde, mais leur definition locale n'est plus chargee.
+          </p>
+          <div className="mt-3 grid gap-2 sm:grid-cols-2">
+            {unavailableOwnedCharacters.map((playerCharacter) => (
+              <div key={playerCharacter.characterId} className="rounded-lg border border-amber-200/20 bg-amber-300/10 p-3">
+                <p className="font-black text-white">Personnage local indisponible</p>
+                <p className="mt-1 text-xs text-slate-300">ID : {playerCharacter.characterId}</p>
+                <p className="mt-1 text-xs font-bold text-amber-100">Fragments : {playerCharacter.fragments ?? 0}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
     </section>
   );
 }

@@ -39,7 +39,7 @@ npm run lint
 Les assets sous `public/private-assets/` sont reserves a un usage local et doivent rester hors Git. Utiliser des placeholders generiques dans le repo public.
 
 Les images de personnages privees peuvent etre placees localement dans `public/private-assets/characters/`.
-Pour declarer des personnages locaux, copier `src/data/characters/characters.local.template.ts` vers `src/data/characters/characters.local.ts`.
+Pour declarer des personnages locaux, copier `src/data/characters/characters.local.example.ts` vers `src/data/characters/characters.local.ts`.
 Ce fichier local est ignore par Git. Si une image privee est absente, l'interface utilise automatiquement le placeholder du personnage.
 
 Voir aussi `PRIVATE_ASSETS_GUIDE.md` pour les formats recommandes, les chemins a utiliser et les precautions avant commit.

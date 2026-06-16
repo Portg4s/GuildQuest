@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { getCharacters } from "@/data/characters/characters.registry";
+import { getCharacterRegistryInfo, getCharacters } from "@/data/characters/characters.registry";
 import { foundationsWebPack } from "@/data/packs/foundations-web.example";
 import { titleDefinitions } from "@/data/config/titles.config";
 import type { Badge, Character, GameSettings, Player, PlayerTitle, Quiz } from "@/domain/models";
@@ -100,6 +100,7 @@ function App() {
   const setQuizProgress = useGameStore((state) => state.setQuizProgress);
   const upsertQuizProgress = useGameStore((state) => state.upsertQuizProgress);
   const characters = useMemo(() => getCharacters(), []);
+  const characterRegistryInfo = useMemo(() => getCharacterRegistryInfo(), []);
   const settings: GameSettings = useMemo(
     () =>
       normalizeSettings({
@@ -572,6 +573,7 @@ function App() {
             player={player}
             settings={settings}
             appVersion="0.1.0"
+            characterRegistryInfo={characterRegistryInfo}
             onBackHome={goHome}
             onOpenImportExport={() => setScreen("import-export")}
             onUpdateSettings={updateSettings}
@@ -606,6 +608,7 @@ function App() {
           <CollectionScreen
             collection={collection}
             characters={characters}
+            characterRegistryInfo={characterRegistryInfo}
             activeCharacterId={player.activeCharacterId}
             onBackHome={goHome}
             onOpenCharacter={(character) => {

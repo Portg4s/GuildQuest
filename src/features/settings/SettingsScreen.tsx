@@ -1,12 +1,14 @@
 import { motion } from "framer-motion";
 import { ArrowLeft, Download, RotateCcw, SlidersHorizontal, Volume2, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import type { CharacterRegistryInfo } from "@/data/characters/characters.registry";
 import type { GameSettings, Player } from "@/domain/models";
 
 type SettingsScreenProps = {
   player: Player;
   settings: GameSettings;
   appVersion: string;
+  characterRegistryInfo: CharacterRegistryInfo;
   onBackHome: () => void;
   onOpenImportExport: () => void;
   onUpdateSettings: (settings: GameSettings) => void;
@@ -17,6 +19,7 @@ export function SettingsScreen({
   player,
   settings,
   appVersion,
+  characterRegistryInfo,
   onBackHome,
   onOpenImportExport,
   onUpdateSettings,
@@ -58,6 +61,24 @@ export function SettingsScreen({
           <SettingStat label="Niveau" value={player.level} />
           <SettingStat label="Version app" value={appVersion} />
         </div>
+      </article>
+
+      <article className="guild-card p-4">
+        <h2 className="text-xl font-black text-white">Pack personnages local</h2>
+        <div className="mt-3 grid grid-cols-2 gap-2">
+          <SettingStat label="Etat" value={characterRegistryInfo.localPackDetected ? "Detecte" : "Absent"} />
+          <SettingStat label="Personnages locaux" value={characterRegistryInfo.localCount} />
+          <SettingStat label="Pack" value={characterRegistryInfo.localPackName ?? "Aucun pack local"} />
+          <SettingStat label="Version" value={characterRegistryInfo.localPackVersion ?? "-"} />
+        </div>
+        {characterRegistryInfo.invalidLocalCount > 0 && (
+          <p className="mt-3 rounded-lg border border-amber-200/25 bg-amber-300/10 p-3 text-sm font-semibold text-amber-100">
+            {characterRegistryInfo.invalidLocalCount} entree(s) locale(s) ignoree(s). Verifie `characters.local.ts`.
+          </p>
+        )}
+        <p className="mt-3 text-xs leading-5 text-slate-400">
+          Copie `characters.local.example.ts` vers `characters.local.ts` pour charger tes personnages prives.
+        </p>
       </article>
 
       <article className="guild-card p-4">

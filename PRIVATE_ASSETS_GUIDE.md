@@ -1,32 +1,27 @@
 # PRIVATE_ASSETS_GUIDE
 
-Ce guide explique comment ajouter des personnages et images prives localement dans GuildQuest sans polluer le repo public.
+Ce guide explique comment ajouter des personnages prives locaux dans GuildQuest sans exposer d'assets dans le repo.
 
 ## Regle principale
 
-Ne commit jamais d'image privee, protegee, sous licence ou issue d'une franchise dans ce repo.
+Ne commit jamais d'image privee, protegee, sous licence ou issue d'une licence existante.
 
-Le dossier suivant est ignore par Git :
+Ces chemins sont ignores par Git :
 
 ```txt
 public/private-assets/
-```
-
-Le fichier local suivant est aussi ignore par Git :
-
-```txt
 src/data/characters/characters.local.ts
 ```
 
-## Ou placer les images
+## A. Ou mettre les images
 
-Place les images locales ici :
+Place les images dans :
 
 ```txt
 public/private-assets/characters/
 ```
 
-Dans le code, le chemin public correspondant commence par :
+Dans les donnees personnages, le chemin public commence par :
 
 ```txt
 /private-assets/characters/
@@ -35,36 +30,38 @@ Dans le code, le chemin public correspondant commence par :
 Exemple :
 
 ```txt
-public/private-assets/characters/mon-personnage.png
+public/private-assets/characters/example-character.webp
 ```
 
-devient :
+se reference ainsi :
 
 ```txt
-/private-assets/characters/mon-personnage.png
+/private-assets/characters/example-character.webp
 ```
 
-## Formats recommandes
+## B. Formats recommandes
 
-- PNG ou WebP.
-- Format carre conseille : 512x512 ou 1024x1024.
-- Fond transparent si possible.
-- Noms de fichiers simples, sans accents ni espaces.
+- `.webp` recommande.
+- `.png` accepte.
+- Portrait carre recommande.
+- Taille conseillee : 512x512 ou 768x768.
+- Eviter les fichiers trop lourds.
+- Utiliser des noms simples, sans espaces ni accents.
 
-Exemples :
+Exemples de noms :
 
 ```txt
-mage-feu-local.png
-gardienne-arcane.webp
-compagnon-lumiere.png
+mage-feu-local.webp
+gardienne-arcane.png
+compagnon-lumiere.webp
 ```
 
-## Declarer des personnages locaux
+## C. Creer le fichier local
 
-Copie le template :
+Copie :
 
 ```txt
-src/data/characters/characters.local.template.ts
+src/data/characters/characters.local.example.ts
 ```
 
 vers :
@@ -73,78 +70,152 @@ vers :
 src/data/characters/characters.local.ts
 ```
 
-Puis adapte la liste :
+Le fichier `characters.local.ts` est ignore par Git.
+
+## D. Exemple de pack local fictif
+
+Le fichier local peut exporter un pack :
 
 ```ts
-import type { Character } from "@/domain/models";
+import type { LocalCharacterPack } from "@/data/characters/characters.registry";
 
-export const localCharacters: Character[] = [
-  {
-    id: "private-character-1",
-    name: "Nom local",
-    rarity: "LEGENDARY",
-    element: "Feu",
-    power: 2500,
-    description: "Description personnelle locale.",
-    image: "/private-assets/characters/mon-personnage.png",
-    placeholderImage: "/pwa.svg",
-    category: "local",
-    variant: "default",
-    isPrivate: true,
-    source: "local"
-  }
-];
+export const localCharacterPack: LocalCharacterPack = {
+  packName: "Private Local Pack",
+  packVersion: 1,
+  author: "local",
+  replacePlaceholders: false,
+  characters: [
+    {
+      id: "private-character-1",
+      name: "Nom local fictif",
+      rarity: "LEGENDARY",
+      element: "Feu",
+      power: 2500,
+      description: "Description personnelle locale.",
+      imageUrl: "/private-assets/characters/example-character.webp",
+      portraitUrl: "/private-assets/characters/example-character-portrait.webp",
+      bannerUrl: "/private-assets/characters/example-character-banner.webp",
+      placeholderImage: "/pwa.svg",
+      quote: "Citation locale optionnelle.",
+      tags: ["local", "test"],
+      category: "private-local",
+      variant: "default",
+      isPrivate: true,
+      source: "private-local-pack"
+    }
+  ]
+};
+
+export const localCharacters = localCharacterPack.characters;
+
+export default localCharacterPack;
 ```
 
-## Remplacement ou ajout
+Tous les noms de cet exemple sont fictifs.
 
-- Si un personnage local utilise un nouvel `id`, il est ajoute a la liste.
-- Si un personnage local utilise le meme `id` qu'un placeholder, il remplace ce placeholder dans le registre.
-- Evite de changer les IDs apres avoir obtenu des personnages en gacha, car la collection locale se base sur ces IDs.
+## Champs importants
 
-## Fallback image
+- `id` : identifiant stable. Evite de le changer apres avoir obtenu le personnage.
+- `name` : nom affiche.
+- `rarity` : `COMMON`, `RARE`, `EPIC`, `LEGENDARY` ou `MYTHIC`.
+- `element` : texte libre court.
+- `power` : nombre.
+- `description` : texte affiche dans le detail.
+- `imageUrl` : chemin principal vers l'image locale.
+- `portraitUrl` : optionnel, reserve pour de futurs affichages.
+- `bannerUrl` : optionnel, reserve pour de futures bannieres.
+- `quote` : optionnel.
+- `tags` : optionnel.
 
-Si `image` pointe vers une image absente ou invalide, GuildQuest affiche automatiquement un placeholder magique genere en CSS.
+## Remplacer ou completer les placeholders
 
-Ce fallback evite :
+Dans `localCharacterPack` :
 
-- les images cassees ;
-- les cartes vides ;
-- les erreurs visuelles dans le gacha, la collection et le profil.
+```ts
+replacePlaceholders: false
+```
 
-## Tester une image
+- `false` : ajoute les personnages locaux aux placeholders.
+- `true` : remplace la liste publique par ton pack local.
 
-1. Ajoute l'image dans `public/private-assets/characters/`.
-2. Declare ou modifie un personnage dans `characters.local.ts`.
-3. Lance l'app :
+Si un personnage local utilise le meme `id` qu'un placeholder, il remplace ce placeholder.
+
+## Validation locale
+
+GuildQuest ignore les entrees locales incompletes au lieu de casser l'application.
+
+Une entree locale doit au minimum avoir :
+
+- `id`
+- `name`
+- `rarity`
+- `element`
+- `power`
+- `description`
+- `imageUrl` ou `image` ou `portraitUrl`
+
+Collection et Parametres indiquent combien de personnages locaux sont charges.
+
+## E. Tester
+
+1. Ajoute les images dans `public/private-assets/characters/`.
+2. Cree `src/data/characters/characters.local.ts`.
+3. Lance :
 
 ```bash
 npm run dev
 ```
 
-4. Ouvre Collection ou Invocation.
-5. Si l'image n'apparait pas, verifie :
-   - le nom exact du fichier ;
-   - le chemin `/private-assets/characters/...` ;
-   - l'extension `.png` / `.webp` ;
-   - que le fichier n'est pas dans `src/`.
+4. Ouvre Collection.
+5. Verifie le bloc de statut du pack local.
+6. Lance une invocation pour confirmer que les personnages locaux peuvent etre tires.
 
-## Export JSON
+Si une image n'apparait pas, verifie :
 
-L'export JSON sauvegarde les references et chemins des personnages, mais pas les images privees elles-memes.
+- le chemin `/private-assets/characters/...` ;
+- l'extension `.webp` ou `.png` ;
+- le nom exact du fichier ;
+- que le fichier est bien dans `public/private-assets/characters/`.
 
-Avant de changer de machine, il faut sauvegarder separement :
+## F. Securite Git
 
-- le fichier JSON GuildQuest ;
-- le dossier local `public/private-assets/characters/` ;
-- le fichier local `src/data/characters/characters.local.ts`.
-
-## Verification Git
-
-Avant tout commit public, verifier :
+Avant de commit :
 
 ```bash
 git status --short
 ```
 
-Aucun fichier sous `public/private-assets/` ni `characters.local.ts` ne doit apparaitre.
+Ces fichiers ne doivent pas apparaitre :
+
+- images sous `public/private-assets/`
+- `src/data/characters/characters.local.ts`
+
+Si un asset prive apparait dans Git, ne le commit pas.
+
+## G. Export JSON
+
+L'export JSON sauvegarde :
+
+- progression ;
+- collection ;
+- references et chemins ;
+- personnage actif ;
+- gacha ;
+- badges/titres.
+
+L'export JSON ne sauvegarde pas les images privees.
+
+Pour changer de machine, sauvegarde separement :
+
+- le JSON GuildQuest ;
+- `public/private-assets/characters/` ;
+- `src/data/characters/characters.local.ts`.
+
+## Fallback image
+
+Si une image locale manque ou ne charge pas, GuildQuest affiche un placeholder magique CSS :
+
+- initiales du personnage ;
+- cadre selon rarete ;
+- aura/rune originale ;
+- aucune image cassee visible.

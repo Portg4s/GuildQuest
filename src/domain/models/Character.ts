@@ -9,6 +9,11 @@ export type Character = {
   description: string;
   image: string;
   placeholderImage: string;
+  imageUrl?: string;
+  portraitUrl?: string;
+  bannerUrl?: string;
+  quote?: string;
+  tags?: string[];
   category?: string;
   variant?: string;
   isPrivate?: boolean;

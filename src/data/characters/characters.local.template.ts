@@ -1,23 +1,34 @@
-import type { Character } from "@/domain/models";
+import type { LocalCharacterPack } from "@/data/characters/characters.registry";
 
-// Copie ce fichier en `characters.local.ts` pour tes personnages prives locaux.
-// Le fichier `characters.local.ts` est ignore par Git et peut referencer :
-// `/public/private-assets/characters/...` via l'URL `/private-assets/characters/...`.
-// Ne place aucun asset protege dans le repo public.
+// Ancien point d'entree conserve comme template court.
+// Pour un exemple complet, consulte `characters.local.example.ts`.
+// Copie `characters.local.example.ts` vers `characters.local.ts`, puis remplace les donnees par tes personnages prives.
 
-export const localCharacters: Character[] = [
-  {
-    id: "private-character-1",
-    name: "Nom du personnage local",
-    rarity: "LEGENDARY",
-    element: "Feu",
-    power: 2500,
-    description: "Description locale personnelle.",
-    image: "/private-assets/characters/mon-personnage.png",
-    placeholderImage: "/pwa.svg",
-    category: "local",
-    variant: "default",
-    isPrivate: true,
-    source: "local-template"
-  }
-];
+export const localCharacterPack: LocalCharacterPack = {
+  packName: "Private Local Pack",
+  packVersion: 1,
+  author: "local",
+  replacePlaceholders: false,
+  characters: [
+    {
+      id: "private-character-1",
+      name: "Nom local fictif",
+      rarity: "LEGENDARY",
+      element: "Feu",
+      power: 2500,
+      description: "Description personnelle locale.",
+      imageUrl: "/private-assets/characters/mon-personnage.webp",
+      placeholderImage: "/pwa.svg",
+      quote: "Citation locale optionnelle.",
+      tags: ["local"],
+      category: "private-local",
+      variant: "default",
+      isPrivate: true,
+      source: "private-local-pack"
+    }
+  ]
+};
+
+export const localCharacters = localCharacterPack.characters;
+
+export default localCharacterPack;
