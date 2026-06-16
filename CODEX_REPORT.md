@@ -4,70 +4,115 @@ Date : 16 juin 2026
 
 ## Resume
 
-Ajout d'un ecran d'introduction au lancement de GuildQuest.
+Creation du fichier local prive :
 
-L'app affiche maintenant une courte entree de guilde avant d'arriver sur le Hall :
+```txt
+src/data/characters/characters.local.ts
+```
 
-- embleme GuildQuest original en CSS ;
-- titre `GuildQuest` ;
-- textes d'ambiance ;
-- particules/runes CSS legeres ;
-- barre de progression animee ;
-- transition fluide vers l'app.
+Ce fichier exporte un pack local :
 
-## Fichiers crees
+```ts
+export const localCharacterPack = {
+  packName: "Fairy Tail Private Pack",
+  packVersion: 1,
+  author: "local",
+  replacePlaceholders: true,
+  characters: [...]
+};
+```
 
-- `src/features/splash/SplashScreen.tsx`
+Les placeholders publics sont remplaces grace a `replacePlaceholders: true`.
 
-## Fichiers modifies
+## Fichier cree
 
-- `src/app/App.tsx`
-- `src/domain/models/GameSettings.ts`
-- `src/storage/repositories/settings.repository.ts`
-- `src/stores/ui.store.ts`
-- `src/features/settings/SettingsScreen.tsx`
-- `CODEX_REPORT.md`
+- `src/data/characters/characters.local.ts`
 
-## Comportement au demarrage
+Ce fichier est volontairement ignore par Git.
 
-Au lancement :
+## Contenu ajoute
 
-1. `SplashScreen` s'affiche en plein ecran.
-2. L'app continue de charger les donnees locales Dexie/Zustand en arriere-plan.
-3. Le splash se ferme automatiquement.
-4. Le Hall apparait normalement.
+Le pack contient :
 
-Durees appliquees :
+- 7 personnages `MYTHIC`
+- 10 personnages `LEGENDARY`
+- 11 personnages `EPIC`
+- 11 personnages `RARE`
+- 5 personnages `COMMON`
 
-- intro desactivee : environ 120 ms ;
-- animations desactivees : environ 260 ms ;
-- vitesse rapide : environ 900 ms ;
-- vitesse reduite : environ 650 ms ;
-- vitesse normale : environ 1500 ms.
+Total : 44 personnages.
 
-## Respect des preferences animations
+Chaque personnage contient :
 
-La preference `showIntroSplash` a ete ajoutee a `GameSettings` et au `ui.store`.
+- `id`
+- `name`
+- `rarity`
+- `element`
+- `power`
+- `description`
+- `imageUrl`
+- `quote`
+- `tags`
 
-Dans Parametres, un toggle permet maintenant de controler :
+Les images sont referencees avec le format :
 
-- `Ecran d'introduction`
+```txt
+/private-assets/characters/<nom-fichier>.webp
+```
 
-Si les animations sont desactivees ou reduites :
+## Verification `.gitignore`
 
-- les particules sont limitees ou absentes ;
-- la duree est plus courte ;
-- l'ecran reste sobre.
+Les protections demandees existent deja dans `.gitignore` :
 
-## Integration technique
+```txt
+/public/private-assets/
+/src/data/characters/characters.local.ts
+```
 
-- `App.tsx` utilise `AnimatePresence` pour afficher/retirer le splash proprement.
-- Le splash ne modifie pas la navigation.
-- Dexie, import/export, reset, gacha, collection, missions et quiz ne sont pas touches dans leur logique.
-- Les parametres existants sont normalises avec une valeur par defaut `showIntroSplash: true`.
+`.gitignore` n'a pas ete modifie.
+
+## Resultat `git status --short`
+
+Commande executee apres creation de `characters.local.ts` :
+
+```bash
+git status --short
+```
+
+Resultat : aucune sortie.
+
+Conclusion :
+
+- `src/data/characters/characters.local.ts` n'apparait pas dans Git.
+- `public/private-assets/` n'apparait pas dans Git.
+- Les assets prives restent non suivis.
+
+Apres mise a jour du rapport, seul `CODEX_REPORT.md` apparait comme modification suivie.
+
+## Verification fichiers locaux
+
+- `src/data/characters/characters.local.ts` existe localement.
+- Les images demandees sont presentes dans `public/private-assets/characters/`.
+- Exemple verifie : `public/private-assets/characters/natsu-dragneel.webp`.
+
+## Compatibilite app
+
+Le registry charge le pack local via `characters.local.ts`.
+
+Effets attendus :
+
+- Collection/Parametres detectent le pack local.
+- Le gacha utilise ces personnages locaux.
+- Les placeholders publics sont remplaces.
+- Les images sont chargees depuis `/private-assets/characters/`.
+- Dexie continue a sauvegarder les IDs de personnages.
 
 ## Commandes executees
 
+- verification `.gitignore`
+- listing des images `.webp`
+- creation de `src/data/characters/characters.local.ts`
+- `git status --short`
 - `npm run lint`
 - `npm run build`
 - `npm run dev -- --host 127.0.0.1`
@@ -88,6 +133,12 @@ Avertissement restant non bloquant :
 
 - certains chunks depassent 500 kB apres minification.
 
+Note importante :
+
+- le build PWA local a precache les fichiers presents dans `public/private-assets/characters/` dans `dist` ;
+- `dist` est ignore par Git ;
+- il ne faut pas publier ce build si ces assets doivent rester strictement prives.
+
 ## Resultat de `npm run dev`
 
 OK pour le demarrage.
@@ -101,19 +152,20 @@ La commande a ete arretee par timeout apres quelques secondes, car le serveur re
 
 ## Points a verifier manuellement
 
-- Recharger l'app et verifier que le splash apparait avant le Hall.
-- Verifier que le Hall apparait automatiquement sans clic.
-- Aller dans Parametres et desactiver `Ecran d'introduction`.
-- Recharger et verifier que l'intro passe presque immediatement.
-- Tester animations `rapide` et `reduite`.
-- Verifier Missions, Quiz, Gacha, Collection, Import/Export et Reset apres l'ajout.
+- Ouvrir Parametres et verifier que le pack local est detecte.
+- Ouvrir Collection et verifier que les personnages locaux remplacent les placeholders.
+- Verifier que les images `.webp` apparaissent correctement.
+- Lancer une invocation x1 ou x10.
+- Definir un personnage actif.
+- Recharger l'app et verifier que la collection/personnage actif persistent.
+- Verifier avant tout commit que `git status --short` ne montre pas `characters.local.ts` ni `public/private-assets/`.
 
 ## Limites eventuelles
 
-- Pas de son ni vibration.
-- Pas de bouton skip, car la duree reste courte.
-- Pas de verification navigateur visuelle automatisee dans cette tache.
+- Le fichier cree est local et ignore par Git : il ne sera pas partage via le repo.
+- Les assets prives ne sont pas exportes dans le JSON de sauvegarde, seuls les chemins/IDs le sont.
+- Si un asset est absent ou mal nomme, `CharacterImage` affichera le placeholder magique CSS.
 
 ## Prochaine etape recommandee
 
-Ajouter plus tard une option de splash saisonnier ou de phrase d'accueil aleatoire liee au rang du joueur.
+Tester visuellement Collection et Gacha sur mobile, puis verifier si le precache PWA doit exclure `private-assets` pour eviter de les embarquer dans un build public.
