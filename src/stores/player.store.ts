@@ -19,12 +19,14 @@ export const defaultPlayer: Player = {
 
 type PlayerStore = {
   player: Player;
+  setPlayer: (player: Player) => void;
   addGems: (amount: number) => void;
   addXp: (amount: number) => void;
 };
 
 export const usePlayerStore = create<PlayerStore>((set) => ({
   player: defaultPlayer,
+  setPlayer: (player) => set({ player }),
   addGems: (amount) =>
     set((state) => ({
       player: {

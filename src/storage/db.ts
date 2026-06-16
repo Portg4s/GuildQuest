@@ -14,8 +14,17 @@ export type QuizProgress = {
   quizId: string;
   bestScore: number;
   attempts: number;
+  lastScore?: number;
+  lastCorrectAnswers?: number;
+  lastTotalQuestions?: number;
+  lastRewards?: QuizProgressReward;
   completedAt?: string;
   updatedAt: string;
+};
+
+export type QuizProgressReward = {
+  xpGained: number;
+  gemsGained: number;
 };
 
 export class GuildQuestDatabase extends Dexie {

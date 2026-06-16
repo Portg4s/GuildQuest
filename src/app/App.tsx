@@ -1,97 +1,167 @@
-import { motion } from "framer-motion";
-import { Gem, Shield, Sparkles, Star } from "lucide-react";
-import { appRoutes } from "@/app/routes";
-import { Button } from "@/components/ui/button";
-import { usePlayerStore } from "@/stores/player.store";
+import { useEffect, useMemo, useState } from "react";
+import { foundationsWebPack } from "@/data/packs/foundations-web.example";
+import type { Quiz } from "@/domain/models";
+import { applyRewardsToPlayer } from "@/domain/progression/level.service";
+import { calculateMissionRewards, type RewardResult } from "@/domain/reward/reward.service";
+import { buildMissionsFromPack, type Mission } from "@/domain/services/mission.service";
+import type { QuizScoreResult } from "@/domain/services/quiz.service";
+import { HomeScreen } from "@/features/home/HomeScreen";
+import { MissionsScreen } from "@/features/missions/MissionsScreen";
+import { ProfileScreen } from "@/features/profile/ProfileScreen";
+import { QuizScreen } from "@/features/quiz/QuizScreen";
+import { ResultsScreen } from "@/features/results/ResultsScreen";
+import { getStoredPlayer, savePlayer } from "@/storage/repositories/player.repository";
+import { getQuizProgressMap, recordQuizAttempt } from "@/storage/repositories/quiz-progress.repository";
+import { useGameStore } from "@/stores/game.store";
+import { defaultPlayer, usePlayerStore } from "@/stores/player.store";
+
+type AppScreen = "home" | "missions" | "quiz" | "results" | "profile";
+
+type CompletedMissionResult = {
+  quiz: Quiz;
+  scoreResult: QuizScoreResult;
+  rewards: RewardResult;
+};
 
 function App() {
+  const [screen, setScreen] = useState<AppScreen>("home");
+  const [selectedMission, setSelectedMission] = useState<Mission | undefined>();
+  const [completedResult, setCompletedResult] = useState<CompletedMissionResult | undefined>();
+  const [persistenceError, setPersistenceError] = useState<string | undefined>();
   const player = usePlayerStore((state) => state.player);
+  const setPlayer = usePlayerStore((state) => state.setPlayer);
+  const quizProgressById = useGameStore((state) => state.quizProgressById);
+  const setQuizProgress = useGameStore((state) => state.setQuizProgress);
+  const upsertQuizProgress = useGameStore((state) => state.upsertQuizProgress);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadLocalState() {
+      try {
+        const [storedPlayer, storedProgress] = await Promise.all([getStoredPlayer(), getQuizProgressMap()]);
+
+        if (cancelled) return;
+
+        if (storedPlayer) {
+          setPlayer(storedPlayer);
+        } else {
+          await savePlayer(defaultPlayer);
+        }
+
+        setQuizProgress(storedProgress);
+      } catch (error) {
+        setPersistenceError("La sauvegarde locale n'a pas pu etre chargee.");
+        console.error(error);
+      }
+    }
+
+    void loadLocalState();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [setPlayer, setQuizProgress]);
+
+  const missions = useMemo(
+    () => buildMissionsFromPack(foundationsWebPack, quizProgressById),
+    [quizProgressById]
+  );
+
+  const goHome = () => setScreen("home");
+
+  const startMission = (mission: Mission) => {
+    setSelectedMission(mission);
+    setCompletedResult(undefined);
+    setScreen("quiz");
+  };
+
+  const completeQuiz = (scoreResult: QuizScoreResult) => {
+    if (!selectedMission) return;
+
+    const rewards = calculateMissionRewards(selectedMission.quiz.rank, scoreResult.score);
+    const updatedPlayer = applyRewardsToPlayer(player, rewards.xpGained, rewards.gemsGained);
+
+    setPlayer(updatedPlayer);
+    setCompletedResult({
+      quiz: selectedMission.quiz,
+      scoreResult,
+      rewards
+    });
+    setScreen("results");
+
+    void saveMissionProgress(selectedMission.quiz.id, scoreResult, rewards, updatedPlayer);
+  };
+
+  const saveMissionProgress = async (
+    quizId: string,
+    scoreResult: QuizScoreResult,
+    rewards: RewardResult,
+    updatedPlayer: typeof player
+  ) => {
+    try {
+      await savePlayer(updatedPlayer);
+      const progress = await recordQuizAttempt({
+        quizId,
+        score: scoreResult.score,
+        correctAnswers: scoreResult.correctAnswers,
+        totalQuestions: scoreResult.totalQuestions,
+        rewards: {
+          xpGained: rewards.xpGained,
+          gemsGained: rewards.gemsGained
+        }
+      });
+      upsertQuizProgress(progress);
+      setPersistenceError(undefined);
+    } catch (error) {
+      setPersistenceError("La progression a ete appliquee en memoire, mais la sauvegarde locale a echoue.");
+      console.error(error);
+    }
+  };
 
   return (
     <main className="min-h-screen overflow-hidden bg-slate-950 text-slate-50">
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(20,184,166,0.24),transparent_32%),linear-gradient(135deg,rgba(49,46,129,0.7),rgba(15,23,42,0.96)_48%,rgba(30,41,59,1))]" />
+      <div className="fixed inset-0 bg-[radial-gradient(circle_at_top_left,rgba(20,184,166,0.24),transparent_32%),linear-gradient(135deg,rgba(49,46,129,0.7),rgba(15,23,42,0.96)_48%,rgba(30,41,59,1))]" />
       <div className="relative mx-auto flex min-h-screen w-full max-w-5xl flex-col px-4 py-5 sm:px-6 lg:px-8">
-        <motion.section
-          initial={{ opacity: 0, y: 18 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.55, ease: "easeOut" }}
-          className="flex flex-1 flex-col justify-between gap-8"
-        >
-          <header className="flex items-center justify-between gap-4">
-            <div className="flex items-center gap-3">
-              <div className="grid size-11 place-items-center rounded-lg border border-teal-300/30 bg-teal-300/10 shadow-glow">
-                <Shield className="size-6 text-teal-200" aria-hidden="true" />
-              </div>
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.22em] text-teal-200">
-                  Hall de guilde
-                </p>
-                <h1 className="text-3xl font-black text-white sm:text-5xl">GuildQuest</h1>
-              </div>
-            </div>
-            <div className="flex items-center gap-2 rounded-lg border border-amber-200/20 bg-amber-200/10 px-3 py-2 text-amber-100">
-              <Gem className="size-4" aria-hidden="true" />
-              <span className="text-sm font-bold">{player.gems}</span>
-            </div>
-          </header>
+        {persistenceError && (
+          <div className="mb-4 rounded-lg border border-amber-300/30 bg-amber-300/10 p-3 text-sm font-semibold text-amber-100">
+            {persistenceError}
+          </div>
+        )}
 
-          <section className="grid gap-4 lg:grid-cols-[1.1fr_0.9fr] lg:items-end">
-            <div className="rounded-lg border border-white/10 bg-white/[0.07] p-5 shadow-2xl backdrop-blur sm:p-6">
-              <div className="mb-6 flex flex-wrap items-center gap-2">
-                <span className="rounded-md bg-teal-300 px-2.5 py-1 text-xs font-black uppercase text-slate-950">
-                  {player.rank}
-                </span>
-                <span className="rounded-md border border-white/15 px-2.5 py-1 text-xs font-semibold text-slate-200">
-                  Niveau {player.level}
-                </span>
-              </div>
-              <p className="text-lg text-slate-300">Bienvenue,</p>
-              <h2 className="mt-1 text-5xl font-black leading-none text-white sm:text-7xl">
-                {player.username}
-              </h2>
-              <div className="mt-6 space-y-2">
-                <div className="flex items-center justify-between text-sm text-slate-300">
-                  <span>XP</span>
-                  <span className="font-bold text-white">{player.xp} / {player.nextLevelXp}</span>
-                </div>
-                <div className="h-3 overflow-hidden rounded-full bg-slate-900/80">
-                  <div
-                    className="h-full rounded-full bg-gradient-to-r from-teal-300 to-amber-300"
-                    style={{ width: `${Math.min((player.xp / player.nextLevelXp) * 100, 100)}%` }}
-                  />
-                </div>
-              </div>
-            </div>
+        {screen === "home" && (
+          <HomeScreen
+            player={player}
+            onGoToMissions={() => setScreen("missions")}
+            onGoToProfile={() => setScreen("profile")}
+          />
+        )}
 
-            <div className="rounded-lg border border-white/10 bg-slate-900/80 p-5">
-              <div className="flex items-center gap-3">
-                <div className="grid size-10 place-items-center rounded-lg bg-indigo-300/15 text-indigo-100">
-                  <Star className="size-5" aria-hidden="true" />
-                </div>
-                <div>
-                  <h3 className="text-base font-bold text-white">Tableau de quetes</h3>
-                  <p className="text-sm text-slate-400">Choisis une activite et gagne tes recompenses.</p>
-                </div>
-              </div>
-              <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-2">
-                {appRoutes.map((route) => {
-                  const Icon = route.icon;
-                  return (
-                    <Button key={route.id} variant="guild" className="h-20 flex-col gap-2">
-                      <Icon className="size-5" aria-hidden="true" />
-                      <span>{route.label}</span>
-                    </Button>
-                  );
-                })}
-              </div>
-            </div>
-          </section>
+        {screen === "missions" && (
+          <MissionsScreen missions={missions} onBackHome={goHome} onStartQuiz={startMission} />
+        )}
 
-          <footer className="flex items-center justify-center gap-2 pb-2 text-xs font-semibold text-slate-400">
-            <Sparkles className="size-4 text-teal-200" aria-hidden="true" />
-            <span>Mode local pret pour les premieres quetes.</span>
-          </footer>
-        </motion.section>
+        {screen === "quiz" && selectedMission && (
+          <QuizScreen quiz={selectedMission.quiz} onExit={() => setScreen("missions")} onComplete={completeQuiz} />
+        )}
+
+        {screen === "results" && completedResult && (
+          <ResultsScreen
+            quiz={completedResult.quiz}
+            scoreResult={completedResult.scoreResult}
+            rewards={completedResult.rewards}
+            onBackToMissions={() => setScreen("missions")}
+            onBackHome={goHome}
+          />
+        )}
+
+        {screen === "profile" && (
+          <ProfileScreen
+            player={player}
+            progressEntries={Object.values(quizProgressById)}
+            onBackHome={goHome}
+          />
+        )}
       </div>
     </main>
   );
