@@ -1,8 +1,8 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { getCharacters } from "@/data/characters/characters.registry";
 import { foundationsWebPack } from "@/data/packs/foundations-web.example";
 import { titleDefinitions } from "@/data/config/titles.config";
-import type { Badge, Character, Player, PlayerTitle, Quiz } from "@/domain/models";
+import type { Badge, Character, GameSettings, Player, PlayerTitle, Quiz } from "@/domain/models";
 import { performGachaInvocation, type GachaPullResult } from "@/domain/gacha/gacha.service";
 import {
   evaluateGachaUnlocks,
@@ -19,12 +19,14 @@ import { CollectionScreen } from "@/features/collection/CollectionScreen";
 import { GachaScreen } from "@/features/gacha/GachaScreen";
 import { BadgesScreen } from "@/features/badges/BadgesScreen";
 import { HomeScreen } from "@/features/home/HomeScreen";
+import { ImportExportScreen } from "@/features/import-export/ImportExportScreen";
 import { MapScreen } from "@/features/map/MapScreen";
 import { ZoneDetailScreen } from "@/features/map/ZoneDetailScreen";
 import { MissionsScreen } from "@/features/missions/MissionsScreen";
 import { ProfileScreen } from "@/features/profile/ProfileScreen";
 import { QuizScreen } from "@/features/quiz/QuizScreen";
 import { ResultsScreen } from "@/features/results/ResultsScreen";
+import { SettingsScreen } from "@/features/settings/SettingsScreen";
 import { getStoredCollection, saveCollection } from "@/storage/repositories/collection.repository";
 import { getStoredGachaHistory, saveGachaPulls } from "@/storage/repositories/gacha-history.repository";
 import {
@@ -35,8 +37,11 @@ import {
 } from "@/storage/repositories/achievement.repository";
 import { getStoredPlayer, savePlayer } from "@/storage/repositories/player.repository";
 import { getQuizProgressMap, recordQuizAttempt } from "@/storage/repositories/quiz-progress.repository";
+import { resetAllLocalData } from "@/storage/repositories/backup.repository";
+import { defaultSettings, getStoredSettings, normalizeSettings, saveSettings } from "@/storage/repositories/settings.repository";
 import { useGameStore } from "@/stores/game.store";
 import { defaultPlayer, usePlayerStore } from "@/stores/player.store";
+import { useUiStore } from "@/stores/ui.store";
 
 type AppScreen =
   | "home"
@@ -46,6 +51,8 @@ type AppScreen =
   | "quiz"
   | "results"
   | "profile"
+  | "settings"
+  | "import-export"
   | "badges"
   | "gacha"
   | "collection"
@@ -73,6 +80,10 @@ function App() {
   const [persistenceError, setPersistenceError] = useState<string | undefined>();
   const player = usePlayerStore((state) => state.player);
   const setPlayer = usePlayerStore((state) => state.setPlayer);
+  const animationsEnabled = useUiStore((state) => state.animationsEnabled);
+  const soundEnabled = useUiStore((state) => state.soundEnabled);
+  const animationSpeed = useUiStore((state) => state.animationSpeed);
+  const setUiPreferences = useUiStore((state) => state.setPreferences);
   const collection = useGameStore((state) => state.collection);
   const gachaHistory = useGameStore((state) => state.gachaHistory);
   const unlockedBadges = useGameStore((state) => state.unlockedBadges);
@@ -89,53 +100,111 @@ function App() {
   const setQuizProgress = useGameStore((state) => state.setQuizProgress);
   const upsertQuizProgress = useGameStore((state) => state.upsertQuizProgress);
   const characters = useMemo(() => getCharacters(), []);
+  const settings: GameSettings = useMemo(
+    () =>
+      normalizeSettings({
+        animationsEnabled,
+        soundEnabled,
+        animationSpeed,
+        reducedMotion: animationSpeed === "reduced"
+      }),
+    [animationSpeed, animationsEnabled, soundEnabled]
+  );
 
-  useEffect(() => {
-    let cancelled = false;
-
-    async function loadLocalState() {
-      try {
-        const [storedPlayer, storedProgress, storedCollection, storedGachaHistory, storedBadges, storedTitles] = await Promise.all([
+  const reloadLocalState = useCallback(async () => {
+    try {
+      const [storedPlayer, storedProgress, storedCollection, storedGachaHistory, storedBadges, storedTitles, storedSettings] =
+        await Promise.all([
           getStoredPlayer(),
           getQuizProgressMap(),
           getStoredCollection(),
           getStoredGachaHistory(),
           getStoredBadges(),
-          getStoredTitles()
+          getStoredTitles(),
+          getStoredSettings()
         ]);
 
-        if (cancelled) return;
-
-        if (storedPlayer) {
-          setPlayer(normalizePlayer(storedPlayer));
-        } else {
-          await savePlayer(defaultPlayer);
-        }
-
-        setQuizProgress(storedProgress);
-        setCollection(storedCollection);
-        setGachaHistory(storedGachaHistory);
-        setUnlockedBadges(storedBadges);
-
-        if (storedTitles.length > 0) {
-          setUnlockedTitles(storedTitles);
-        } else {
-          const defaultTitles = getDefaultUnlockedTitles();
-          setUnlockedTitles(defaultTitles);
-          await saveUnlockedTitles(defaultTitles);
-        }
-      } catch (error) {
-        setPersistenceError("La sauvegarde locale n'a pas pu etre chargee.");
-        console.error(error);
+      if (storedPlayer) {
+        setPlayer(normalizePlayer(storedPlayer));
+      } else {
+        setPlayer(defaultPlayer);
+        await savePlayer(defaultPlayer);
       }
+
+      setQuizProgress(storedProgress);
+      setCollection(storedCollection);
+      setGachaHistory(storedGachaHistory);
+      setUnlockedBadges(storedBadges);
+
+      if (storedTitles.length > 0) {
+        setUnlockedTitles(storedTitles);
+      } else {
+        const defaultTitles = getDefaultUnlockedTitles();
+        setUnlockedTitles(defaultTitles);
+        await saveUnlockedTitles(defaultTitles);
+      }
+
+      const nextSettings = normalizeSettings(storedSettings ?? defaultSettings);
+      setUiPreferences({
+        animationsEnabled: nextSettings.animationsEnabled,
+        soundEnabled: nextSettings.soundEnabled,
+        animationSpeed: nextSettings.animationSpeed
+      });
+      if (!storedSettings) await saveSettings(nextSettings);
+
+      setPersistenceError(undefined);
+    } catch (error) {
+      setPersistenceError("La sauvegarde locale n'a pas pu etre chargee.");
+      console.error(error);
     }
+  }, [
+    setCollection,
+    setGachaHistory,
+    setPlayer,
+    setQuizProgress,
+    setUiPreferences,
+    setUnlockedBadges,
+    setUnlockedTitles
+  ]);
 
-    void loadLocalState();
+  useEffect(() => {
+    const timeoutId = window.setTimeout(() => {
+      void reloadLocalState();
+    }, 0);
 
-    return () => {
-      cancelled = true;
-    };
-  }, [setCollection, setGachaHistory, setPlayer, setQuizProgress, setUnlockedBadges, setUnlockedTitles]);
+    return () => window.clearTimeout(timeoutId);
+  }, [reloadLocalState]);
+
+  const updateSettings = (nextSettings: GameSettings) => {
+    const normalized = normalizeSettings(nextSettings);
+    setUiPreferences({
+      animationsEnabled: normalized.animationsEnabled,
+      soundEnabled: normalized.soundEnabled,
+      animationSpeed: normalized.animationSpeed
+    });
+    void saveSettings(normalized).catch((error) => {
+      setPersistenceError("Les parametres sont appliques en memoire, mais la sauvegarde locale a echoue.");
+      console.error(error);
+    });
+  };
+
+  const resetAllData = async () => {
+    const confirmed = window.confirm("Cette action remplacera toute ta progression locale. Continuer ?");
+    if (!confirmed) return;
+
+    try {
+      await resetAllLocalData();
+      setGachaResults([]);
+      setSelectedMission(undefined);
+      setSelectedCharacter(undefined);
+      setCompletedResult(undefined);
+      await reloadLocalState();
+      setScreen("home");
+    } catch (error) {
+      setPersistenceError("La reinitialisation locale a echoue.");
+      console.error(error);
+    }
+  };
 
   const missions = useMemo(
     () => buildMissionsFromPack(foundationsWebPack, quizProgressById),
@@ -403,6 +472,7 @@ function App() {
             onGoToGacha={() => setScreen("gacha")}
             onGoToCollection={() => setScreen("collection")}
             onGoToBadges={() => setScreen("badges")}
+            onGoToSettings={() => setScreen("settings")}
           />
         )}
 
@@ -494,6 +564,27 @@ function App() {
             activeTitleId={player.activeTitleId}
             onSetActiveTitle={setActiveTitle}
             onBackHome={goHome}
+          />
+        )}
+
+        {screen === "settings" && (
+          <SettingsScreen
+            player={player}
+            settings={settings}
+            appVersion="0.1.0"
+            onBackHome={goHome}
+            onOpenImportExport={() => setScreen("import-export")}
+            onUpdateSettings={updateSettings}
+            onResetAll={resetAllData}
+          />
+        )}
+
+        {screen === "import-export" && (
+          <ImportExportScreen
+            onBackSettings={() => setScreen("settings")}
+            onBackHome={goHome}
+            onImported={reloadLocalState}
+            onResetAll={resetAllData}
           />
         )}
 

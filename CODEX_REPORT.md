@@ -4,179 +4,146 @@ Date : 16 juin 2026
 
 ## Resume
 
-Le systeme de progression gratifiant V1 est ajoute :
+La couche de gestion locale des donnees est ajoutee :
 
-- montee de niveau detaillee ;
-- bonus de gemmes a chaque niveau franchi ;
-- animation de level up sur l'ecran Resultat ;
-- resume clair des gains XP/gemmes ;
-- badges V1 ;
-- titres V1 ;
-- ecran `Badges & Titres` ;
-- titre actif affichable et modifiable ;
-- debug local dans le Profil pour tester niveaux et gacha x10 ;
-- persistance Dexie des badges/titres.
+- ecran `Parametres` ;
+- ecran `Import / Export` ;
+- export JSON complet ;
+- import JSON complet avec validation et confirmation ;
+- reset local complet ;
+- preferences UI sons/animations/vitesse ;
+- rechargement des stores Zustand apres import/reset ;
+- documentation README.
 
 ## Fichiers crees ou modifies
 
 Crees :
 
-- `src/data/config/level-rewards.config.ts`
-- `src/data/config/badges.config.ts`
-- `src/data/config/titles.config.ts`
-- `src/domain/progression/achievements.service.ts`
-- `src/features/badges/BadgesScreen.tsx`
-- `src/storage/repositories/achievement.repository.ts`
+- `src/features/settings/SettingsScreen.tsx`
+- `src/features/import-export/ImportExportScreen.tsx`
+- `src/storage/repositories/backup.repository.ts`
+- `src/storage/repositories/settings.repository.ts`
 
 Modifies :
 
+- `README.md`
 - `src/app/App.tsx`
-- `src/domain/progression/level.service.ts`
+- `src/domain/models/GameSettings.ts`
 - `src/features/home/HomeScreen.tsx`
-- `src/features/profile/ProfileScreen.tsx`
-- `src/features/results/ResultsScreen.tsx`
-- `src/storage/db.ts`
-- `src/stores/game.store.ts`
-- `src/stores/player.store.ts`
+- `src/stores/ui.store.ts`
 - `CODEX_REPORT.md`
 
-## Formule de bonus gemmes
+## Tables exportees
 
-Config ajoutee :
+L'export complet JSON inclut :
 
-- `src/data/config/level-rewards.config.ts`
-
-Formule :
-
-```ts
-Math.round(75 * Math.pow(levelReached, 1.15))
-```
-
-Le bonus est donne pour chaque niveau franchi. Si plusieurs niveaux sont gagnes d'un coup, les bonus sont cumules.
-
-## Logique de montee de niveau
-
-La regle XP reste :
-
-- XP necessaire niveau suivant = `level * 100`
-
-Le service retourne maintenant :
-
-- ancien niveau ;
-- nouveau niveau ;
-- nombre de niveaux gagnes ;
-- XP actuelle ;
-- XP necessaire prochain niveau ;
-- gemmes bonus gagnees ;
-- liste des niveaux franchis.
-
-L'application ajoute au joueur :
-
-- gemmes de mission ;
-- gemmes bonus de niveau ;
-- XP restante apres montee ;
-- nouveau niveau ;
-- prochain seuil XP.
-
-## Ecran Resultat
-
-L'ecran Resultat affiche maintenant :
-
-- XP de mission ;
-- gemmes de mission ;
-- bonus gemmes de niveau ;
-- total gemmes gagnees ;
-- animation `Niveau superieur !` si applicable ;
-- badges debloques ;
-- titres debloques.
-
-## Badges V1
-
-Config ajoutee :
-
-- `src/data/config/badges.config.ts`
-
-Badges declares :
-
-- Premier quiz reussi
-- Premier sans-faute
-- 5 quiz termines
-- 10 quiz termines
-- Premier niveau superieur
-- Niveau 5 atteint
-- Niveau 10 atteint
-- Premiere invocation
-- Premier personnage rare
-- Premier personnage legendaire
-- Explorateur des Fondations
-- Maitre des Fondations
-
-Branches maintenant :
-
-- badges quiz ;
-- badges niveau ;
-- badges progression Fondations ;
-- badges gacha de base apres invocation.
-
-## Titres V1
-
-Config ajoutee :
-
-- `src/data/config/titles.config.ts`
-
-Titres declares :
-
-- Apprenti de la Guilde
-- Chasseur de Competences
-- Mage du Web
-- Invocateur Debutant
-- Collectionneur de Guilde
-- Stratege des Fondations
-- Etoile Montante
-- Mage de Rang F
-
-Fonctionnel maintenant :
-
-- titres debloques ;
-- titres par defaut ;
-- titre actif ;
-- changement du titre actif depuis `Badges & Titres` ;
-- affichage dans Hall et Profil.
-
-## Persistance Dexie
-
-Tables utilisees :
-
+- `player`
+- `playerCharacters`
+- `quizProgress`
+- `gachaHistory`
 - `unlockedBadges`
 - `unlockedTitles`
+- `settings`
+- `installedPacks`
+
+Metadata incluse :
+
+- `appName: GuildQuest`
+- `backupVersion`
+- `exportedAt`
+- `schemaVersion`
+
+Nom de fichier :
+
+- `guildquest-backup-YYYY-MM-DD-HH-mm.json`
+
+Les assets prives dans `public/private-assets/characters/` ne sont pas inclus. Seuls les chemins/references stockes dans les donnees sont exportes.
+
+## Tables importees
+
+L'import complet remplace les memes tables :
+
 - `player`
+- `playerCharacters`
+- `quizProgress`
+- `gachaHistory`
+- `unlockedBadges`
+- `unlockedTitles`
+- `settings`
+- `installedPacks`
 
-Persistant :
+Apres import, les stores Zustand sont recharges depuis Dexie :
 
-- badges debloques ;
-- titres debloques ;
-- `activeTitleId` sur le joueur ;
-- ids de badges/titres sur le joueur ;
-- bonus de gemmes via la valeur `player.gems` ;
-- dernieres recompenses quiz avec total gemmes, gemmes de mission et bonus niveau.
+- joueur ;
+- collection ;
+- historique gacha ;
+- progression quiz ;
+- badges ;
+- titres ;
+- preferences UI.
 
-## Debug local
+## Validation JSON
 
-Ajoute dans le Profil, section `Debug local` :
+La validation verifie :
 
-- `+500 gemmes`
-- `+2000 gemmes`
-- `+1000 XP`
-- `Gemmes = 200`
+- JSON lisible ;
+- presence d'un objet `metadata` ;
+- `metadata.appName === "GuildQuest"` ;
+- `backupVersion` numerique ;
+- presence d'un objet `data` ;
+- presence de tableaux pour les tables attendues.
 
-Ces actions modifient le joueur localement et persistent via Dexie. Elles servent a tester rapidement les invocations x10 et les niveaux.
+Un fichier invalide affiche un message clair et n'est pas importe.
+
+Avant import, une confirmation navigateur demande :
+
+`Cette action remplacera ta progression locale actuelle. Continuer ?`
+
+## Reset local
+
+Le reset complet :
+
+- vide les tables GuildQuest ;
+- recree le joueur `leb` ;
+- niveau 1 ;
+- XP 0 ;
+- gemmes 200 ;
+- rang `Mage de Rang F` ;
+- restaure les titres par defaut ;
+- restaure les parametres par defaut.
+
+L'app recharge les stores apres reset et revient au Hall.
+
+## Parametres
+
+L'ecran `Parametres` affiche :
+
+- pseudo ;
+- rang ;
+- niveau ;
+- version app ;
+- sons actives/desactives ;
+- animations activees/desactivees ;
+- vitesse animations : normale, rapide, reduite ;
+- acces Import / Export ;
+- zone danger pour reset complet ;
+- rappel offline/local.
+
+Les preferences sont persistees dans la table Dexie `settings`.
+
+## README
+
+Ajout d'une section `Sauvegarde et restauration` :
+
+- export JSON ;
+- import JSON ;
+- reset local ;
+- assets prives non inclus ;
+- recommandation d'export avant changement majeur ou voyage.
 
 ## Commandes executees
 
-- `Get-Content -Raw CODEX_RULES.md`
-- lectures des fichiers `App`, `ResultsScreen`, stores, repositories, modeles et services de progression
-- `Get-Content src/features/results/ResultsScreen.tsx | Select-Object -Index 72..88`
-- `Get-Content src/features/results/ResultsScreen.tsx | Select-Object -Skip 72 -First 20`
+- lectures des fichiers stores, App, db, README et modeles
 - `npm run build`
 - `npm run lint`
 - `npm run dev -- --host 127.0.0.1`
@@ -191,13 +158,13 @@ Le build production Vite passe.
 Avertissement restant :
 
 - certains chunks depassent 500 kB apres minification.
-- avertissement non bloquant deja present sur les versions precedentes.
+- avertissement non bloquant deja connu.
 
 ## Resultat de `npm run lint`
 
 OK.
 
-Aucune erreur et aucun avertissement ESLint.
+Un premier lint a signale `react-hooks/set-state-in-effect` dans `App.tsx`. Le rechargement initial est maintenant decale via `setTimeout`, puis le lint est repasse sans erreur.
 
 ## Resultat de `npm run dev`
 
@@ -210,27 +177,27 @@ Vite annonce :
 
 La commande a ete arretee par timeout volontaire apres quelques secondes, car le serveur de dev reste ouvert en continu.
 
-## Erreurs ou limites rencontrees
+## Limites eventuelles
 
-- Une commande de lecture PowerShell avec `Select-Object -Index 72..88` a echoue car la plage n'etait pas convertie en tableau d'entiers. Relance reussie avec `-Skip 72 -First 20`.
-- Un premier build a echoue sur `->` dans du JSX. Correction : rendu sous forme de chaine `{"->"}`.
-- La verification visuelle navigateur integre n'a pas ete tentee dans cette tache.
-- Aucun commit et aucun push n'ont ete faits.
+- Export partiel progression/collection non implemente pour cette etape.
+- Le reset partiel quiz ou gacha n'est pas encore separe : seul le reset complet est implemente.
+- Les images privees ne sont pas exportees, volontairement.
+- La verification visuelle navigateur integre n'a pas ete effectuee dans cette tache.
 
 ## Points a verifier manuellement
 
-- Lancer `npm run dev`.
-- Terminer un quiz avec assez d'XP pour monter de niveau.
-- Verifier l'animation `Niveau superieur !`.
-- Verifier que les gemmes bonus sont ajoutees.
-- Verifier l'ecran Resultat et le detail des gains.
-- Ouvrir `Badges & Titres`.
-- Changer le titre actif.
-- Verifier le titre actif dans Hall et Profil.
-- Utiliser le debug local `+2000 gemmes`.
-- Tester une invocation x10.
-- Rafraichir la page et verifier que joueur, badges, titres et titre actif persistent.
+- Ouvrir le Hall.
+- Aller dans `Parametres`.
+- Changer sons/animations/vitesse et verifier la persistance apres refresh.
+- Ouvrir `Import / Export`.
+- Exporter un JSON complet.
+- Verifier que le fichier contient metadata et data.
+- Importer une sauvegarde valide et confirmer.
+- Tenter un JSON invalide et verifier le message d'erreur.
+- Faire un reset complet.
+- Verifier que `leb` revient niveau 1, XP 0, 200 gemmes.
+- Verifier que Missions, Gacha, Collection, Carte, Profil restent utilisables apres import/reset.
 
 ## Prochaine etape recommandee
 
-Ajouter une notification globale de recompenses/deblocages reutilisable pour le gacha, les badges, les titres et les futures evolutions de personnages.
+Ajouter des exports partiels `progression seulement` et `collection seulement`, puis un ecran d'inspection de sauvegarde plus detaille avant import.

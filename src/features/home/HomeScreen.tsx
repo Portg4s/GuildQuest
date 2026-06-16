@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Crown, Gem, Map, Medal, Shield, Sparkles, Star, UserRound, ScrollText, Trophy } from "lucide-react";
+import { Crown, Gem, Map, Medal, Settings, Shield, Sparkles, Star, UserRound, ScrollText, Trophy } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { CharacterImage } from "@/components/game/CharacterImage";
 import { rarityBadgeClasses, rarityLabels } from "@/components/game/rarity-styles";
@@ -18,6 +18,7 @@ type HomeScreenProps = {
   onGoToGacha: () => void;
   onGoToCollection: () => void;
   onGoToBadges: () => void;
+  onGoToSettings: () => void;
 };
 
 export function HomeScreen({
@@ -30,7 +31,8 @@ export function HomeScreen({
   onGoToProfile,
   onGoToGacha,
   onGoToCollection,
-  onGoToBadges
+  onGoToBadges,
+  onGoToSettings
 }: HomeScreenProps) {
   const xpProgress = Math.min((player.xp / player.nextLevelXp) * 100, 100);
 
@@ -120,6 +122,10 @@ export function HomeScreen({
             <Button variant="guild" className="h-24 flex-col gap-2" onClick={onGoToBadges}>
               <Medal className="size-6" aria-hidden="true" />
               <span>Badges</span>
+            </Button>
+            <Button variant="guild" className="h-24 flex-col gap-2" onClick={onGoToSettings}>
+              <Settings className="size-6" aria-hidden="true" />
+              <span>Parametres</span>
             </Button>
             <Button variant="guild" className="h-24 flex-col gap-2" onClick={onGoToProfile}>
               <UserRound className="size-6" aria-hidden="true" />
