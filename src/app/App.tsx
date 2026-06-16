@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { exampleCharacters } from "@/data/characters/characters.example";
+import { getCharacters } from "@/data/characters/characters.registry";
 import { foundationsWebPack } from "@/data/packs/foundations-web.example";
 import type { Character, Player, Quiz } from "@/domain/models";
 import { performGachaInvocation, type GachaPullResult } from "@/domain/gacha/gacha.service";
@@ -64,6 +64,7 @@ function App() {
   const setActiveCharacterInCollection = useGameStore((state) => state.setActiveCharacter);
   const setQuizProgress = useGameStore((state) => state.setQuizProgress);
   const upsertQuizProgress = useGameStore((state) => state.upsertQuizProgress);
+  const characters = useMemo(() => getCharacters(), []);
 
   useEffect(() => {
     let cancelled = false;
@@ -115,8 +116,8 @@ function App() {
     [selectedZoneId]
   );
   const activeCharacter = useMemo(
-    () => exampleCharacters.find((character) => character.id === player.activeCharacterId),
-    [player.activeCharacterId]
+    () => characters.find((character) => character.id === player.activeCharacterId),
+    [characters, player.activeCharacterId]
   );
   const selectedOwnedCharacter = useMemo(
     () => collection.find((playerCharacter) => playerCharacter.characterId === selectedCharacter?.id),
@@ -168,7 +169,7 @@ function App() {
           player,
           collection,
           count,
-          characters: exampleCharacters
+          characters
         });
 
         setPlayer(invocation.player);
@@ -334,6 +335,7 @@ function App() {
         {screen === "collection" && (
           <CollectionScreen
             collection={collection}
+            characters={characters}
             activeCharacterId={player.activeCharacterId}
             onBackHome={goHome}
             onOpenCharacter={(character) => {

@@ -31,3 +31,23 @@ export const rarityGlowClasses: Record<CharacterRarity, string> = {
   LEGENDARY: "shadow-[0_0_34px_rgba(252,211,77,0.32)]",
   MYTHIC: "shadow-[0_0_42px_rgba(251,113,133,0.34)]"
 };
+
+export const raritySortWeight: Record<CharacterRarity, number> = {
+  COMMON: 1,
+  RARE: 2,
+  EPIC: 3,
+  LEGENDARY: 4,
+  MYTHIC: 5
+};
+
+export const rarityVisualWeight: Record<CharacterRarity, string> = {
+  COMMON: "I",
+  RARE: "II",
+  EPIC: "III",
+  LEGENDARY: "IV",
+  MYTHIC: "V"
+};
+
+export function compareRarity(a: CharacterRarity, b: CharacterRarity) {
+  return raritySortWeight[a] - raritySortWeight[b];
+}

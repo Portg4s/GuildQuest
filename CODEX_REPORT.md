@@ -4,176 +4,193 @@ Date : 16 juin 2026
 
 ## Resume
 
-La partie apprentissage/exploration de GuildQuest a ete renforcee :
+Le systeme de personnages est prepare pour des assets locaux prives tout en gardant le repo propre :
 
-- Bouton `Carte` active depuis le Hall.
-- Nouvel ecran `Carte des regions`.
-- Nouvel ecran `Detail de zone / arbre de competences`.
-- Navigation RPG : Hall -> Carte -> Zone -> Quiz.
-- L'ecran Missions reste disponible comme acces rapide aux quiz.
-- Hall enrichi avec un bloc `Progression actuelle`.
-- Profil enrichi avec progression du pack, quiz valides et quiz parfaits.
-- Pack `Fondations Web` fortement enrichi.
+- registre central de personnages ;
+- liste publique placeholder enrichie ;
+- template local prive commitable ;
+- support d'un fichier local ignore par Git ;
+- fallback automatique des images cassees ;
+- integration dans gacha, collection, detail personnage, Hall et Profil ;
+- dossier local `public/private-assets/characters/` cree sans contenu suivi.
 
 ## Fichiers crees ou modifies
 
 Crees :
 
-- `src/domain/progression/learning-progress.service.ts`
-- `src/features/map/MapScreen.tsx`
-- `src/features/map/ZoneDetailScreen.tsx`
+- `src/components/game/CharacterImage.tsx`
+- `src/data/characters/characters.placeholder.ts`
+- `src/data/characters/characters.registry.ts`
+- `src/data/characters/characters.local.template.ts`
 
 Modifies :
 
+- `.gitignore`
+- `README.md`
 - `src/app/App.tsx`
-- `src/data/packs/foundations-web.example.ts`
-- `src/domain/models/SkillNode.ts`
-- `src/features/home/HomeScreen.tsx`
-- `src/features/profile/ProfileScreen.tsx`
+- `src/components/game/rarity-styles.ts`
+- `src/data/characters/characters.example.ts`
+- `src/domain/gacha/gacha.service.ts`
+- `src/domain/models/Character.ts`
+- `src/features/character-detail/CharacterDetailScreen.tsx`
 - `src/features/collection/CollectionScreen.tsx`
 - `src/features/gacha/GachaScreen.tsx`
+- `src/features/home/HomeScreen.tsx`
+- `src/features/profile/ProfileScreen.tsx`
 - `CODEX_REPORT.md`
 
-## Contenu ajoute au pack
+## Nouvelle strategie des personnages
 
-Pack actif : `Fondations Web`.
+La source publique principale est maintenant :
 
-Region :
+- `src/data/characters/characters.placeholder.ts`
 
-- `Plaine des Fondations`
+Le registre central est :
 
-Zones :
+- `src/data/characters/characters.registry.ts`
 
-- Internet & Web
-- Client / Serveur
-- HTTP & HTTPS
-- HTML & CSS
-- JavaScript & APIs
+Il fusionne :
 
-Volume actuel :
+- les personnages placeholders publics ;
+- un fichier local optionnel `src/data/characters/characters.local.ts` si present.
 
-- 5 zones
-- 15 quiz
-- 45 questions
-- 15 noeuds de competence
+Le fichier local reel `characters.local.ts` est ignore par Git. Il peut exporter :
 
-Chaque zone contient 3 quiz et 3 noeuds de competence. Les questions melangent :
+- `localCharacters`
+- ou un export `default`
 
-- `SINGLE_CHOICE`
-- `MULTIPLE_CHOICE`
-- `TRUE_FALSE`
+Les personnages locaux qui ont le meme `id` qu'un placeholder remplacent la version publique. Cela prepare un futur import/remplacement JSON sans changer la logique gacha/collection.
 
-Themes couverts :
+`characters.example.ts` reste present comme alias de compatibilite vers la liste placeholder.
 
-- difference Internet / Web
-- navigateur
-- URL
-- DNS
-- hebergement
-- client / serveur
-- requete / reponse
-- API
-- frontend / backend
-- methodes HTTP
-- codes HTTP
-- headers
-- body
-- HTTPS
-- structure HTML
-- balises semantiques
-- attributs
-- CSS
-- selecteurs
-- responsive
-- JavaScript
-- DOM
-- evenements
-- JSON
-- fetch
-- API REST
+## Personnages placeholders
 
-## Logique de progression ajoutee
+La liste publique contient maintenant 30 personnages generiques :
 
-Nouveau service : `learning-progress.service.ts`.
+- 10 COMMON
+- 8 RARE
+- 6 EPIC
+- 4 LEGENDARY
+- 2 MYTHIC
 
-Fonctions principales :
+Les anciens IDs ont ete conserves pour limiter l'impact sur les collections Dexie existantes :
 
-- calcul du statut d'un quiz ;
-- calcul de progression d'une zone ;
-- calcul de progression d'une region ;
-- calcul de progression du pack ;
-- recuperation des quiz d'une zone ;
-- recuperation des noeuds de competence d'une zone ;
-- calcul de progression d'un noeud.
+- `apprentice-luma`
+- `scribe-novan`
+- `forge-mira`
+- `rune-tarek`
+- `aera-sentinel`
+- `kael-architect`
+- `naya-oracle`
+- `solen-warden`
+- `elys-celestial`
+- `orion-voidsmith`
 
-Regles appliquees :
+Les puissances ont ete ajustees pour respecter les fourchettes par rarete.
 
-- Quiz non tente : aucune tentative.
-- Quiz echoue : tentative avec meilleur score < 60%.
-- Quiz valide : meilleur score >= 60%.
-- Quiz parfait : meilleur score = 100%.
-- Zone non commencee : aucun quiz tente.
-- Zone en cours : au moins un quiz tente, mais tous les quiz ne sont pas valides.
-- Zone terminee : tous les quiz de la zone sont valides.
-- Progression zone : quiz valides / quiz totaux.
-- Progression region : quiz valides / quiz totaux de la region.
+## Modele Character
 
-## UI ajoutee
+Le modele accepte maintenant les champs optionnels :
 
-Carte des regions :
+- `category`
+- `variant`
+- `isPrivate`
+- `source`
 
-- titre `Carte des regions` ;
-- retour Hall ;
-- pack actif ;
-- region `Plaine des Fondations` ;
-- progression globale ;
-- zones terminees / total ;
-- quiz valides / total ;
-- quiz parfaits ;
-- cartes de zones avec statut, progression et bouton `Explorer`.
+Les champs existants restent compatibles :
 
-Detail de zone :
+- `id`
+- `name`
+- `rarity`
+- `element`
+- `power`
+- `description`
+- `image`
+- `placeholderImage`
 
-- nom et description de la zone ;
-- barre de progression ;
-- statut de zone ;
-- noeuds de competence ordonnes ;
-- quiz lies a chaque noeud ;
-- meilleur score visible ;
-- bouton `Lancer`.
+## Fallback image
 
-Hall :
+Nouveau composant :
 
-- bouton `Carte` ajoute ;
-- bloc `Progression actuelle` avec pack, region et pourcentage ;
-- bouton `Ouvrir la carte`.
+- `CharacterImage`
 
-Profil :
+Comportement :
 
-- progression `Fondations Web` ;
-- quiz valides ;
-- quiz parfaits ;
-- conservation des stats quiz, gacha et personnage actif.
+- tente d'abord `character.image`, par exemple `/private-assets/characters/...` ;
+- si l'image est absente ou invalide, utilise `character.placeholderImage` ;
+- si le placeholder echoue aussi, utilise `/pwa.svg` ;
+- evite les images cassees dans l'UI.
 
-## Extensibilite packs
+Le composant est utilise dans :
 
-La logique reste basee sur `ContentPack`, `Region`, `Zone`, `Quiz` et `SkillNode`.
+- Invocation ;
+- Collection ;
+- Detail personnage ;
+- Hall ;
+- Profil.
 
-Simplifications actuelles :
+## Raretes
 
-- un seul pack actif est charge directement depuis `foundations-web.example.ts` ;
-- une seule region est affichee pour la V1 ;
-- les zones sont toutes accessibles, sans verrouillage strict ;
-- les noeuds de competence portent des champs optionnels `zoneId`, `quizIds` et `order` pour preparer plusieurs zones/packs plus tard.
+Le helper `rarity-styles.ts` contient maintenant :
+
+- labels francais ;
+- classes de carte ;
+- classes de badge ;
+- classes de glow ;
+- poids de tri ;
+- poids visuel ;
+- fonction `compareRarity`.
+
+Les raretes restent :
+
+- COMMON
+- RARE
+- EPIC
+- LEGENDARY
+- MYTHIC
+
+## Assets prives
+
+`.gitignore` ignore :
+
+- `/public/private-assets/`
+- `/src/data/characters/characters.local.ts`
+
+Le dossier local suivant a ete cree vide :
+
+- `public/private-assets/characters/`
+
+Aucun asset prive ou protege n'a ete ajoute.
+
+Le README documente :
+
+- ou placer les images privees ;
+- comment copier le template local ;
+- le fallback automatique vers les placeholders.
+
+## Impact sur la collection existante
+
+Impact limite :
+
+- les 10 premiers IDs existants sont conserves ;
+- les personnages deja obtenus avec ces IDs restent compatibles ;
+- les nouvelles entrees ajoutent simplement plus de personnages au pool gacha.
+
+Attention :
+
+- si un futur fichier local remplace un personnage avec un ID existant, la collection Dexie pointera vers cette nouvelle definition ;
+- si un personnage obtenu a un ID retire d'une future liste, il pourrait ne plus etre affichable sans migration.
 
 ## Commandes executees
 
-- `Get-Content -Raw CODEX_RULES.md`
-- lectures des fichiers existants `App`, `HomeScreen`, `ProfileScreen`, `MissionsScreen`, modeles et pack
+- `Get-Content -Raw .gitignore`
+- lectures des fichiers personnages, gacha, collection, Hall, Profil et detail personnage
+- `New-Item -ItemType Directory -Force -Path public/private-assets/characters`
+- `git check-ignore -v public/private-assets/characters`
+- `git check-ignore -v src/data/characters/characters.local.ts`
 - `npm run build`
 - `npm run lint`
 - `npm run dev -- --host 127.0.0.1`
-- tentative de connexion au navigateur integre
 
 ## Resultat de `npm run build`
 
@@ -184,14 +201,13 @@ Le build production Vite passe et genere les fichiers PWA.
 Avertissement restant :
 
 - Vite signale que certains chunks depassent 500 kB apres minification.
-- Ce n'est pas bloquant pour la V1.
-- Une prochaine etape possible sera le code splitting par ecran.
+- Ce n'est pas bloquant.
 
 ## Resultat de `npm run lint`
 
 OK.
 
-Aucune erreur et aucun avertissement ESLint.
+Un premier passage a signale `react-hooks/set-state-in-effect` dans `CharacterImage`. Le composant a ete corrige pour suivre les sources en erreur sans effet React, puis le lint est repasse sans erreur.
 
 ## Resultat de `npm run dev`
 
@@ -206,24 +222,22 @@ La commande a ete arretee par timeout volontaire apres quelques secondes, car le
 
 ## Erreurs ou limites rencontrees
 
-- Verification navigateur integre impossible : l'instance `iab` n'est pas disponible dans cette session.
-- La validation visuelle complete doit donc etre faite manuellement.
+- Aucune erreur restante cote build ou lint.
+- Aucune verification visuelle navigateur n'a ete effectuee dans cette tache.
+- Aucun telechargement Internet n'a ete effectue.
 - Aucun commit et aucun push n'ont ete faits.
-- Aucun asset protege n'a ete ajoute.
 
 ## Points a verifier manuellement
 
 - Lancer `npm run dev`.
 - Ouvrir `http://127.0.0.1:5173/`.
-- Depuis le Hall, ouvrir `Carte`.
-- Verifier la region `Plaine des Fondations`.
-- Explorer chaque zone.
-- Lancer un quiz depuis un noeud de competence.
-- Terminer un quiz et verifier que la progression de zone/region evolue.
-- Verifier que l'ecran Missions fonctionne toujours.
-- Verifier que le Profil affiche la progression d'apprentissage.
-- Tester le rendu mobile des cartes de zones et noeuds.
+- Verifier Invocation et Collection avec les 30 placeholders.
+- Placer une image locale dans `public/private-assets/characters/`.
+- Copier `characters.local.template.ts` vers `characters.local.ts` et adapter un personnage.
+- Verifier que l'image privee s'affiche.
+- Renommer ou supprimer l'image privee et verifier le fallback vers `/pwa.svg`.
+- Verifier que le personnage actif s'affiche toujours dans le Hall et le Profil.
 
 ## Prochaine etape recommandee
 
-Ajouter un vrai verrouillage progressif des zones/noeuds, puis introduire un ecran `Carte` multi-regions avec selection de pack actif.
+Ajouter un import JSON local pour personnages et un petit ecran de validation listant les IDs remplaces, les images manquantes et les raretes disponibles.

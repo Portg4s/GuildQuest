@@ -1,5 +1,5 @@
 import { gachaCosts } from "@/data/config/gacha.config";
-import { exampleCharacters } from "@/data/characters/characters.example";
+import { getCharacters } from "@/data/characters/characters.registry";
 import type { Character, CharacterRarity, GachaPull, Player, PlayerCharacter } from "@/domain/models";
 import { getDuplicateReward } from "@/domain/gacha/duplicate.service";
 import { rollRarity } from "@/domain/gacha/gacha-rates.service";
@@ -70,7 +70,7 @@ export function performGachaInvocation(params: {
   count: 1 | 10;
   characters?: Character[];
 }): GachaInvocationResult {
-  const characters = params.characters ?? exampleCharacters;
+  const characters = params.characters ?? getCharacters();
   const totalCost = getGachaCost(params.count);
 
   if (characters.length === 0) {

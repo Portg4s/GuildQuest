@@ -1,14 +1,15 @@
 import { useMemo, useState } from "react";
 import { ArrowLeft, Check, Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { CharacterImage } from "@/components/game/CharacterImage";
 import { rarityBadgeClasses, rarityCardClasses, rarityLabels } from "@/components/game/rarity-styles";
-import { exampleCharacters } from "@/data/characters/characters.example";
 import type { Character, CharacterRarity, PlayerCharacter } from "@/domain/models";
 import { getRarityOrder } from "@/domain/gacha/gacha-rates.service";
 import { cn } from "@/lib/utils";
 
 type CollectionScreenProps = {
   collection: PlayerCharacter[];
+  characters: Character[];
   activeCharacterId?: string;
   onBackHome: () => void;
   onOpenCharacter: (character: Character) => void;
@@ -19,6 +20,7 @@ type Filter = CharacterRarity | "ALL";
 
 export function CollectionScreen({
   collection,
+  characters,
   activeCharacterId,
   onBackHome,
   onOpenCharacter,
@@ -29,9 +31,9 @@ export function CollectionScreen({
     () => new Map(collection.map((playerCharacter) => [playerCharacter.characterId, playerCharacter])),
     [collection]
   );
-  const characters = filter === "ALL"
-    ? exampleCharacters
-    : exampleCharacters.filter((character) => character.rarity === filter);
+  const filteredCharacters = filter === "ALL"
+    ? characters
+    : characters.filter((character) => character.rarity === filter);
 
   return (
     <section className="space-y-5">
@@ -40,7 +42,7 @@ export function CollectionScreen({
           <p className="text-xs font-semibold uppercase tracking-[0.22em] text-teal-200">Archives de guilde</p>
           <h1 className="text-3xl font-black text-white">Collection</h1>
           <p className="mt-2 text-sm text-slate-300">
-            {collection.length} / {exampleCharacters.length} personnages debloques
+            {collection.length} / {characters.length} personnages debloques
           </p>
         </div>
         <Button variant="guild" onClick={onBackHome}>
@@ -58,8 +60,13 @@ export function CollectionScreen({
         ))}
       </div>
 
+      <div className="rounded-lg border border-teal-200/20 bg-teal-300/10 p-3 text-sm text-teal-50">
+        Les images privees locales sont chargees si elles existent dans /public/private-assets/characters/.
+        Sinon, GuildQuest utilise les placeholders.
+      </div>
+
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {characters.map((character) => {
+        {filteredCharacters.map((character) => {
           const owned = ownedByCharacterId.get(character.id);
           const isActive = activeCharacterId === character.id;
 
@@ -78,9 +85,8 @@ export function CollectionScreen({
                   </span>
                   {isActive ? <Check className="size-5 text-teal-100" aria-hidden="true" /> : !owned && <Lock className="size-5" aria-hidden="true" />}
                 </div>
-                <img
-                  src={character.placeholderImage}
-                  alt=""
+                <CharacterImage
+                  character={character}
                   className={cn(
                     "mx-auto mt-4 size-24 rounded-lg border border-white/10 bg-white/10 p-3",
                     !owned && "grayscale opacity-35"

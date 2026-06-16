@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { ArrowLeft, Gem, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { CharacterImage } from "@/components/game/CharacterImage";
 import { rarityBadgeClasses, rarityCardClasses, rarityGlowClasses, rarityLabels } from "@/components/game/rarity-styles";
 import { gachaCosts } from "@/data/config/gacha.config";
 import type { Player } from "@/domain/models";
@@ -112,9 +113,8 @@ export function GachaScreen({
                   {result.isNew ? "Nouveau !" : "Doublon"}
                 </span>
               </div>
-              <img
-                src={result.character.placeholderImage}
-                alt=""
+              <CharacterImage
+                character={result.character}
                 className="mx-auto mt-4 size-24 rounded-lg border border-white/10 bg-white/10 p-3"
               />
               <h2 className="mt-4 text-xl font-black text-white">{result.character.name}</h2>

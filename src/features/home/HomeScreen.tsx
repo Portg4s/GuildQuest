@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { Gem, Map, Shield, Sparkles, Star, UserRound, ScrollText, Trophy } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { CharacterImage } from "@/components/game/CharacterImage";
 import { rarityBadgeClasses, rarityLabels } from "@/components/game/rarity-styles";
 import type { Character, Player } from "@/domain/models";
 import type { RegionProgress } from "@/domain/progression/learning-progress.service";
@@ -164,9 +165,8 @@ export function HomeScreen({
                 {rarityLabels[activeCharacter.rarity]}
               </span>
             )}
-            <img
-              src={activeCharacter?.placeholderImage ?? "/pwa.svg"}
-              alt=""
+            <CharacterImage
+              character={activeCharacter}
               className="size-20 rounded-lg border border-white/10 bg-white/10 p-3"
             />
           </div>

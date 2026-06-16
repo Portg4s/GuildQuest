@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { ArrowLeft, Check, Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { CharacterImage } from "@/components/game/CharacterImage";
 import { rarityBadgeClasses, rarityCardClasses, rarityGlowClasses, rarityLabels } from "@/components/game/rarity-styles";
 import type { Character, PlayerCharacter } from "@/domain/models";
 import { cn } from "@/lib/utils";
@@ -52,9 +53,8 @@ export function CharacterDetailScreen({
           </span>
         </div>
 
-        <img
-          src={character.placeholderImage}
-          alt=""
+        <CharacterImage
+          character={character}
           className={cn(
             "mx-auto mt-6 size-36 rounded-lg border border-white/10 bg-white/10 p-5",
             !owned && "grayscale opacity-45"

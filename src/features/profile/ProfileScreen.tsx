@@ -1,5 +1,6 @@
 import { ArrowLeft, Gem, Sparkles, Trophy, UserRound } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { CharacterImage } from "@/components/game/CharacterImage";
 import { rarityBadgeClasses, rarityLabels } from "@/components/game/rarity-styles";
 import type { Character, GachaPull, Player, PlayerCharacter } from "@/domain/models";
 import type { RegionProgress } from "@/domain/progression/learning-progress.service";
@@ -96,7 +97,7 @@ export function ProfileScreen({
         <p className="text-sm font-bold uppercase tracking-[0.18em] text-teal-200">Personnage actif</p>
         {activeCharacter ? (
           <div className="mt-4 flex items-center gap-4">
-            <img src={activeCharacter.placeholderImage} alt="" className="size-20 rounded-lg border border-white/10 bg-white/10 p-3" />
+            <CharacterImage character={activeCharacter} className="size-20 rounded-lg border border-white/10 bg-white/10 p-3" />
             <div>
               <h2 className="text-2xl font-black text-white">{activeCharacter.name}</h2>
               <p className="mt-1 text-sm text-slate-300">{activeCharacter.element} - Puissance {activeCharacter.power}</p>

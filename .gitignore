@@ -14,3 +14,4 @@ Thumbs.db
 coverage
 .vite
 /public/private-assets/
+/src/data/characters/characters.local.ts
