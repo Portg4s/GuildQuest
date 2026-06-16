@@ -594,6 +594,8 @@ function App() {
             results={gachaResults}
             isInvoking={isInvoking}
             error={gachaError}
+            animationsEnabled={animationsEnabled}
+            animationSpeed={animationSpeed}
             onInvoke={invokeGacha}
             onBackHome={goHome}
             onGoToCollection={() => setScreen("collection")}
