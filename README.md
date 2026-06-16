@@ -44,9 +44,9 @@ npm run lint
 
 ## Assets prives
 
-Les assets sous `public/private-assets/` sont reserves a un usage local et doivent rester hors Git. Utiliser des placeholders generiques dans le repo public.
+Les assets sous `public/private-assets/` peuvent etre versionnes si tu decides explicitement de les publier sur GitHub Pages. Verifie toujours que tu as le droit de publier ces fichiers avant commit.
 
-Les images de personnages privees peuvent etre placees localement dans `public/private-assets/characters/`.
+Les images de personnages peuvent etre placees dans `public/private-assets/characters/`.
 Pour declarer des personnages locaux, copier `src/data/characters/characters.local.example.ts` vers `src/data/characters/characters.local.ts`.
 Ce fichier local est ignore par Git. Si une image privee est absente, l'interface utilise automatiquement le placeholder du personnage.
 
@@ -62,7 +62,7 @@ GuildQuest stocke les donnees localement dans IndexedDB. Depuis `Parametres > Im
 
 L'export JSON inclut notamment le joueur, la progression quiz, la collection, l'historique gacha, les badges, les titres, les preferences et les packs installes si presents.
 
-Les assets prives dans `public/private-assets/characters/` ne sont pas inclus dans les sauvegardes. Seuls les chemins/references sont conserves.
+Les assets dans `public/private-assets/characters/` ne sont pas inclus dans les sauvegardes JSON. Seuls les chemins/references sont conserves.
 
 Avant un changement majeur, un reset local ou un voyage, il est recommande d'exporter un fichier `guildquest-backup-YYYY-MM-DD-HH-mm.json`.
 
@@ -77,7 +77,7 @@ Dans `Parametres > Installer sur telephone`, GuildQuest affiche une aide pour co
 
 Pour un usage personnel avec assets prives, rester sur le reseau local ou un environnement prive.
 
-Attention : si `public/private-assets/` contient des images privees, elles peuvent etre copiees dans `dist` lors du build. Ne publie pas `dist` avec des assets prives. Pour un deploiement public, retire les assets prives ou utilise seulement les placeholders.
+Attention : si `public/private-assets/` contient des images, elles peuvent etre copiees dans `dist` lors du build. Ne publie pas `dist` avec des fichiers que tu n'as pas le droit de diffuser.
 
 ## Deploiement GitHub Pages
 
@@ -102,12 +102,11 @@ Pour activer le deploiement :
 3. Choisir `Source: GitHub Actions`.
 4. Pousser sur `main` ou lancer le workflow manuellement.
 
-La version GitHub Pages est publique et ne doit contenir que les fichiers versionnes du repo. Les fichiers locaux suivants restent exclus :
+La version GitHub Pages est publique et ne doit contenir que les fichiers versionnes du repo. Le fichier local suivant reste exclu :
 
-- `public/private-assets/`
 - `src/data/characters/characters.local.ts`
 
-La version publique utilise donc les placeholders generiques. Pour une version locale privee avec images personnelles, utiliser `npm run dev -- --host 0.0.0.0` sur le reseau local ou un environnement prive.
+Les images placees dans `public/private-assets/` peuvent etre publiees si elles sont ajoutees au suivi Git. Pour une version strictement locale, ne commit pas ces fichiers et utilise `npm run dev -- --host 0.0.0.0` sur le reseau local ou un environnement prive.
 
 Sur telephone, ouvrir `https://portg4s.github.io/GuildQuest/`, puis installer la PWA :
 

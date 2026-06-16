@@ -1,90 +1,48 @@
 # CODEX_REPORT
 
-Date : 16 juin 2026
+Date : 17 juin 2026
 
 ## Resume
 
-Preparation de GuildQuest pour un deploiement public GitHub Pages propre :
+Changement applique suite a la decision de publier les images sur GitHub Pages :
 
-- configuration Vite compatible avec `https://portg4s.github.io/GuildQuest/` ;
-- ajout d'un build dedie `npm run build:pages` ;
-- creation du workflow GitHub Actions Pages ;
-- ajustement PWA pour `start_url` et `scope` sous `/GuildQuest/` en mode Pages ;
-- nettoyage automatique de `dist/private-assets` dans le build Pages local ;
-- ajout d'une aide `Installation via GitHub Pages` dans Parametres ;
-- mise a jour du README avec les etapes GitHub Pages et les avertissements assets prives.
+- `public/private-assets/` n'est plus ignore par Git ;
+- les 44 images `.webp` presentes dans `public/private-assets/characters/` sont maintenant candidates au suivi Git ;
+- `src/data/characters/characters.local.ts` reste ignore par Git ;
+- un pack public versionne a ete ajoute pour que GitHub Pages charge les personnages avec les vraies images ;
+- les URLs d'images sont maintenant compatibles avec la base `/GuildQuest/` ;
+- la PWA Pages inclut les `.webp` dans le precache ;
+- la documentation a ete ajustee pour distinguer assets publiables et fichier local ignore.
 
 Aucun commit et aucun push effectues.
-Aucun asset telecharge.
-Aucune image privee modifiee.
+Aucune image n'a ete modifiee.
+Aucun asset n'a ete telecharge.
 
 ## Fichiers crees
 
-- `.github/workflows/deploy-pages.yml`
+- `src/data/characters/characters.public-pack.ts`
 
 ## Fichiers modifies
 
+- `.gitignore`
+- `CODEX_RULES.md`
+- `PRIVATE_ASSETS_GUIDE.md`
 - `README.md`
-- `package.json`
+- `src/components/game/CharacterImage.tsx`
+- `src/data/characters/characters.registry.ts`
 - `src/features/settings/SettingsScreen.tsx`
 - `vite.config.ts`
 - `CODEX_REPORT.md`
 
-## Configuration Vite / GitHub Pages
+## Images GitHub Pages
 
-`vite.config.ts` utilise maintenant une base conditionnelle :
-
-- dev local et `npm run build` : `base: "/"` ;
-- build GitHub Pages avec `npm run build:pages` : `base: "/GuildQuest/"`.
-
-Le manifest PWA genere en mode Pages contient :
-
-- `start_url: "/GuildQuest/"` ;
-- `scope: "/GuildQuest/"`.
-
-Les icones du manifest utilisent des chemins relatifs pour rester compatibles avec le sous-chemin GitHub Pages.
-
-Un petit plugin Vite local supprime `dist/private-assets` uniquement en mode `pages`. Cela ne touche pas au dossier source `public/private-assets/`, mais evite de laisser une copie privee dans l'artefact Pages genere localement.
-
-## Workflow GitHub Actions
-
-Workflow cree :
+Le dossier suivant n'est plus ignore :
 
 ```txt
-.github/workflows/deploy-pages.yml
+public/private-assets/
 ```
 
-Declencheurs :
-
-- push vers `main` ;
-- push vers `master` ;
-- lancement manuel `workflow_dispatch`.
-
-Etapes principales :
-
-- checkout ;
-- setup Node 22 ;
-- `npm ci` si `package-lock.json` existe, sinon `npm install` ;
-- `npm run lint` ;
-- `npm run build:pages` ;
-- `actions/configure-pages` ;
-- `actions/upload-pages-artifact` ;
-- `actions/deploy-pages`.
-
-Permissions configurees :
-
-- `contents: read` ;
-- `pages: write` ;
-- `id-token: write`.
-
-## Protection des fichiers prives
-
-`.gitignore` couvre deja :
-
-- `/public/private-assets/`
-- `/src/data/characters/characters.local.ts`
-
-Verification executee :
+Verification :
 
 ```bash
 git status --short --ignored src\data\characters\characters.local.ts public\private-assets
@@ -93,34 +51,88 @@ git status --short --ignored src\data\characters\characters.local.ts public\priv
 Resultat :
 
 ```txt
-!! public/private-assets/
+?? public/private-assets/
 !! src/data/characters/characters.local.ts
 ```
 
 Conclusion :
 
-- `public/private-assets/` reste ignore par Git ;
-- `src/data/characters/characters.local.ts` reste ignore par Git ;
-- ces fichiers n'apparaissent pas dans les fichiers publics a deployer.
+- les images peuvent maintenant etre ajoutees au prochain commit ;
+- `characters.local.ts` reste bien ignore ;
+- le repo public inclura les images si `public/private-assets/` est ajoute et pousse.
 
-## README / Parametres
+## Pack personnages public
 
-README mis a jour avec :
+Nouveau fichier :
 
-- section `Deploiement GitHub Pages` ;
-- URL attendue `https://portg4s.github.io/GuildQuest/` ;
-- activation GitHub Pages via `Settings > Pages > Source: GitHub Actions` ;
-- distinction version locale privee / version publique ;
-- avertissement sur les assets prives ;
-- installation mobile depuis l'URL GitHub Pages.
+```txt
+src/data/characters/characters.public-pack.ts
+```
 
-Parametres contient maintenant une section `Installation via GitHub Pages` avec :
+Il expose un pack public versionne :
 
-- URL publique prevue ;
-- instructions iPhone/Safari ;
-- instructions Android/Chrome ;
-- rappel que les images privees locales ne sont pas publiees ;
-- rappel IndexedDB et export JSON.
+- `Fairy Tail Public Pack` ;
+- 44 personnages ;
+- chemins d'images vers `/private-assets/characters/*.webp` ;
+- `replacePlaceholders: true`.
+
+Le registry charge maintenant :
+
+1. le pack public versionne ;
+2. puis `characters.local.ts` s'il existe localement.
+
+Si `characters.local.ts` existe et demande `replacePlaceholders: true`, il garde la priorite en local. Sur GitHub Pages, le fichier local ignore n'existe pas, donc le pack public est utilise.
+
+## Correction des URLs sous `/GuildQuest/`
+
+`CharacterImage` transforme maintenant les chemins publics absolus comme :
+
+```txt
+/private-assets/characters/natsu-dragneel.webp
+```
+
+en chemin compatible avec la base Vite :
+
+```txt
+/GuildQuest/private-assets/characters/natsu-dragneel.webp
+```
+
+Cela corrige les 404 vus dans la console GitHub Pages, ou le navigateur demandait auparavant :
+
+```txt
+https://portg4s.github.io/private-assets/...
+```
+
+au lieu de :
+
+```txt
+https://portg4s.github.io/GuildQuest/private-assets/...
+```
+
+## PWA
+
+`vite.config.ts` ne nettoie plus `dist/private-assets` en mode Pages.
+
+Le precache Workbox inclut maintenant les `.webp` :
+
+```txt
+globPatterns: ["**/*.{js,css,html,svg,ico,png,webp,json}"]
+```
+
+Apres `npm run build:pages` :
+
+- `dist/private-assets/characters/natsu-dragneel.webp` existe ;
+- `dist/private-assets/characters/` contient 44 fichiers ;
+- `manifest.webmanifest` garde `start_url: "/GuildQuest/"` et `scope: "/GuildQuest/"`.
+
+## Documentation
+
+Mises a jour :
+
+- `CODEX_RULES.md` indique que `public/private-assets/` peut etre versionne si l'utilisateur demande explicitement une publication publique.
+- `README.md` explique que les assets peuvent etre publies s'ils sont ajoutes au suivi Git.
+- `PRIVATE_ASSETS_GUIDE.md` distingue le fichier local ignore des assets publiables.
+- `Parametres > Installation via GitHub Pages` indique que les images dans `public/private-assets` peuvent etre incluses dans la version publique.
 
 ## Commandes executees
 
@@ -173,12 +185,11 @@ npm run build:pages
 Resultat :
 
 - build Vite en mode `pages` reussi ;
-- `dist/index.html` reference les assets sous `/GuildQuest/` ;
-- `dist/manifest.webmanifest` contient `start_url` et `scope` sous `/GuildQuest/` ;
-- `dist/private-assets` absent apres nettoyage Pages ;
+- 44 images `.webp` presentes dans `dist/private-assets/characters/` ;
+- precache PWA : 55 entrees ;
 - avertissement non bloquant : chunk JS superieur a 500 kB apres minification.
 
-## Resultat git status
+## Resultat Git
 
 Commande :
 
@@ -189,40 +200,34 @@ git status --short
 Resultat :
 
 ```txt
+ M .gitignore
+ M CODEX_RULES.md
+ M PRIVATE_ASSETS_GUIDE.md
  M README.md
- M package.json
+ M src/components/game/CharacterImage.tsx
+ M src/data/characters/characters.registry.ts
  M src/features/settings/SettingsScreen.tsx
  M vite.config.ts
-?? .github/
+?? public/private-assets/
+?? src/data/characters/characters.public-pack.ts
 ```
 
-Note : `CODEX_REPORT.md` est egalement modifie par cette mise a jour de rapport.
-
-## Etapes manuelles GitHub restantes
-
-Sur GitHub :
-
-1. Ouvrir `Portg4s/GuildQuest`.
-2. Aller dans `Settings > Pages`.
-3. Choisir `Source: GitHub Actions`.
-4. Pousser les changements publics quand tu voudras declencher le workflow.
-5. Verifier l'URL publiee : `https://portg4s.github.io/GuildQuest/`.
-
-## Limites / points d'attention
-
-- `npm run build` local conserve le comportement Vite standard et peut copier `public/private-assets` dans `dist` si des assets prives existent.
-- `npm run build:pages` nettoie `dist/private-assets` pour l'artefact Pages.
-- Le workflow GitHub Actions ne voit normalement pas les fichiers ignores, donc le deploiement public utilise les placeholders publics.
-- Le warning de chunk > 500 kB reste a traiter plus tard par code splitting si necessaire.
+Note : `CODEX_REPORT.md` est egalement modifie par cette mise a jour.
 
 ## Points a verifier manuellement
 
-- Activer GitHub Pages en mode GitHub Actions.
-- Apres deploiement, ouvrir `https://portg4s.github.io/GuildQuest/`.
-- Verifier l'installation PWA sur iPhone/Safari et Android/Chrome.
-- Verifier que la version publique affiche les placeholders sans dependance aux personnages prives.
-- Verifier que l'import/export IndexedDB fonctionne encore sur la version Pages.
+- Avant commit, verifier que tu acceptes bien de publier les 44 images dans `public/private-assets/characters/`.
+- Apres push/deploiement Pages, vider le cache ou recharger fort la PWA si l'ancien service worker garde les anciens assets.
+- Ouvrir `https://portg4s.github.io/GuildQuest/`.
+- Verifier Collection, Gacha, Detail personnage et Hall.
+- Confirmer que les URLs reseau pointent vers `/GuildQuest/private-assets/characters/*.webp`.
 
 ## Prochaine etape recommandee
 
-Apres le premier deploiement Pages, tester l'installation PWA sur telephone puis ajouter du code splitting sur les gros ecrans/features si le poids du bundle devient genant.
+Quand tu es pret a publier, ajouter les fichiers publics au commit, notamment :
+
+```bash
+git add public/private-assets src/data/characters/characters.public-pack.ts
+```
+
+Puis commit/push depuis ton environnement. Je n'ai pas fait de commit ni de push.

@@ -1,22 +1,7 @@
-import { rm } from "node:fs/promises";
 import path from "node:path";
 import react from "@vitejs/plugin-react";
-import { defineConfig, type PluginOption } from "vite";
+import { defineConfig } from "vite";
 import { VitePWA } from "vite-plugin-pwa";
-
-function cleanPrivateAssetsForPages(enabled: boolean): PluginOption {
-  return {
-    name: "guildquest-clean-private-assets-for-pages",
-    apply: "build",
-    async closeBundle() {
-      if (!enabled) {
-        return;
-      }
-
-      await rm(path.resolve(__dirname, "dist/private-assets"), { recursive: true, force: true });
-    }
-  };
-}
 
 export default defineConfig(({ mode }) => {
   const base = mode === "pages" ? "/GuildQuest/" : "/";
@@ -54,11 +39,9 @@ export default defineConfig(({ mode }) => {
           ]
         },
         workbox: {
-          globPatterns: ["**/*.{js,css,html,svg,ico,png,json}"],
-          globIgnores: ["**/private-assets/**"]
+          globPatterns: ["**/*.{js,css,html,svg,ico,png,webp,json}"]
         }
-      }),
-      cleanPrivateAssetsForPages(mode === "pages")
+      })
     ],
     resolve: {
       alias: {

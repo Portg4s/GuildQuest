@@ -87,21 +87,21 @@ export function SettingsScreen({
       </article>
 
       <article className="guild-card p-4">
-        <h2 className="text-xl font-black text-white">Pack personnages local</h2>
+        <h2 className="text-xl font-black text-white">Packs personnages</h2>
         <div className="mt-3 grid grid-cols-2 gap-2">
-          <SettingStat label="Etat" value={characterRegistryInfo.localPackDetected ? "Detecte" : "Absent"} />
-          <SettingStat label="Personnages locaux" value={characterRegistryInfo.localCount} />
-          <SettingStat label="Pack" value={characterRegistryInfo.localPackName ?? "Aucun pack local"} />
-          <SettingStat label="Version" value={characterRegistryInfo.localPackVersion ?? "-"} />
+          <SettingStat label="Pack public" value={characterRegistryInfo.publicPackName ?? "Aucun"} />
+          <SettingStat label="Persos publics" value={characterRegistryInfo.publicCount} />
+          <SettingStat label="Pack local" value={characterRegistryInfo.localPackDetected ? "Detecte" : "Absent"} />
+          <SettingStat label="Persos locaux" value={characterRegistryInfo.localCount} />
         </div>
+        <p className="mt-3 text-xs leading-5 text-slate-400">
+          Le pack public est inclus dans GitHub Pages. `characters.local.ts` reste optionnel et ignore par Git.
+        </p>
         {characterRegistryInfo.invalidLocalCount > 0 && (
           <p className="mt-3 rounded-lg border border-amber-200/25 bg-amber-300/10 p-3 text-sm font-semibold text-amber-100">
             {characterRegistryInfo.invalidLocalCount} entree(s) locale(s) ignoree(s). Verifie `characters.local.ts`.
           </p>
         )}
-        <p className="mt-3 text-xs leading-5 text-slate-400">
-          Copie `characters.local.example.ts` vers `characters.local.ts` pour charger tes personnages prives.
-        </p>
       </article>
 
       <article className="guild-card p-4">
@@ -193,7 +193,8 @@ export function SettingsScreen({
         </p>
         {copyStatus && <p className="mt-2 text-xs font-semibold text-teal-100">{copyStatus}</p>}
         <p className="mt-3 text-xs leading-5 text-amber-100">
-          Attention : si `public/private-assets` contient des images privees, ne publie pas le build `dist` tel quel.
+          Attention : si `public/private-assets` contient des images publiees, elles seront incluses dans le build.
+          Verifie les droits avant de deployer.
         </p>
       </article>
 
@@ -210,8 +211,8 @@ export function SettingsScreen({
           <p>iPhone/Safari : ouvre l'URL, puis Partager et Sur l'ecran d'accueil.</p>
           <p>Android/Chrome : ouvre l'URL, puis menu et Ajouter a l'ecran d'accueil.</p>
           <p>
-            Cette version publique utilise uniquement les placeholders du repo. Les images privees locales ne sont pas
-            publiees.
+            Cette version publique peut inclure les images placees dans `public/private-assets`. Verifie les droits des
+            assets avant chaque publication.
           </p>
           <p>
             Les donnees restent sur l'appareil via IndexedDB. Pense a exporter un JSON pour sauvegarder ta progression.
