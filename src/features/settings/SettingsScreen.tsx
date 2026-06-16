@@ -89,15 +89,15 @@ export function SettingsScreen({
       </article>
 
       <article className="guild-card p-4">
-        <h2 className="text-xl font-black text-white">Pack personnages local</h2>
+        <h2 className="text-xl font-black text-white">Packs personnages</h2>
         <div className="mt-3 grid grid-cols-2 gap-2">
-          <SettingStat label="Etat" value={characterRegistryInfo.localPackDetected ? "Detecte" : "Absent"} />
-          <SettingStat label="Personnages locaux" value={characterRegistryInfo.localCount} />
-          <SettingStat label="Pack" value={characterRegistryInfo.localPackName ?? "Aucun pack local"} />
-          <SettingStat label="Version" value={characterRegistryInfo.localPackVersion ?? "-"} />
+          <SettingStat label="Pack public" value={characterRegistryInfo.publicPackName ?? "Aucun"} />
+          <SettingStat label="Persos publics" value={characterRegistryInfo.publicCount} />
+          <SettingStat label="Pack local" value={characterRegistryInfo.localPackDetected ? "Detecte" : "Absent"} />
+          <SettingStat label="Persos locaux" value={characterRegistryInfo.localCount} />
         </div>
         <p className="mt-3 text-xs leading-5 text-slate-400">
-          GitHub Pages utilise les placeholders CSS publics. `characters.local.ts` charge tes assets prives en local et reste ignore par Git.
+          GitHub Pages utilise le pack public et les images versionnees. `characters.local.ts` reste optionnel et ignore par Git.
         </p>
         {characterRegistryInfo.invalidLocalCount > 0 && (
           <p className="mt-3 rounded-lg border border-amber-200/25 bg-amber-300/10 p-3 text-sm font-semibold text-amber-100">
@@ -202,7 +202,7 @@ export function SettingsScreen({
         </p>
         {copyStatus && <p className="mt-2 text-xs font-semibold text-teal-100">{copyStatus}</p>}
         <p className="mt-3 text-xs leading-5 text-amber-100">
-          Attention : `public/private-assets` est ignore par Git et reserve a l'usage local prive.
+          Attention : les images dans `public/private-assets` sont incluses dans le build public.
         </p>
       </article>
 
@@ -219,7 +219,7 @@ export function SettingsScreen({
           <p>iPhone/Safari : ouvre l'URL, puis Partager et Sur l'ecran d'accueil.</p>
           <p>Android/Chrome : ouvre l'URL, puis menu et Ajouter a l'ecran d'accueil.</p>
           <p>
-            Cette version publique utilise les placeholders CSS et n'inclut pas `public/private-assets`.
+            Cette version publique inclut les images versionnees dans `public/private-assets`.
           </p>
           <p>
             Les donnees restent sur l'appareil via IndexedDB. Pense a exporter un JSON pour sauvegarder ta progression.
