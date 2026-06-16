@@ -44,7 +44,7 @@ npm run lint
 
 ## Assets prives
 
-Les assets sous `public/private-assets/` peuvent etre versionnes si tu decides explicitement de les publier sur GitHub Pages. Verifie toujours que tu as le droit de publier ces fichiers avant commit.
+Les assets sous `public/private-assets/` sont reserves a un usage local prive et doivent rester hors Git. La version publique GitHub Pages utilise les placeholders CSS.
 
 Les images de personnages peuvent etre placees dans `public/private-assets/characters/`.
 Pour declarer des personnages locaux, copier `src/data/characters/characters.local.example.ts` vers `src/data/characters/characters.local.ts`.
@@ -102,11 +102,12 @@ Pour activer le deploiement :
 3. Choisir `Source: GitHub Actions`.
 4. Pousser sur `main` ou lancer le workflow manuellement.
 
-La version GitHub Pages est publique et ne doit contenir que les fichiers versionnes du repo. Le fichier local suivant reste exclu :
+La version GitHub Pages est publique et ne doit contenir que les fichiers versionnes du repo. Les fichiers locaux suivants restent exclus :
 
+- `public/private-assets/`
 - `src/data/characters/characters.local.ts`
 
-Les images placees dans `public/private-assets/` peuvent etre publiees si elles sont ajoutees au suivi Git. Pour une version strictement locale, ne commit pas ces fichiers et utilise `npm run dev -- --host 0.0.0.0` sur le reseau local ou un environnement prive.
+La version publique utilise donc les placeholders CSS. Pour une version locale privee avec images personnelles, utiliser `npm run dev -- --host 0.0.0.0` sur le reseau local ou un environnement prive.
 
 Sur telephone, ouvrir `https://portg4s.github.io/GuildQuest/`, puis installer la PWA :
 

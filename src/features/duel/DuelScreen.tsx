@@ -1,18 +1,29 @@
 import { useMemo, useState } from "react";
 import { motion } from "framer-motion";
-import { ArrowLeft, Shield, Sparkles, Swords, Trophy } from "lucide-react";
+import { ArrowLeft, Medal, Shield, Sparkles, Swords, Trophy } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { CharacterImage } from "@/components/game/CharacterImage";
 import { rarityBadgeClasses, rarityCardClasses, rarityLabels } from "@/components/game/rarity-styles";
-import type { Character, PlayerCharacter } from "@/domain/models";
+import type { ArenaProgress, DuelHistoryEntry, DuelTeam, Character, PlayerCharacter } from "@/domain/models";
 import { cn } from "@/lib/utils";
 
 type DuelScreenProps = {
   collection: PlayerCharacter[];
   characters: Character[];
+  preferredTeam?: DuelTeam;
+  duelHistory: DuelHistoryEntry[];
+  arenaProgress: ArenaProgress;
   onBackHome: () => void;
   onGoToGacha: () => void;
-  onDuelReward: (xp: number, gems: number, won: boolean) => void;
+  onSaveTeam: (characterIds: string[]) => void;
+  onDuelReward: (result: {
+    xp: number;
+    gems: number;
+    won: boolean;
+    opponentId: string;
+    opponentName: string;
+    teamCharacterIds: string[];
+  }) => void;
 };
 
 type DuelCard = {
@@ -91,7 +102,17 @@ const bots: DuelBot[] = [
   }
 ];
 
-export function DuelScreen({ collection, characters, onBackHome, onGoToGacha, onDuelReward }: DuelScreenProps) {
+export function DuelScreen({
+  collection,
+  characters,
+  preferredTeam,
+  duelHistory,
+  arenaProgress,
+  onBackHome,
+  onGoToGacha,
+  onSaveTeam,
+  onDuelReward
+}: DuelScreenProps) {
   const [botIndex, setBotIndex] = useState(0);
   const ownedCharacters = useMemo(() => {
     const ownedIds = new Set(collection.map((owned) => owned.characterId));
@@ -100,11 +121,17 @@ export function DuelScreen({ collection, characters, onBackHome, onGoToGacha, on
       .sort((a, b) => b.power - a.power);
   }, [characters, collection]);
   const autoTeam = ownedCharacters.slice(0, 3);
+  const [selectedTeamIds, setSelectedTeamIds] = useState<string[]>(preferredTeam?.characterIds ?? autoTeam.map((character) => character.id));
+  const selectedTeam = selectedTeamIds
+    .map((id) => ownedCharacters.find((character) => character.id === id))
+    .filter((character): character is Character => Boolean(character))
+    .slice(0, 3);
+  const effectiveTeam = selectedTeam.length === 3 ? selectedTeam : autoTeam;
   const [duel, setDuel] = useState<DuelState | undefined>();
   const selectedBot = bots[botIndex];
 
   const startDuel = () => {
-    const playerCards = autoTeam.map(toDuelCard);
+    const playerCards = effectiveTeam.map(toDuelCard);
     const botCards = selectedBot.cards.map((card) => ({ ...card, hp: card.maxHp }));
 
     setDuel({
@@ -112,7 +139,7 @@ export function DuelScreen({ collection, characters, onBackHome, onGoToGacha, on
       botCards,
       activePlayerIndex: 0,
       activeBotIndex: 0,
-      log: [`${selectedBot.name} accepte le duel.`, "Equipe auto : les 3 plus fortes cartes entrent dans l'arene."],
+      log: [`${selectedBot.name} accepte le duel.`, "Ton equipe de 3 cartes entre dans l'arene."],
       finished: false,
       rewardClaimed: false,
       playerGuard: false
@@ -180,8 +207,23 @@ export function DuelScreen({ collection, characters, onBackHome, onGoToGacha, on
 
     const xp = duel.won ? selectedBot.reward.xp : 8;
     const gems = duel.won ? selectedBot.reward.gems : 0;
-    onDuelReward(xp, gems, duel.won);
+    onDuelReward({
+      xp,
+      gems,
+      won: duel.won,
+      opponentId: selectedBot.id,
+      opponentName: selectedBot.name,
+      teamCharacterIds: duel.playerCards.map((card) => card.id)
+    });
     setDuel({ ...duel, rewardClaimed: true });
+  };
+
+  const toggleTeamMember = (characterId: string) => {
+    setSelectedTeamIds((current) => {
+      if (current.includes(characterId)) return current.filter((id) => id !== characterId);
+      if (current.length >= 3) return [...current.slice(1), characterId];
+      return [...current, characterId];
+    });
   };
 
   if (ownedCharacters.length < 3) {
@@ -210,6 +252,17 @@ export function DuelScreen({ collection, characters, onBackHome, onGoToGacha, on
       <DuelHeader onBackHome={onBackHome} />
 
       <article className="guild-card p-3">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.2em] text-amber-200">Progression arene</p>
+            <h2 className="text-xl font-black text-white">{arenaProgress.rank}</h2>
+            <p className="text-sm text-slate-300">{arenaProgress.points} points - meilleur rang : {arenaProgress.bestRank}</p>
+          </div>
+          <Medal className="size-9 text-amber-100" />
+        </div>
+      </article>
+
+      <article className="guild-card p-3">
         <p className="text-xs font-black uppercase tracking-[0.2em] text-teal-200">Adversaire</p>
         <div className="mt-2 grid gap-2 sm:grid-cols-3">
           {bots.map((bot, index) => (
@@ -236,18 +289,42 @@ export function DuelScreen({ collection, characters, onBackHome, onGoToGacha, on
       <article className="guild-panel magic-border p-4">
         <div className="flex items-center justify-between gap-3">
           <div>
-            <p className="text-xs font-black uppercase tracking-[0.2em] text-amber-200">Equipe auto</p>
-            <h2 className="text-xl font-black text-white">Top 3 puissance</h2>
+            <p className="text-xs font-black uppercase tracking-[0.2em] text-amber-200">Deck builder</p>
+            <h2 className="text-xl font-black text-white">Equipe {effectiveTeam.length} / 3</h2>
           </div>
-          <Button onClick={startDuel}>
-            <Swords className="mr-2 size-4" aria-hidden="true" />
-            {duel ? "Relancer" : "Entrer dans l'arene"}
-          </Button>
+          <div className="flex flex-wrap gap-2">
+            <Button variant="guild" onClick={() => onSaveTeam(effectiveTeam.map((character) => character.id))}>
+              Sauver equipe
+            </Button>
+            <Button onClick={startDuel}>
+              <Swords className="mr-2 size-4" aria-hidden="true" />
+              {duel ? "Relancer" : "Combattre"}
+            </Button>
+          </div>
         </div>
         <div className="mt-3 grid grid-cols-3 gap-2">
-          {autoTeam.map((character) => (
+          {effectiveTeam.map((character) => (
             <MiniCard key={character.id} character={character} />
           ))}
+        </div>
+        <div className="mt-3 grid grid-cols-3 gap-2 sm:grid-cols-4 lg:grid-cols-6">
+          {ownedCharacters.map((character) => {
+            const selected = selectedTeamIds.includes(character.id);
+            return (
+              <button
+                key={character.id}
+                type="button"
+                onClick={() => toggleTeamMember(character.id)}
+                className={cn(
+                  "rounded-xl border p-1.5 text-left transition active:scale-[0.98]",
+                  selected ? "border-teal-200 bg-teal-300/15" : "border-white/10 bg-white/[0.04]"
+                )}
+              >
+                <CharacterImage character={character} className="h-20 w-full rounded-lg" />
+                <p className="mt-1 truncate text-[0.7rem] font-black text-white">{character.name}</p>
+              </button>
+            );
+          })}
         </div>
       </article>
 
@@ -301,6 +378,27 @@ export function DuelScreen({ collection, characters, onBackHome, onGoToGacha, on
           </ul>
         </article>
       )}
+
+      <article className="guild-card p-3">
+        <p className="text-xs font-black uppercase tracking-[0.2em] text-teal-200">Historique recent</p>
+        {duelHistory.length === 0 ? (
+          <p className="mt-2 text-sm text-slate-300">Aucun duel enregistre pour l'instant.</p>
+        ) : (
+          <div className="mt-2 grid gap-2 sm:grid-cols-2">
+            {duelHistory.map((entry) => (
+              <div key={entry.id} className="rounded-lg border border-white/10 bg-black/20 p-3">
+                <div className="flex justify-between gap-2">
+                  <p className="font-bold text-white">{entry.opponentName}</p>
+                  <span className={entry.won ? "text-emerald-200" : "text-red-200"}>{entry.won ? "Victoire" : "Defaite"}</span>
+                </div>
+                <p className="mt-1 text-xs text-slate-300">
+                  +{entry.xpGained} XP / +{entry.gemsGained} gemmes / +{entry.arenaPointsGained} pts
+                </p>
+              </div>
+            ))}
+          </div>
+        )}
+      </article>
     </section>
   );
 }

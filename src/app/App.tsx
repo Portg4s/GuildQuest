@@ -1,9 +1,24 @@
 import { AnimatePresence } from "framer-motion";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { lazy, Suspense, useCallback, useEffect, useMemo, useState } from "react";
 import { getCharacterRegistryInfo, getCharacters } from "@/data/characters/characters.registry";
 import { foundationsWebPack } from "@/data/packs/foundations-web.example";
 import { titleDefinitions } from "@/data/config/titles.config";
-import type { Badge, Character, GameSettings, Player, PlayerTitle, Quiz } from "@/domain/models";
+import type {
+  ArenaProgress,
+  Badge,
+  Character,
+  DailyProgress,
+  DailyQuestId,
+  DuelHistoryEntry,
+  DuelTeam,
+  GameSettings,
+  Player,
+  PlayerTitle,
+  Quiz,
+  ShopItem,
+  ShopPurchase,
+  StreakState
+} from "@/domain/models";
 import { performGachaInvocation, type GachaPullResult } from "@/domain/gacha/gacha.service";
 import {
   evaluateGachaUnlocks,
@@ -15,20 +30,10 @@ import { calculatePackProgress } from "@/domain/progression/learning-progress.se
 import { calculateMissionRewards, type RewardResult } from "@/domain/reward/reward.service";
 import { buildMissionsFromPack, type Mission } from "@/domain/services/mission.service";
 import type { QuizScoreResult } from "@/domain/services/quiz.service";
-import { CharacterDetailScreen } from "@/features/character-detail/CharacterDetailScreen";
-import { CollectionScreen } from "@/features/collection/CollectionScreen";
-import { DuelScreen } from "@/features/duel/DuelScreen";
-import { GachaScreen } from "@/features/gacha/GachaScreen";
-import { BadgesScreen } from "@/features/badges/BadgesScreen";
 import { HomeScreen } from "@/features/home/HomeScreen";
-import { ImportExportScreen } from "@/features/import-export/ImportExportScreen";
-import { MapScreen } from "@/features/map/MapScreen";
-import { ZoneDetailScreen } from "@/features/map/ZoneDetailScreen";
-import { MissionsScreen } from "@/features/missions/MissionsScreen";
-import { ProfileScreen } from "@/features/profile/ProfileScreen";
+import { OnboardingScreen } from "@/features/onboarding/OnboardingScreen";
 import { QuizScreen } from "@/features/quiz/QuizScreen";
 import { ResultsScreen } from "@/features/results/ResultsScreen";
-import { SettingsScreen } from "@/features/settings/SettingsScreen";
 import { SplashScreen } from "@/features/splash/SplashScreen";
 import { getStoredCollection, saveCollection } from "@/storage/repositories/collection.repository";
 import { getStoredGachaHistory, saveGachaPulls } from "@/storage/repositories/gacha-history.repository";
@@ -42,9 +47,48 @@ import { getStoredPlayer, savePlayer } from "@/storage/repositories/player.repos
 import { getQuizProgressMap, recordQuizAttempt } from "@/storage/repositories/quiz-progress.repository";
 import { resetAllLocalData } from "@/storage/repositories/backup.repository";
 import { defaultSettings, getStoredSettings, normalizeSettings, saveSettings } from "@/storage/repositories/settings.repository";
+import {
+  claimDailyQuestReward,
+  createDailyProgress,
+  createStreakState,
+  getStoredStreakState,
+  getTodayDailyProgress,
+  trackDailyQuest
+} from "@/storage/repositories/daily.repository";
+import { getStoredShopPurchases, purchaseShopItem } from "@/storage/repositories/shop.repository";
+import {
+  getStoredArenaProgress,
+  getStoredDuelHistory,
+  getStoredDuelTeam,
+  recordDuelHistory,
+  saveDuelTeam
+} from "@/storage/repositories/duel.repository";
+import { setOnboardingSeen } from "@/storage/repositories/onboarding.repository";
 import { useGameStore } from "@/stores/game.store";
 import { defaultPlayer, usePlayerStore } from "@/stores/player.store";
 import { useUiStore } from "@/stores/ui.store";
+
+const BadgesScreen = lazy(() => import("@/features/badges/BadgesScreen").then((module) => ({ default: module.BadgesScreen })));
+const CharacterDetailScreen = lazy(() =>
+  import("@/features/character-detail/CharacterDetailScreen").then((module) => ({ default: module.CharacterDetailScreen }))
+);
+const CollectionScreen = lazy(() =>
+  import("@/features/collection/CollectionScreen").then((module) => ({ default: module.CollectionScreen }))
+);
+const DailyQuestsScreen = lazy(() =>
+  import("@/features/daily/DailyQuestsScreen").then((module) => ({ default: module.DailyQuestsScreen }))
+);
+const DuelScreen = lazy(() => import("@/features/duel/DuelScreen").then((module) => ({ default: module.DuelScreen })));
+const GachaScreen = lazy(() => import("@/features/gacha/GachaScreen").then((module) => ({ default: module.GachaScreen })));
+const ImportExportScreen = lazy(() =>
+  import("@/features/import-export/ImportExportScreen").then((module) => ({ default: module.ImportExportScreen }))
+);
+const MapScreen = lazy(() => import("@/features/map/MapScreen").then((module) => ({ default: module.MapScreen })));
+const MissionsScreen = lazy(() => import("@/features/missions/MissionsScreen").then((module) => ({ default: module.MissionsScreen })));
+const ProfileScreen = lazy(() => import("@/features/profile/ProfileScreen").then((module) => ({ default: module.ProfileScreen })));
+const SettingsScreen = lazy(() => import("@/features/settings/SettingsScreen").then((module) => ({ default: module.SettingsScreen })));
+const ShopScreen = lazy(() => import("@/features/shop/ShopScreen").then((module) => ({ default: module.ShopScreen })));
+const ZoneDetailScreen = lazy(() => import("@/features/map/ZoneDetailScreen").then((module) => ({ default: module.ZoneDetailScreen })));
 
 type AppScreen =
   | "home"
@@ -57,6 +101,9 @@ type AppScreen =
   | "settings"
   | "import-export"
   | "badges"
+  | "daily"
+  | "shop"
+  | "onboarding"
   | "gacha"
   | "duel"
   | "collection"
@@ -83,6 +130,20 @@ function App() {
   const [isInvoking, setIsInvoking] = useState(false);
   const [splashVisible, setSplashVisible] = useState(true);
   const [persistenceError, setPersistenceError] = useState<string | undefined>();
+  const [dailyProgress, setDailyProgress] = useState<DailyProgress>(() => createDailyProgress());
+  const [streakState, setStreakState] = useState<StreakState>(() => createStreakState());
+  const [shopPurchases, setShopPurchases] = useState<ShopPurchase[]>([]);
+  const [shopMessage, setShopMessage] = useState<string | undefined>();
+  const [duelTeam, setDuelTeam] = useState<DuelTeam | undefined>();
+  const [duelHistory, setDuelHistory] = useState<DuelHistoryEntry[]>([]);
+  const [arenaProgress, setArenaProgress] = useState<ArenaProgress>({
+    id: "main-arena",
+    rank: "Bronze",
+    points: 0,
+    bestRank: "Bronze",
+    updatedAt: new Date().toISOString()
+  });
+  const [onboardingSeen, setOnboardingSeenState] = useState(true);
   const player = usePlayerStore((state) => state.player);
   const setPlayer = usePlayerStore((state) => state.setPlayer);
   const animationsEnabled = useUiStore((state) => state.animationsEnabled);
@@ -114,9 +175,10 @@ function App() {
         soundEnabled,
         animationSpeed,
         showIntroSplash,
+        onboardingSeen,
         reducedMotion: animationSpeed === "reduced"
       }),
-    [animationSpeed, animationsEnabled, showIntroSplash, soundEnabled]
+    [animationSpeed, animationsEnabled, onboardingSeen, showIntroSplash, soundEnabled]
   );
 
   useEffect(() => {
@@ -138,16 +200,35 @@ function App() {
 
   const reloadLocalState = useCallback(async () => {
     try {
-      const [storedPlayer, storedProgress, storedCollection, storedGachaHistory, storedBadges, storedTitles, storedSettings] =
-        await Promise.all([
-          getStoredPlayer(),
-          getQuizProgressMap(),
-          getStoredCollection(),
-          getStoredGachaHistory(),
-          getStoredBadges(),
-          getStoredTitles(),
-          getStoredSettings()
-        ]);
+      const [
+        storedPlayer,
+        storedProgress,
+        storedCollection,
+        storedGachaHistory,
+        storedBadges,
+        storedTitles,
+        storedSettings,
+        storedDailyProgress,
+        storedStreakState,
+        storedShopPurchases,
+        storedDuelTeam,
+        storedDuelHistory,
+        storedArenaProgress
+      ] = await Promise.all([
+        getStoredPlayer(),
+        getQuizProgressMap(),
+        getStoredCollection(),
+        getStoredGachaHistory(),
+        getStoredBadges(),
+        getStoredTitles(),
+        getStoredSettings(),
+        getTodayDailyProgress(),
+        getStoredStreakState(),
+        getStoredShopPurchases(),
+        getStoredDuelTeam(),
+        getStoredDuelHistory(),
+        getStoredArenaProgress()
+      ]);
 
       if (storedPlayer) {
         setPlayer(normalizePlayer(storedPlayer));
@@ -160,6 +241,12 @@ function App() {
       setCollection(storedCollection);
       setGachaHistory(storedGachaHistory);
       setUnlockedBadges(storedBadges);
+      setDailyProgress(storedDailyProgress);
+      setStreakState(storedStreakState);
+      setShopPurchases(storedShopPurchases);
+      setDuelTeam(storedDuelTeam);
+      setDuelHistory(storedDuelHistory);
+      setArenaProgress(storedArenaProgress);
 
       if (storedTitles.length > 0) {
         setUnlockedTitles(storedTitles);
@@ -170,6 +257,7 @@ function App() {
       }
 
       const nextSettings = normalizeSettings(storedSettings ?? defaultSettings);
+      setOnboardingSeenState(nextSettings.onboardingSeen);
       setUiPreferences({
         animationsEnabled: nextSettings.animationsEnabled,
         soundEnabled: nextSettings.soundEnabled,
@@ -177,6 +265,13 @@ function App() {
         showIntroSplash: nextSettings.showIntroSplash
       });
       if (!storedSettings) await saveSettings(nextSettings);
+
+      const dailyOpen = await trackDailyQuest("open-app");
+      setDailyProgress(dailyOpen.dailyProgress);
+      setStreakState(dailyOpen.streakState);
+      if (!nextSettings.onboardingSeen) {
+        setScreen("onboarding");
+      }
 
       setPersistenceError(undefined);
     } catch (error) {
@@ -209,6 +304,7 @@ function App() {
       animationSpeed: normalized.animationSpeed,
       showIntroSplash: normalized.showIntroSplash
     });
+    setOnboardingSeenState(normalized.onboardingSeen);
     void saveSettings(normalized).catch((error) => {
       setPersistenceError("Les parametres sont appliques en memoire, mais la sauvegarde locale a echoue.");
       console.error(error);
@@ -258,8 +354,61 @@ function App() {
     () => collection.find((playerCharacter) => playerCharacter.characterId === selectedCharacter?.id),
     [collection, selectedCharacter]
   );
+  const weeklyStats = useMemo(
+    () => ({
+      quizCompleted: Object.values(quizProgressById).filter((entry) => entry.completedAt).length,
+      duelWins: player.duelStats?.won ?? 0,
+      gachaPulls: gachaHistory.length,
+      perfectQuiz: Object.values(quizProgressById).filter((entry) => entry.bestScore === 100).length
+    }),
+    [gachaHistory.length, player.duelStats?.won, quizProgressById]
+  );
 
   const goHome = () => setScreen("home");
+
+  const syncDailyQuest = (questId: DailyQuestId, amount = 1) => {
+    void trackDailyQuest(questId, amount)
+      .then((result) => {
+        setDailyProgress(result.dailyProgress);
+        setStreakState(result.streakState);
+      })
+      .catch((error) => {
+        setPersistenceError("L'objectif quotidien est applique en jeu, mais sa sauvegarde a echoue.");
+        console.error(error);
+      });
+  };
+
+  const completeOnboarding = async () => {
+    try {
+      const nextSettings = await setOnboardingSeen(true);
+      setOnboardingSeenState(true);
+      updateSettings(nextSettings);
+      setScreen("home");
+    } catch (error) {
+      setPersistenceError("Le tutoriel est termine, mais la sauvegarde locale a echoue.");
+      console.error(error);
+      setScreen("home");
+    }
+  };
+
+  const replayOnboarding = () => {
+    setScreen("onboarding");
+  };
+
+  const claimDailyReward = (questId: DailyQuestId) => {
+    void claimDailyQuestReward(player, questId)
+      .then((result) => {
+        if (result.claimed) {
+          setPlayer(result.player);
+          setDailyProgress(result.dailyProgress);
+          setStreakState(result.streakState);
+        }
+      })
+      .catch((error) => {
+        setPersistenceError("La recompense quotidienne n'a pas pu etre reclamee.");
+        console.error(error);
+      });
+  };
 
   const startMission = (mission: Mission) => {
     setSelectedMission(mission);
@@ -323,6 +472,10 @@ function App() {
       newTitles: learningUnlocks.newTitles
     });
     setScreen("results");
+    syncDailyQuest("complete-quiz");
+    if (scoreResult.score >= 80) {
+      syncDailyQuest("score-80");
+    }
 
     void saveMissionProgress(
       selectedMission.quiz.id,
@@ -370,6 +523,7 @@ function App() {
         setPlayer(updatedPlayer);
         addUnlockedBadges(gachaUnlocks.newBadges);
         addUnlockedTitles(gachaUnlocks.newTitles);
+        syncDailyQuest("gacha-pull", count);
         void saveGachaInvocation(updatedPlayer, invocation.collection, invocation.history, gachaUnlocks.newBadges, gachaUnlocks.newTitles);
       } catch (error) {
         setGachaError(error instanceof Error ? error.message : "Invocation impossible.");
@@ -434,22 +588,71 @@ function App() {
     });
   };
 
-  const completeDuel = (xp: number, gems: number, won: boolean) => {
-    const rewardApplication = applyRewardsToPlayerDetailed(player, xp, gems);
+  const completeDuel = (result: {
+    xp: number;
+    gems: number;
+    won: boolean;
+    opponentId: string;
+    opponentName: string;
+    teamCharacterIds: string[];
+  }) => {
+    const rewardApplication = applyRewardsToPlayerDetailed(player, result.xp, result.gems);
     const updatedPlayer: Player = {
       ...rewardApplication.player,
       duelStats: {
         played: (player.duelStats?.played ?? 0) + 1,
-        won: (player.duelStats?.won ?? 0) + (won ? 1 : 0)
+        won: (player.duelStats?.won ?? 0) + (result.won ? 1 : 0)
       },
       updatedAt: new Date().toISOString()
     };
 
     setPlayer(updatedPlayer);
-    void savePlayer(updatedPlayer).catch((error) => {
-      setPersistenceError("La recompense de duel est appliquee en memoire, mais la sauvegarde locale a echoue.");
-      console.error(error);
-    });
+    syncDailyQuest("play-duel");
+    if (result.won) syncDailyQuest("win-duel");
+    void Promise.all([
+      savePlayer(updatedPlayer),
+      recordDuelHistory({
+        opponentId: result.opponentId,
+        opponentName: result.opponentName,
+        won: result.won,
+        xpGained: result.xp,
+        gemsGained: result.gems,
+        arenaPointsGained: result.won ? 25 : 5,
+        teamCharacterIds: result.teamCharacterIds
+      })
+    ])
+      .then(([, duelRecord]) => {
+        setDuelHistory((current) => [duelRecord.history, ...current].slice(0, 10));
+        setArenaProgress(duelRecord.arena);
+      })
+      .catch((error) => {
+        setPersistenceError("La recompense de duel est appliquee en memoire, mais la sauvegarde locale a echoue.");
+        console.error(error);
+      });
+  };
+
+  const savePreferredDuelTeam = (characterIds: string[]) => {
+    void saveDuelTeam(characterIds)
+      .then(setDuelTeam)
+      .catch((error) => {
+        setPersistenceError("L'equipe de duel n'a pas pu etre sauvegardee.");
+        console.error(error);
+      });
+  };
+
+  const buyShopItem = (item: ShopItem) => {
+    const confirmed = window.confirm(`Acheter ${item.name} pour ${item.costGems} gemmes ?`);
+    if (!confirmed) return;
+
+    void purchaseShopItem(player, item)
+      .then((result) => {
+        setPlayer(result.player);
+        setShopPurchases((current) => [result.purchase, ...current]);
+        setShopMessage(`${item.name} achete : +${result.purchase.xpGained} XP, +${result.purchase.magicDustGained} poussiere.`);
+      })
+      .catch((error) => {
+        setShopMessage(error instanceof Error ? error.message : "Achat impossible.");
+      });
   };
 
   const applyDebugPlayerUpdate = (updater: (current: Player) => Player) => {
@@ -510,12 +713,19 @@ function App() {
           </div>
         )}
 
+        <Suspense fallback={<GuildLoadingFallback />}>
+        {screen === "onboarding" && (
+          <OnboardingScreen onComplete={completeOnboarding} onSkip={completeOnboarding} />
+        )}
+
         {screen === "home" && (
           <HomeScreen
             player={player}
             activeTitle={activeTitle}
             activeCharacter={activeCharacter}
             regionProgress={regionProgress}
+            dailyProgress={dailyProgress}
+            streak={streakState}
             onGoToMissions={() => setScreen("missions")}
             onGoToMap={() => setScreen("map")}
             onGoToProfile={() => setScreen("profile")}
@@ -524,6 +734,28 @@ function App() {
             onGoToBadges={() => setScreen("badges")}
             onGoToSettings={() => setScreen("settings")}
             onGoToDuel={() => setScreen("duel")}
+            onGoToDaily={() => setScreen("daily")}
+            onGoToShop={() => setScreen("shop")}
+          />
+        )}
+
+        {screen === "daily" && (
+          <DailyQuestsScreen
+            dailyProgress={dailyProgress}
+            streak={streakState}
+            weeklyStats={weeklyStats}
+            onBackHome={goHome}
+            onClaimQuest={claimDailyReward}
+          />
+        )}
+
+        {screen === "shop" && (
+          <ShopScreen
+            player={player}
+            lastPurchase={shopPurchases[0]}
+            message={shopMessage}
+            onBackHome={goHome}
+            onPurchase={buyShopItem}
           />
         )}
 
@@ -582,6 +814,8 @@ function App() {
             unlockedBadges={unlockedBadges}
             unlockedTitles={unlockedTitles}
             regionProgress={regionProgress}
+            streak={streakState}
+            arenaProgress={arenaProgress}
             onBackHome={goHome}
             onGoToCollection={() => setScreen("collection")}
             onGoToBadges={() => setScreen("badges")}
@@ -627,6 +861,7 @@ function App() {
             onBackHome={goHome}
             onOpenImportExport={() => setScreen("import-export")}
             onUpdateSettings={updateSettings}
+            onReplayOnboarding={replayOnboarding}
             onResetAll={resetAllData}
           />
         )}
@@ -658,8 +893,12 @@ function App() {
           <DuelScreen
             collection={collection}
             characters={characters}
+            preferredTeam={duelTeam}
+            duelHistory={duelHistory}
+            arenaProgress={arenaProgress}
             onBackHome={goHome}
             onGoToGacha={() => setScreen("gacha")}
+            onSaveTeam={savePreferredDuelTeam}
             onDuelReward={completeDuel}
           />
         )}
@@ -688,8 +927,18 @@ function App() {
             onSetActive={setActiveCharacter}
           />
         )}
+        </Suspense>
       </div>
     </main>
+  );
+}
+
+function GuildLoadingFallback() {
+  return (
+    <div className="guild-card mx-auto mt-12 max-w-sm p-4 text-center">
+      <p className="text-sm font-black uppercase tracking-[0.2em] text-teal-200">Chargement</p>
+      <p className="mt-2 text-white">La guilde prepare l'ecran...</p>
+    </div>
   );
 }
 

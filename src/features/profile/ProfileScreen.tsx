@@ -2,7 +2,7 @@ import { ArrowLeft, Crown, Gem, Medal, Sparkles, Trophy, UserRound } from "lucid
 import { Button } from "@/components/ui/button";
 import { CharacterImage } from "@/components/game/CharacterImage";
 import { rarityBadgeClasses, rarityLabels } from "@/components/game/rarity-styles";
-import type { Badge, Character, GachaPull, Player, PlayerCharacter, PlayerTitle } from "@/domain/models";
+import type { ArenaProgress, Badge, Character, GachaPull, Player, PlayerCharacter, PlayerTitle, StreakState } from "@/domain/models";
 import type { RegionProgress } from "@/domain/progression/learning-progress.service";
 import type { QuizProgress } from "@/storage/db";
 import { cn } from "@/lib/utils";
@@ -17,6 +17,8 @@ type ProfileScreenProps = {
   unlockedBadges: Badge[];
   unlockedTitles: PlayerTitle[];
   regionProgress: RegionProgress;
+  streak: StreakState;
+  arenaProgress: ArenaProgress;
   onBackHome: () => void;
   onGoToCollection: () => void;
   onGoToBadges: () => void;
@@ -35,6 +37,8 @@ export function ProfileScreen({
   unlockedBadges,
   unlockedTitles,
   regionProgress,
+  streak,
+  arenaProgress,
   onBackHome,
   onGoToCollection,
   onGoToBadges,
@@ -107,6 +111,12 @@ export function ProfileScreen({
           <ProfileStat label="Quiz parfaits" value={regionProgress.perfectQuizCount} />
           <ProfileStat label="Duels joues" value={player.duelStats?.played ?? 0} />
           <ProfileStat label="Duels gagnes" value={player.duelStats?.won ?? 0} />
+          <ProfileStat label="Rang d'arene" value={arenaProgress.rank} />
+          <ProfileStat label="Points d'arene" value={arenaProgress.points} />
+          <ProfileStat label="Streak actuel" value={`${streak.current} j`} />
+          <ProfileStat label="Meilleur streak" value={`${streak.best} j`} />
+          <ProfileStat label="Quetes quotidiennes" value={streak.totalDailyCompleted} />
+          <ProfileStat label="Recompenses reclamees" value={streak.totalRewardsClaimed} />
           <ProfileStat label="Score moyen" value={attempted.length ? `${averageScore}%` : "Aucun"} />
           <ProfileStat label="Meilleur score" value={attempted.length ? `${bestScore}%` : "Aucun"} />
         </div>

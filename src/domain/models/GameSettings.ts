@@ -5,6 +5,7 @@ export type GameSettings = {
   reducedMotion: boolean;
   animationSpeed: "normal" | "fast" | "reduced";
   showIntroSplash: boolean;
+  onboardingSeen: boolean;
   language: "fr";
   updatedAt: string;
 };

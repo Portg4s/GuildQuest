@@ -1,6 +1,6 @@
 # PRIVATE_ASSETS_GUIDE
 
-Ce guide explique comment ajouter des personnages locaux ou publiables dans GuildQuest.
+Ce guide explique comment ajouter des personnages prives locaux dans GuildQuest sans exposer d'assets dans le repo public.
 
 ## Regle principale
 
@@ -12,7 +12,7 @@ Le fichier de donnees local reste ignore par Git :
 src/data/characters/characters.local.ts
 ```
 
-Le dossier `public/private-assets/` peut etre versionne si tu decides explicitement de publier ces images sur GitHub Pages.
+Le dossier `public/private-assets/` reste ignore par Git pour garder la version GitHub Pages propre.
 
 ## A. Ou mettre les images
 
@@ -71,7 +71,7 @@ vers :
 src/data/characters/characters.local.ts
 ```
 
-Le fichier `characters.local.ts` est ignore par Git. Pour publier un pack public, utiliser un fichier versionne comme `characters.public-pack.ts`.
+Le fichier `characters.local.ts` est ignore par Git.
 
 ## D. Exemple de pack local fictif
 
@@ -190,7 +190,7 @@ Ce fichier ne doit pas apparaitre :
 
 - `src/data/characters/characters.local.ts`
 
-Les images sous `public/private-assets/` peuvent apparaitre si tu veux les publier. Si une image ne doit pas etre publique, ne la commit pas.
+Les images sous `public/private-assets/` ne doivent pas apparaitre dans Git pour la version publique propre.
 
 ## G. Export JSON
 

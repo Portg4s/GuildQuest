@@ -1,6 +1,5 @@
 import type { Character, CharacterRarity } from "@/domain/models";
 import { placeholderCharacters } from "@/data/characters/characters.placeholder";
-import { publicCharacterPack } from "@/data/characters/characters.public-pack";
 
 const validRarities: CharacterRarity[] = ["COMMON", "RARE", "EPIC", "LEGENDARY", "MYTHIC"];
 
@@ -30,9 +29,6 @@ type LocalCharacterModule = {
 export type CharacterRegistryInfo = {
   totalCharacters: number;
   placeholderCount: number;
-  publicCount: number;
-  publicPackName?: string;
-  publicPackVersion?: number;
   localCount: number;
   localPackDetected: boolean;
   localPackName?: string;
@@ -116,26 +112,15 @@ function mergeCharacters(publicCharacters: Character[], privateCharacters: Chara
 }
 
 const localPack = readLocalPack();
-const publicPackCharacters = publicCharacterPack.characters
-  .filter(isValidLocalCharacter)
-  .map((character) => normalizeLocalCharacter(character, publicCharacterPack.packName));
 const localPackCharacters = localPack?.characters ?? [];
 const validLocalCharacters = localPackCharacters
   .filter(isValidLocalCharacter)
   .map((character) => normalizeLocalCharacter(character, localPack?.packName ?? "Pack local prive"));
 const invalidLocalCount = localPackCharacters.length - validLocalCharacters.length;
-const publicCharacters = mergeCharacters(
-  placeholderCharacters,
-  publicPackCharacters,
-  Boolean(publicCharacterPack.replacePlaceholders)
-);
 
 export const characterRegistryInfo: CharacterRegistryInfo = {
-  totalCharacters: mergeCharacters(publicCharacters, validLocalCharacters, Boolean(localPack?.replacePlaceholders)).length,
+  totalCharacters: mergeCharacters(placeholderCharacters, validLocalCharacters, Boolean(localPack?.replacePlaceholders)).length,
   placeholderCount: placeholderCharacters.length,
-  publicCount: publicPackCharacters.length,
-  publicPackName: publicCharacterPack.packName,
-  publicPackVersion: publicCharacterPack.packVersion,
   localCount: validLocalCharacters.length,
   localPackDetected: Boolean(localPack),
   localPackName: localPack?.packName,
@@ -146,7 +131,7 @@ export const characterRegistryInfo: CharacterRegistryInfo = {
 };
 
 export const characters = mergeCharacters(
-  publicCharacters,
+  placeholderCharacters,
   validLocalCharacters,
   characterRegistryInfo.replacePlaceholders
 );

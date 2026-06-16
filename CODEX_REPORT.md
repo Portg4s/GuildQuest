@@ -4,45 +4,55 @@ Date : 17 juin 2026
 
 ## Resume
 
-Changement applique suite a la decision de publier les images sur GitHub Pages :
+Phase `GuildQuest Saison 1 - Boucle de jeu complete` ajoutee en V1 stable :
 
-- `public/private-assets/` n'est plus ignore par Git ;
-- les 44 images `.webp` presentes dans `public/private-assets/characters/` sont maintenant candidates au suivi Git ;
-- `src/data/characters/characters.local.ts` reste ignore par Git ;
-- un pack public versionne a ete ajoute pour que GitHub Pages charge les personnages avec les vraies images ;
-- les URLs d'images sont maintenant compatibles avec la base `/GuildQuest/` ;
-- la PWA Pages inclut les `.webp` dans le precache ;
-- la documentation a ete ajustee pour distinguer assets publiables et fichier local ignore.
+- correction GitHub Pages publique sans chargement de `/private-assets/...` depuis les placeholders ;
+- onboarding de premiere ouverture ;
+- objectifs quotidiens avec streak ;
+- ecran Quetes quotidiennes avec tableau hebdo simple ;
+- boutique avec achats en gemmes ;
+- Duel ameliore avec deck builder, equipe sauvegardee, historique et progression d'arene ;
+- Hall enrichi en dashboard quotidien ;
+- Profil enrichi ;
+- export/import/reset et Dexie etendus ;
+- code splitting avec `React.lazy` / `Suspense`.
 
 Aucun commit et aucun push effectues.
-Aucune image n'a ete modifiee.
-Aucun asset n'a ete telecharge.
+`public/private-assets/` n'a pas ete modifie sur le disque.
+`src/data/characters/characters.local.ts` n'a pas ete modifie.
 
-## Fichiers crees
+## Correction GitHub Pages / assets prives
 
-- `src/data/characters/characters.public-pack.ts`
+Les placeholders publics ne referencent plus `/private-assets/...`.
 
-## Fichiers modifies
+Modifications :
 
-- `.gitignore`
-- `CODEX_RULES.md`
-- `PRIVATE_ASSETS_GUIDE.md`
-- `README.md`
-- `src/components/game/CharacterImage.tsx`
-- `src/data/characters/characters.registry.ts`
-- `src/features/settings/SettingsScreen.tsx`
-- `vite.config.ts`
-- `CODEX_REPORT.md`
+- `src/data/characters/characters.placeholder.ts` utilise maintenant `image: ""` pour forcer le fallback CSS magique.
+- `src/data/characters/characters.registry.ts` ne charge plus `characters.public-pack.ts`.
+- `src/data/characters/characters.public-pack.ts` est supprime du suivi public.
+- `vite.config.ts` exclut `private-assets` du precache Workbox.
+- `vite.config.ts` nettoie `dist/private-assets` uniquement en mode `pages`.
 
-## Images GitHub Pages
+Etat verifie :
 
-Le dossier suivant n'est plus ignore :
+- `dist/private-assets` apres `npm run build:pages` : absent.
+- `dist/manifest.webmanifest` garde `start_url: "/GuildQuest/"` et `scope: "/GuildQuest/"`.
 
-```txt
-public/private-assets/
+## Fichiers prives / Git
+
+Les images etaient deja suivies par Git. Pour respecter la consigne, elles ont ete retirees de l'index avec :
+
+```bash
+git rm --cached -r public/private-assets
 ```
 
-Verification :
+Important :
+
+- la commande a retire les fichiers du suivi Git uniquement ;
+- les fichiers locaux existent toujours ;
+- exemple verifie : `public/private-assets/characters/natsu-dragneel.webp` existe encore.
+
+Verification demandee :
 
 ```bash
 git status --short --ignored src\data\characters\characters.local.ts public\private-assets
@@ -51,88 +61,163 @@ git status --short --ignored src\data\characters\characters.local.ts public\priv
 Resultat :
 
 ```txt
-?? public/private-assets/
+D  public/private-assets/characters/...
+!! public/private-assets/
 !! src/data/characters/characters.local.ts
 ```
 
-Conclusion :
+Interpretation :
 
-- les images peuvent maintenant etre ajoutees au prochain commit ;
-- `characters.local.ts` reste bien ignore ;
-- le repo public inclura les images si `public/private-assets/` est ajoute et pousse.
+- les lignes `D` indiquent la suppression du suivi Git pour les images deja trackees ;
+- `!! public/private-assets/` confirme que le dossier est ignore ;
+- `!! src/data/characters/characters.local.ts` confirme que le fichier local reste ignore.
 
-## Pack personnages public
+## Onboarding
 
 Nouveau fichier :
 
-```txt
-src/data/characters/characters.public-pack.ts
-```
+- `src/features/onboarding/OnboardingScreen.tsx`
 
-Il expose un pack public versionne :
+Comportement :
 
-- `Fairy Tail Public Pack` ;
-- 44 personnages ;
-- chemins d'images vers `/private-assets/characters/*.webp` ;
-- `replacePlaceholders: true`.
+- affiche 6 etapes maximum ;
+- explique Hall, missions/quiz, XP/gemmes, invocation/collection, duel, export JSON ;
+- stocke l'etat via `settings.onboardingSeen` ;
+- peut etre revu depuis Parametres.
 
-Le registry charge maintenant :
+## Quetes quotidiennes / streak
 
-1. le pack public versionne ;
-2. puis `characters.local.ts` s'il existe localement.
+Nouveaux fichiers :
 
-Si `characters.local.ts` existe et demande `replacePlaceholders: true`, il garde la priorite en local. Sur GitHub Pages, le fichier local ignore n'existe pas, donc le pack public est utilise.
+- `src/domain/models/DailyQuest.ts`
+- `src/data/config/daily-quests.config.ts`
+- `src/storage/repositories/daily.repository.ts`
+- `src/features/daily/DailyQuestsScreen.tsx`
+- `src/domain/services/date-key.service.ts`
 
-## Correction des URLs sous `/GuildQuest/`
+Objectifs quotidiens V1 :
 
-`CharacterImage` transforme maintenant les chemins publics absolus comme :
+- ouvrir l'app ;
+- terminer 1 quiz ;
+- obtenir au moins 80% a un quiz ;
+- faire 1 invocation ;
+- jouer 1 duel ;
+- gagner 1 duel.
 
-```txt
-/private-assets/characters/natsu-dragneel.webp
-```
+Chaque objectif donne une petite recompense XP/gemmes, parfois poussiere magique.
+Le streak augmente quand un objectif est complete dans la journee.
 
-en chemin compatible avec la base Vite :
+Limite documentee :
 
-```txt
-/GuildQuest/private-assets/characters/natsu-dragneel.webp
-```
+- les quetes hebdomadaires sont une V1 derivee des compteurs existants, sans recompenses hebdo persistantes dediees pour l'instant.
 
-Cela corrige les 404 vus dans la console GitHub Pages, ou le navigateur demandait auparavant :
+## Boutique
 
-```txt
-https://portg4s.github.io/private-assets/...
-```
+Nouveaux fichiers :
 
-au lieu de :
+- `src/domain/models/Shop.ts`
+- `src/data/config/shop.config.ts`
+- `src/storage/repositories/shop.repository.ts`
+- `src/features/shop/ShopScreen.tsx`
 
-```txt
-https://portg4s.github.io/GuildQuest/private-assets/...
-```
+Achats V1 :
 
-## PWA
+- 100 gemmes -> 50 poussiere magique ;
+- 150 gemmes -> 100 XP ;
+- 300 gemmes -> cache arcane XP/poussiere avec petit bonus aleatoire.
 
-`vite.config.ts` ne nettoie plus `dist/private-assets` en mode Pages.
+Les achats demandent confirmation et sont sauvegardes dans Dexie.
 
-Le precache Workbox inclut maintenant les `.webp` :
+## Duel V1 ameliore
 
-```txt
-globPatterns: ["**/*.{js,css,html,svg,ico,png,webp,json}"]
-```
+Fichiers principaux :
 
-Apres `npm run build:pages` :
+- `src/domain/models/DuelProgress.ts`
+- `src/storage/repositories/duel.repository.ts`
+- `src/features/duel/DuelScreen.tsx`
 
-- `dist/private-assets/characters/natsu-dragneel.webp` existe ;
-- `dist/private-assets/characters/` contient 44 fichiers ;
-- `manifest.webmanifest` garde `start_url: "/GuildQuest/"` et `scope: "/GuildQuest/"`.
+Ajouts :
 
-## Documentation
+- selection manuelle de 3 personnages possedes ;
+- sauvegarde de l'equipe preferee ;
+- fallback equipe auto si equipe invalide ;
+- historique des 10 derniers duels ;
+- progression d'arene avec rangs `Bronze`, `Argent`, `Or`, `Saphir`, `Legende` ;
+- affichage du rang d'arene et des points.
 
-Mises a jour :
+## Hall / Profil
 
-- `CODEX_RULES.md` indique que `public/private-assets/` peut etre versionne si l'utilisateur demande explicitement une publication publique.
-- `README.md` explique que les assets peuvent etre publies s'ils sont ajoutes au suivi Git.
-- `PRIVATE_ASSETS_GUIDE.md` distingue le fichier local ignore des assets publiables.
-- `Parametres > Installation via GitHub Pages` indique que les images dans `public/private-assets` peuvent etre incluses dans la version publique.
+Hall :
+
+- bouton `Quetes` ;
+- bouton `Boutique` ;
+- bloc compact `Dashboard quotidien` ;
+- affichage du streak ;
+- alerte si recompense quotidienne a reclamer.
+
+Profil :
+
+- streak actuel ;
+- meilleur streak ;
+- quetes quotidiennes completees ;
+- recompenses quotidiennes reclamees ;
+- rang d'arene ;
+- points d'arene.
+
+## Export / Import / Reset
+
+`backup.repository.ts` inclut maintenant :
+
+- `dailyProgress` ;
+- `streakState` ;
+- `shopPurchases` ;
+- `duelTeam` ;
+- `duelHistory` ;
+- `arenaProgress`.
+
+L'import reste compatible avec les anciennes sauvegardes :
+
+- les nouveaux champs sont optionnels ;
+- des tableaux vides sont utilises si absents.
+
+Reset local :
+
+- vide aussi les nouvelles tables Dexie ;
+- recree toujours le joueur `leb` via le flux existant.
+
+## Dexie
+
+`src/storage/db.ts` passe a une version 2 avec tables :
+
+- `dailyProgress` ;
+- `streakState` ;
+- `shopPurchases` ;
+- `duelTeam` ;
+- `duelHistory` ;
+- `arenaProgress`.
+
+## Code splitting
+
+`App.tsx` utilise maintenant `React.lazy` et `Suspense` pour charger separement :
+
+- Missions ;
+- Map ;
+- Zone detail ;
+- Gacha ;
+- Collection ;
+- Character detail ;
+- Badges ;
+- Settings ;
+- Import/Export ;
+- Duel ;
+- DailyQuests ;
+- Shop ;
+- Profile.
+
+Resultat :
+
+- les ecrans sont bien decoupes en chunks separes ;
+- le chunk principal reste legerement au-dessus du seuil Vite de 500 kB, mais il est passe a environ 519 kB minifie.
 
 ## Commandes executees
 
@@ -141,93 +226,103 @@ Mises a jour :
 - `npm run build:pages`
 - `git status --short`
 - `git status --short --ignored src\data\characters\characters.local.ts public\private-assets`
+- `git rm --cached -r public/private-assets`
 
 ## Resultat lint
 
 OK.
 
-Commande :
-
-```bash
-npm run lint
-```
-
-Resultat :
-
-- aucune erreur ESLint.
-
 ## Resultat build
 
 OK.
 
-Commande :
-
-```bash
-npm run build
-```
-
-Resultat :
+Details :
 
 - build TypeScript + Vite reussi ;
 - PWA generee ;
-- avertissement non bloquant : chunk JS superieur a 500 kB apres minification.
+- avertissement non bloquant : chunk principal superieur a 500 kB apres minification.
 
 ## Resultat build Pages
 
 OK.
 
-Commande :
-
-```bash
-npm run build:pages
-```
-
-Resultat :
+Details :
 
 - build Vite en mode `pages` reussi ;
-- 44 images `.webp` presentes dans `dist/private-assets/characters/` ;
-- precache PWA : 55 entrees ;
-- avertissement non bloquant : chunk JS superieur a 500 kB apres minification.
+- manifest compatible `/GuildQuest/` ;
+- `dist/private-assets` absent apres nettoyage ;
+- PWA generee ;
+- avertissement non bloquant : chunk principal superieur a 500 kB apres minification.
 
-## Resultat Git
+## Etat Git final
 
-Commande :
-
-```bash
-git status --short
-```
-
-Resultat :
+`git status --short` affiche notamment :
 
 ```txt
  M .gitignore
  M CODEX_RULES.md
  M PRIVATE_ASSETS_GUIDE.md
  M README.md
- M src/components/game/CharacterImage.tsx
+ M src/app/App.tsx
+ M src/data/characters/characters.placeholder.ts
+ D src/data/characters/characters.public-pack.ts
  M src/data/characters/characters.registry.ts
+ M src/domain/models/GameSettings.ts
+ M src/domain/models/index.ts
+ M src/features/duel/DuelScreen.tsx
+ M src/features/home/HomeScreen.tsx
+ M src/features/import-export/ImportExportScreen.tsx
+ M src/features/profile/ProfileScreen.tsx
  M src/features/settings/SettingsScreen.tsx
+ M src/storage/db.ts
+ M src/storage/repositories/backup.repository.ts
+ M src/storage/repositories/settings.repository.ts
  M vite.config.ts
-?? public/private-assets/
-?? src/data/characters/characters.public-pack.ts
+ D public/private-assets/characters/...
+?? src/data/config/daily-quests.config.ts
+?? src/data/config/shop.config.ts
+?? src/domain/models/DailyQuest.ts
+?? src/domain/models/DuelProgress.ts
+?? src/domain/models/Shop.ts
+?? src/domain/services/date-key.service.ts
+?? src/features/daily/
+?? src/features/onboarding/
+?? src/features/shop/
+?? src/storage/repositories/daily.repository.ts
+?? src/storage/repositories/duel.repository.ts
+?? src/storage/repositories/onboarding.repository.ts
+?? src/storage/repositories/shop.repository.ts
 ```
 
-Note : `CODEX_REPORT.md` est egalement modifie par cette mise a jour.
+Les `D public/private-assets/...` correspondent au retrait du suivi Git, pas a une suppression locale.
 
-## Points a verifier manuellement
+## Limites
 
-- Avant commit, verifier que tu acceptes bien de publier les 44 images dans `public/private-assets/characters/`.
-- Apres push/deploiement Pages, vider le cache ou recharger fort la PWA si l'ancien service worker garde les anciens assets.
-- Ouvrir `https://portg4s.github.io/GuildQuest/`.
-- Verifier Collection, Gacha, Detail personnage et Hall.
-- Confirmer que les URLs reseau pointent vers `/GuildQuest/private-assets/characters/*.webp`.
+- Pas de vraies notifications push, seulement feedbacks UI simples.
+- Les quetes hebdomadaires n'ont pas encore de recompenses persistantes.
+- La boutique V1 est volontairement simple.
+- Le deck builder Duel sauvegarde une equipe de 3, sans edition avancee.
+- Le warning bundle > 500 kB reste present, mais le code splitting a bien decoupe les ecrans lourds.
+- Pas de test navigateur automatise lance dans cette etape.
+
+## Points a tester manuellement
+
+- Premier lancement : onboarding visible.
+- Parametres : bouton pour revoir le tutoriel.
+- Hall : bloc quotidien, boutons Quetes et Boutique.
+- Faire un quiz : objectif quotidien quiz mis a jour.
+- Faire un score >= 80% : objectif quotidien score mis a jour.
+- Faire une invocation : objectif invocation mis a jour.
+- Jouer/gagner un duel : objectifs duel mis a jour.
+- Reclamer une recompense quotidienne.
+- Acheter un item Boutique.
+- Choisir et sauvegarder une equipe Duel.
+- Faire un duel et verifier historique + rang d'arene.
+- Profil : streak, arene, quetes quotidiennes.
+- Export JSON puis import.
+- Reset local.
+- GitHub Pages : absence de requetes 404 vers `/private-assets/...`.
 
 ## Prochaine etape recommandee
 
-Quand tu es pret a publier, ajouter les fichiers publics au commit, notamment :
-
-```bash
-git add public/private-assets src/data/characters/characters.public-pack.ts
-```
-
-Puis commit/push depuis ton environnement. Je n'ai pas fait de commit ni de push.
+Ajouter des recompenses hebdomadaires persistantes et un petit toast global partage par tous les ecrans pour les feedbacks de recompense/achat/streak.

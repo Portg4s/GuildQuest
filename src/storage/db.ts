@@ -6,7 +6,13 @@ import type {
   Player,
   PlayerCharacter,
   PlayerTitle,
-  Badge
+  Badge,
+  DailyProgress,
+  StreakState,
+  ShopPurchase,
+  DuelTeam,
+  DuelHistoryEntry,
+  ArenaProgress
 } from "@/domain/models";
 
 export type QuizProgress = {
@@ -38,6 +44,12 @@ export class GuildQuestDatabase extends Dexie {
   unlockedTitles!: EntityTable<PlayerTitle, "id">;
   settings!: EntityTable<GameSettings, "id">;
   installedPacks!: EntityTable<ContentPack, "id">;
+  dailyProgress!: EntityTable<DailyProgress, "id">;
+  streakState!: EntityTable<StreakState, "id">;
+  shopPurchases!: EntityTable<ShopPurchase, "id">;
+  duelTeam!: EntityTable<DuelTeam, "id">;
+  duelHistory!: EntityTable<DuelHistoryEntry, "id">;
+  arenaProgress!: EntityTable<ArenaProgress, "id">;
 
   constructor() {
     super("guildquest");
@@ -50,6 +62,22 @@ export class GuildQuestDatabase extends Dexie {
       unlockedTitles: "id, unlockedAt",
       settings: "id, updatedAt",
       installedPacks: "id, version, installedAt"
+    });
+    this.version(2).stores({
+      player: "id, username, rank, level, updatedAt",
+      playerCharacters: "id, characterId, isActive, unlockedAt",
+      quizProgress: "id, quizId, bestScore, completedAt, updatedAt",
+      gachaHistory: "id, characterId, rarity, pulledAt",
+      unlockedBadges: "id, unlockedAt",
+      unlockedTitles: "id, unlockedAt",
+      settings: "id, updatedAt",
+      installedPacks: "id, version, installedAt",
+      dailyProgress: "id, dateKey, updatedAt",
+      streakState: "id, lastActiveDateKey, updatedAt",
+      shopPurchases: "id, itemId, purchasedAt",
+      duelTeam: "id, updatedAt",
+      duelHistory: "id, opponentId, playedAt",
+      arenaProgress: "id, rank, points, updatedAt"
     });
   }
 }

@@ -1,4 +1,18 @@
-import type { Badge, ContentPack, GachaPull, GameSettings, Player, PlayerCharacter, PlayerTitle } from "@/domain/models";
+import type {
+  ArenaProgress,
+  Badge,
+  ContentPack,
+  DailyProgress,
+  DuelHistoryEntry,
+  DuelTeam,
+  GachaPull,
+  GameSettings,
+  Player,
+  PlayerCharacter,
+  PlayerTitle,
+  ShopPurchase,
+  StreakState
+} from "@/domain/models";
 import { getDefaultUnlockedTitles } from "@/domain/progression/achievements.service";
 import { defaultPlayer } from "@/stores/player.store";
 import { db, type QuizProgress } from "@/storage/db";
@@ -16,6 +30,12 @@ export type GuildQuestBackupData = {
   unlockedTitles: PlayerTitle[];
   settings: GameSettings[];
   installedPacks: ContentPack[];
+  dailyProgress?: DailyProgress[];
+  streakState?: StreakState[];
+  shopPurchases?: ShopPurchase[];
+  duelTeam?: DuelTeam[];
+  duelHistory?: DuelHistoryEntry[];
+  arenaProgress?: ArenaProgress[];
 };
 
 export type GuildQuestBackup = {
@@ -37,7 +57,13 @@ export async function createFullBackup(): Promise<GuildQuestBackup> {
     unlockedBadges,
     unlockedTitles,
     settings,
-    installedPacks
+    installedPacks,
+    dailyProgress,
+    streakState,
+    shopPurchases,
+    duelTeam,
+    duelHistory,
+    arenaProgress
   ] = await Promise.all([
     db.player.toArray(),
     db.playerCharacters.toArray(),
@@ -46,7 +72,13 @@ export async function createFullBackup(): Promise<GuildQuestBackup> {
     db.unlockedBadges.toArray(),
     db.unlockedTitles.toArray(),
     db.settings.toArray(),
-    db.installedPacks.toArray()
+    db.installedPacks.toArray(),
+    db.dailyProgress.toArray(),
+    db.streakState.toArray(),
+    db.shopPurchases.toArray(),
+    db.duelTeam.toArray(),
+    db.duelHistory.toArray(),
+    db.arenaProgress.toArray()
   ]);
 
   return {
@@ -64,7 +96,13 @@ export async function createFullBackup(): Promise<GuildQuestBackup> {
       unlockedBadges,
       unlockedTitles,
       settings,
-      installedPacks
+      installedPacks,
+      dailyProgress,
+      streakState,
+      shopPurchases,
+      duelTeam,
+      duelHistory,
+      arenaProgress
     }
   };
 }
@@ -101,7 +139,10 @@ export function summarizeBackup(backup: GuildQuestBackup) {
     quizProgressCount: backup.data.quizProgress.length,
     gachaPullCount: backup.data.gachaHistory.length,
     badgeCount: backup.data.unlockedBadges.length,
-    titleCount: backup.data.unlockedTitles.length
+    titleCount: backup.data.unlockedTitles.length,
+    dailyQuestCount: backup.data.dailyProgress?.length ?? 0,
+    duelHistoryCount: backup.data.duelHistory?.length ?? 0,
+    shopPurchaseCount: backup.data.shopPurchases?.length ?? 0
   };
 }
 
@@ -120,7 +161,13 @@ export async function importFullBackup(backup: GuildQuestBackup) {
       db.unlockedBadges,
       db.unlockedTitles,
       db.settings,
-      db.installedPacks
+      db.installedPacks,
+      db.dailyProgress,
+      db.streakState,
+      db.shopPurchases,
+      db.duelTeam,
+      db.duelHistory,
+      db.arenaProgress
     ],
     async () => {
       await Promise.all([
@@ -131,7 +178,13 @@ export async function importFullBackup(backup: GuildQuestBackup) {
         db.unlockedBadges.clear(),
         db.unlockedTitles.clear(),
         db.settings.clear(),
-        db.installedPacks.clear()
+        db.installedPacks.clear(),
+        db.dailyProgress.clear(),
+        db.streakState.clear(),
+        db.shopPurchases.clear(),
+        db.duelTeam.clear(),
+        db.duelHistory.clear(),
+        db.arenaProgress.clear()
       ]);
 
       await Promise.all([
@@ -142,7 +195,13 @@ export async function importFullBackup(backup: GuildQuestBackup) {
         db.unlockedBadges.bulkPut(backup.data.unlockedBadges),
         db.unlockedTitles.bulkPut(backup.data.unlockedTitles),
         db.settings.bulkPut(backup.data.settings),
-        db.installedPacks.bulkPut(backup.data.installedPacks)
+        db.installedPacks.bulkPut(backup.data.installedPacks),
+        db.dailyProgress.bulkPut(backup.data.dailyProgress ?? []),
+        db.streakState.bulkPut(backup.data.streakState ?? []),
+        db.shopPurchases.bulkPut(backup.data.shopPurchases ?? []),
+        db.duelTeam.bulkPut(backup.data.duelTeam ?? []),
+        db.duelHistory.bulkPut(backup.data.duelHistory ?? []),
+        db.arenaProgress.bulkPut(backup.data.arenaProgress ?? [])
       ]);
     }
   );
@@ -161,7 +220,13 @@ export async function resetAllLocalData() {
       db.unlockedBadges,
       db.unlockedTitles,
       db.settings,
-      db.installedPacks
+      db.installedPacks,
+      db.dailyProgress,
+      db.streakState,
+      db.shopPurchases,
+      db.duelTeam,
+      db.duelHistory,
+      db.arenaProgress
     ],
     async () => {
       await Promise.all([
@@ -172,7 +237,13 @@ export async function resetAllLocalData() {
         db.unlockedBadges.clear(),
         db.unlockedTitles.clear(),
         db.settings.clear(),
-        db.installedPacks.clear()
+        db.installedPacks.clear(),
+        db.dailyProgress.clear(),
+        db.streakState.clear(),
+        db.shopPurchases.clear(),
+        db.duelTeam.clear(),
+        db.duelHistory.clear(),
+        db.arenaProgress.clear()
       ]);
 
       await Promise.all([

@@ -116,7 +116,8 @@ export function ImportExportScreen({ onBackSettings, onBackHome, onImported, onR
       <article className="guild-card p-5">
         <h2 className="text-xl font-black text-white">Export JSON complet</h2>
         <p className="mt-2 text-sm leading-6 text-slate-300">
-          Inclut joueur, progression quiz, collection, gacha, badges, titres, preferences et packs installes.
+          Inclut joueur, progression quiz, collection, gacha, badges, titres, preferences, quetes quotidiennes,
+          boutique, equipe duel, historique duel et progression d'arene.
           Les images privees ne sont pas incluses.
         </p>
         <Button className="mt-4 w-full sm:w-auto" onClick={exportBackup} disabled={busy}>
@@ -164,6 +165,9 @@ export function ImportExportScreen({ onBackSettings, onBackHome, onImported, onR
             <SummaryLine label="Tirages gacha" value={state.summary.gachaPullCount} />
             <SummaryLine label="Badges" value={state.summary.badgeCount} />
             <SummaryLine label="Titres" value={state.summary.titleCount} />
+            <SummaryLine label="Jours quotidiens" value={state.summary.dailyQuestCount} />
+            <SummaryLine label="Achats boutique" value={state.summary.shopPurchaseCount} />
+            <SummaryLine label="Historique duel" value={state.summary.duelHistoryCount} />
           </div>
         </article>
       )}

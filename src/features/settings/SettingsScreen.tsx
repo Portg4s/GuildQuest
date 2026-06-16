@@ -24,6 +24,7 @@ type SettingsScreenProps = {
   onBackHome: () => void;
   onOpenImportExport: () => void;
   onUpdateSettings: (settings: GameSettings) => void;
+  onReplayOnboarding: () => void;
   onResetAll: () => void;
 };
 
@@ -35,6 +36,7 @@ export function SettingsScreen({
   onBackHome,
   onOpenImportExport,
   onUpdateSettings,
+  onReplayOnboarding,
   onResetAll
 }: SettingsScreenProps) {
   const [localIp, setLocalIp] = useState("");
@@ -87,15 +89,15 @@ export function SettingsScreen({
       </article>
 
       <article className="guild-card p-4">
-        <h2 className="text-xl font-black text-white">Packs personnages</h2>
+        <h2 className="text-xl font-black text-white">Pack personnages local</h2>
         <div className="mt-3 grid grid-cols-2 gap-2">
-          <SettingStat label="Pack public" value={characterRegistryInfo.publicPackName ?? "Aucun"} />
-          <SettingStat label="Persos publics" value={characterRegistryInfo.publicCount} />
-          <SettingStat label="Pack local" value={characterRegistryInfo.localPackDetected ? "Detecte" : "Absent"} />
-          <SettingStat label="Persos locaux" value={characterRegistryInfo.localCount} />
+          <SettingStat label="Etat" value={characterRegistryInfo.localPackDetected ? "Detecte" : "Absent"} />
+          <SettingStat label="Personnages locaux" value={characterRegistryInfo.localCount} />
+          <SettingStat label="Pack" value={characterRegistryInfo.localPackName ?? "Aucun pack local"} />
+          <SettingStat label="Version" value={characterRegistryInfo.localPackVersion ?? "-"} />
         </div>
         <p className="mt-3 text-xs leading-5 text-slate-400">
-          Le pack public est inclus dans GitHub Pages. `characters.local.ts` reste optionnel et ignore par Git.
+          GitHub Pages utilise les placeholders CSS publics. `characters.local.ts` charge tes assets prives en local et reste ignore par Git.
         </p>
         {characterRegistryInfo.invalidLocalCount > 0 && (
           <p className="mt-3 rounded-lg border border-amber-200/25 bg-amber-300/10 p-3 text-sm font-semibold text-amber-100">
@@ -131,6 +133,13 @@ export function SettingsScreen({
             enabled={settings.showIntroSplash}
             onToggle={() => updateSettings({ showIntroSplash: !settings.showIntroSplash })}
           />
+          <div className="rounded-lg border border-white/10 bg-white/[0.06] p-3">
+            <p className="font-bold text-white">Tutoriel d'aventure</p>
+            <p className="mt-1 text-sm text-slate-400">Revoir les bases de GuildQuest, missions, gacha, duel et sauvegarde.</p>
+            <Button variant="guild" className="mt-3 w-full sm:w-auto" onClick={onReplayOnboarding}>
+              Revoir le tutoriel
+            </Button>
+          </div>
           <div className="rounded-lg border border-white/10 bg-white/[0.06] p-3">
             <p className="text-sm font-bold text-white">Vitesse animations</p>
             <div className="mt-3 grid grid-cols-3 gap-2">
@@ -193,8 +202,7 @@ export function SettingsScreen({
         </p>
         {copyStatus && <p className="mt-2 text-xs font-semibold text-teal-100">{copyStatus}</p>}
         <p className="mt-3 text-xs leading-5 text-amber-100">
-          Attention : si `public/private-assets` contient des images publiees, elles seront incluses dans le build.
-          Verifie les droits avant de deployer.
+          Attention : `public/private-assets` est ignore par Git et reserve a l'usage local prive.
         </p>
       </article>
 
@@ -211,8 +219,7 @@ export function SettingsScreen({
           <p>iPhone/Safari : ouvre l'URL, puis Partager et Sur l'ecran d'accueil.</p>
           <p>Android/Chrome : ouvre l'URL, puis menu et Ajouter a l'ecran d'accueil.</p>
           <p>
-            Cette version publique peut inclure les images placees dans `public/private-assets`. Verifie les droits des
-            assets avant chaque publication.
+            Cette version publique utilise les placeholders CSS et n'inclut pas `public/private-assets`.
           </p>
           <p>
             Les donnees restent sur l'appareil via IndexedDB. Pense a exporter un JSON pour sauvegarder ta progression.

@@ -1,12 +1,12 @@
 import { motion } from "framer-motion";
-import { Crown, Gem, Map, Medal, Settings, Shield, Sparkles, UserRound, ScrollText, Trophy, Swords } from "lucide-react";
+import { CalendarDays, Crown, Gem, Map, Medal, Settings, Shield, Sparkles, UserRound, ScrollText, Trophy, Swords, Store } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { CharacterImage } from "@/components/game/CharacterImage";
 import { CompactProgressCard } from "@/components/game/CompactProgressCard";
 import { QuickActionGrid, type QuickAction } from "@/components/game/QuickActionGrid";
 import { rarityBadgeClasses, rarityLabels } from "@/components/game/rarity-styles";
 import { StatPill } from "@/components/game/StatPill";
-import type { Character, Player, PlayerTitle } from "@/domain/models";
+import type { Character, DailyProgress, Player, PlayerTitle, StreakState } from "@/domain/models";
 import type { RegionProgress } from "@/domain/progression/learning-progress.service";
 import { cn } from "@/lib/utils";
 
@@ -15,6 +15,8 @@ type HomeScreenProps = {
   activeTitle?: PlayerTitle;
   activeCharacter?: Character;
   regionProgress: RegionProgress;
+  dailyProgress: DailyProgress;
+  streak: StreakState;
   onGoToMissions: () => void;
   onGoToMap: () => void;
   onGoToProfile: () => void;
@@ -23,6 +25,8 @@ type HomeScreenProps = {
   onGoToBadges: () => void;
   onGoToSettings: () => void;
   onGoToDuel: () => void;
+  onGoToDaily: () => void;
+  onGoToShop: () => void;
 };
 
 export function HomeScreen({
@@ -30,6 +34,8 @@ export function HomeScreen({
   activeTitle,
   activeCharacter,
   regionProgress,
+  dailyProgress,
+  streak,
   onGoToMissions,
   onGoToMap,
   onGoToProfile,
@@ -37,7 +43,9 @@ export function HomeScreen({
   onGoToCollection,
   onGoToBadges,
   onGoToSettings,
-  onGoToDuel
+  onGoToDuel,
+  onGoToDaily,
+  onGoToShop
 }: HomeScreenProps) {
   const xpProgress = Math.min((player.xp / player.nextLevelXp) * 100, 100);
   const quickActions: QuickAction[] = [
@@ -45,11 +53,15 @@ export function HomeScreen({
     { id: "map", label: "Carte", icon: <Map className="size-5" />, onClick: onGoToMap },
     { id: "gacha", label: "Invocation", icon: <Sparkles className="size-5" />, onClick: onGoToGacha },
     { id: "duel", label: "Duel", icon: <Swords className="size-5" />, onClick: onGoToDuel },
+    { id: "daily", label: "Quetes", icon: <CalendarDays className="size-5" />, onClick: onGoToDaily },
+    { id: "shop", label: "Boutique", icon: <Store className="size-5" />, onClick: onGoToShop },
     { id: "collection", label: "Collection", icon: <Trophy className="size-5" />, onClick: onGoToCollection },
     { id: "badges", label: "Badges", icon: <Medal className="size-5" />, onClick: onGoToBadges },
     { id: "profile", label: "Profil", icon: <UserRound className="size-5" />, onClick: onGoToProfile },
     { id: "settings", label: "Parametres", icon: <Settings className="size-5" />, onClick: onGoToSettings }
   ];
+  const mainDailyQuest = dailyProgress.quests.find((quest) => !quest.claimed) ?? dailyProgress.quests[0];
+  const readyToClaim = dailyProgress.quests.filter((quest) => quest.completed && !quest.claimed).length;
 
   return (
     <motion.section
@@ -120,6 +132,22 @@ export function HomeScreen({
       </section>
 
       <QuickActionGrid actions={quickActions} />
+
+      <section className="guild-card border-amber-200/25 bg-amber-300/10 p-3">
+        <div className="flex items-center justify-between gap-3">
+          <div>
+            <p className="text-[0.68rem] font-semibold uppercase tracking-[0.16em] text-amber-100">Dashboard quotidien</p>
+            <h3 className="text-lg font-black text-white">Streak {streak.current} jour{streak.current > 1 ? "s" : ""}</h3>
+            <p className="mt-1 text-xs text-slate-300">
+              Objectif actif : {mainDailyQuest?.value ?? 0}/{mainDailyQuest?.target ?? 1}
+              {readyToClaim > 0 ? ` - ${readyToClaim} recompense(s) a reclamer` : ""}
+            </p>
+          </div>
+          <Button size="sm" onClick={onGoToDaily}>
+            Quetes
+          </Button>
+        </div>
+      </section>
 
       <div className="grid gap-3 lg:grid-cols-[0.95fr_1.05fr]">
         <CompactProgressCard
