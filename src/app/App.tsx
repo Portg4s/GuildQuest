@@ -1,3 +1,4 @@
+import { AnimatePresence } from "framer-motion";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { getCharacterRegistryInfo, getCharacters } from "@/data/characters/characters.registry";
 import { foundationsWebPack } from "@/data/packs/foundations-web.example";
@@ -27,6 +28,7 @@ import { ProfileScreen } from "@/features/profile/ProfileScreen";
 import { QuizScreen } from "@/features/quiz/QuizScreen";
 import { ResultsScreen } from "@/features/results/ResultsScreen";
 import { SettingsScreen } from "@/features/settings/SettingsScreen";
+import { SplashScreen } from "@/features/splash/SplashScreen";
 import { getStoredCollection, saveCollection } from "@/storage/repositories/collection.repository";
 import { getStoredGachaHistory, saveGachaPulls } from "@/storage/repositories/gacha-history.repository";
 import {
@@ -77,12 +79,14 @@ function App() {
   const [gachaResults, setGachaResults] = useState<GachaPullResult[]>([]);
   const [gachaError, setGachaError] = useState<string | undefined>();
   const [isInvoking, setIsInvoking] = useState(false);
+  const [splashVisible, setSplashVisible] = useState(true);
   const [persistenceError, setPersistenceError] = useState<string | undefined>();
   const player = usePlayerStore((state) => state.player);
   const setPlayer = usePlayerStore((state) => state.setPlayer);
   const animationsEnabled = useUiStore((state) => state.animationsEnabled);
   const soundEnabled = useUiStore((state) => state.soundEnabled);
   const animationSpeed = useUiStore((state) => state.animationSpeed);
+  const showIntroSplash = useUiStore((state) => state.showIntroSplash);
   const setUiPreferences = useUiStore((state) => state.setPreferences);
   const collection = useGameStore((state) => state.collection);
   const gachaHistory = useGameStore((state) => state.gachaHistory);
@@ -107,10 +111,28 @@ function App() {
         animationsEnabled,
         soundEnabled,
         animationSpeed,
+        showIntroSplash,
         reducedMotion: animationSpeed === "reduced"
       }),
-    [animationSpeed, animationsEnabled, soundEnabled]
+    [animationSpeed, animationsEnabled, showIntroSplash, soundEnabled]
   );
+
+  useEffect(() => {
+    if (!splashVisible) return;
+
+    const duration = !showIntroSplash
+      ? 120
+      : !animationsEnabled
+        ? 260
+        : animationSpeed === "fast"
+          ? 900
+          : animationSpeed === "reduced"
+            ? 650
+            : 1500;
+    const timeoutId = window.setTimeout(() => setSplashVisible(false), duration);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [animationSpeed, animationsEnabled, showIntroSplash, splashVisible]);
 
   const reloadLocalState = useCallback(async () => {
     try {
@@ -149,7 +171,8 @@ function App() {
       setUiPreferences({
         animationsEnabled: nextSettings.animationsEnabled,
         soundEnabled: nextSettings.soundEnabled,
-        animationSpeed: nextSettings.animationSpeed
+        animationSpeed: nextSettings.animationSpeed,
+        showIntroSplash: nextSettings.showIntroSplash
       });
       if (!storedSettings) await saveSettings(nextSettings);
 
@@ -181,7 +204,8 @@ function App() {
     setUiPreferences({
       animationsEnabled: normalized.animationsEnabled,
       soundEnabled: normalized.soundEnabled,
-      animationSpeed: normalized.animationSpeed
+      animationSpeed: normalized.animationSpeed,
+      showIntroSplash: normalized.showIntroSplash
     });
     void saveSettings(normalized).catch((error) => {
       setPersistenceError("Les parametres sont appliques en memoire, mais la sauvegarde locale a echoue.");
@@ -453,6 +477,11 @@ function App() {
 
   return (
     <main className="guild-background arcane-background min-h-screen overflow-hidden text-slate-50">
+      <AnimatePresence>
+        {splashVisible && (
+          <SplashScreen animationsEnabled={animationsEnabled} animationSpeed={animationSpeed} />
+        )}
+      </AnimatePresence>
       <div className="pointer-events-none fixed inset-0 bg-[radial-gradient(circle_at_50%_-10%,rgba(250,204,21,0.12),transparent_28%),radial-gradient(circle_at_10%_30%,rgba(45,212,191,0.16),transparent_26%),linear-gradient(180deg,rgba(2,6,23,0.1),rgba(2,6,23,0.74))]" />
       <div className="relative mx-auto flex min-h-screen w-full max-w-5xl flex-col px-4 py-5 sm:px-6 lg:px-8">
         {persistenceError && (

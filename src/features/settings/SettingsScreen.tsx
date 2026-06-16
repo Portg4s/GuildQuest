@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { ArrowLeft, Download, RotateCcw, SlidersHorizontal, Volume2, Zap } from "lucide-react";
+import { ArrowLeft, Download, RotateCcw, Shield, SlidersHorizontal, Volume2, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { CharacterRegistryInfo } from "@/data/characters/characters.registry";
 import type { GameSettings, Player } from "@/domain/models";
@@ -100,6 +100,13 @@ export function SettingsScreen({
             description="Controle les animations d'interface."
             enabled={settings.animationsEnabled}
             onToggle={() => updateSettings({ animationsEnabled: !settings.animationsEnabled })}
+          />
+          <ToggleRow
+            icon={<Shield className="size-5" />}
+            label="Ecran d'introduction"
+            description="Affiche l'entree de guilde au lancement."
+            enabled={settings.showIntroSplash}
+            onToggle={() => updateSettings({ showIntroSplash: !settings.showIntroSplash })}
           />
           <div className="rounded-lg border border-white/10 bg-white/[0.06] p-3">
             <p className="text-sm font-bold text-white">Vitesse animations</p>

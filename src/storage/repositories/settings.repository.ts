@@ -9,6 +9,7 @@ export const defaultSettings: GameSettings = {
   soundEnabled: false,
   reducedMotion: false,
   animationSpeed: "normal",
+  showIntroSplash: true,
   language: "fr",
   updatedAt: new Date().toISOString()
 };
