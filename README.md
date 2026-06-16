@@ -22,6 +22,14 @@ npm install
 npm run dev
 ```
 
+Pour tester sur telephone sur le meme Wi-Fi :
+
+```bash
+npm run dev -- --host 0.0.0.0
+```
+
+Ouvrir ensuite `http://IP_DU_PC:5173` sur le telephone.
+
 Build de verification :
 
 ```bash
@@ -59,3 +67,14 @@ Les assets prives dans `public/private-assets/characters/` ne sont pas inclus da
 Avant un changement majeur, un reset local ou un voyage, il est recommande d'exporter un fichier `guildquest-backup-YYYY-MM-DD-HH-mm.json`.
 
 L'import remplace les donnees locales apres confirmation. Le reset local remet le joueur `leb` au niveau 1 avec 0 XP, 200 gemmes et le rang `Mage de Rang F`.
+
+## Installation telephone / PWA
+
+Dans `Parametres > Installer sur telephone`, GuildQuest affiche une aide pour copier l'URL locale.
+
+- Android / Chrome : menu puis `Ajouter a l'ecran d'accueil`.
+- iPhone / Safari : bouton Partager puis `Sur l'ecran d'accueil`.
+
+Pour un usage personnel avec assets prives, rester sur le reseau local ou un environnement prive.
+
+Attention : si `public/private-assets/` contient des images privees, elles peuvent etre copiees dans `dist` lors du build. Ne publie pas `dist` avec des assets prives. Pour un deploiement public, retire les assets prives ou utilise seulement les placeholders.

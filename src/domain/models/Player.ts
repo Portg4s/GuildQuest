@@ -13,6 +13,10 @@ export type Player = {
   unlockedBadgeIds: string[];
   unlockedTitleIds: string[];
   activeTitleId?: string;
+  duelStats?: {
+    played: number;
+    won: number;
+  };
   createdAt: string;
   updatedAt: string;
 };

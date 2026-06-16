@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Crown, Gem, Map, Medal, Settings, Shield, Sparkles, UserRound, ScrollText, Trophy } from "lucide-react";
+import { Crown, Gem, Map, Medal, Settings, Shield, Sparkles, UserRound, ScrollText, Trophy, Swords } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { CharacterImage } from "@/components/game/CharacterImage";
 import { CompactProgressCard } from "@/components/game/CompactProgressCard";
@@ -22,6 +22,7 @@ type HomeScreenProps = {
   onGoToCollection: () => void;
   onGoToBadges: () => void;
   onGoToSettings: () => void;
+  onGoToDuel: () => void;
 };
 
 export function HomeScreen({
@@ -35,13 +36,15 @@ export function HomeScreen({
   onGoToGacha,
   onGoToCollection,
   onGoToBadges,
-  onGoToSettings
+  onGoToSettings,
+  onGoToDuel
 }: HomeScreenProps) {
   const xpProgress = Math.min((player.xp / player.nextLevelXp) * 100, 100);
   const quickActions: QuickAction[] = [
     { id: "missions", label: "Missions", icon: <ScrollText className="size-5" />, onClick: onGoToMissions },
     { id: "map", label: "Carte", icon: <Map className="size-5" />, onClick: onGoToMap },
     { id: "gacha", label: "Invocation", icon: <Sparkles className="size-5" />, onClick: onGoToGacha },
+    { id: "duel", label: "Duel", icon: <Swords className="size-5" />, onClick: onGoToDuel },
     { id: "collection", label: "Collection", icon: <Trophy className="size-5" />, onClick: onGoToCollection },
     { id: "badges", label: "Badges", icon: <Medal className="size-5" />, onClick: onGoToBadges },
     { id: "profile", label: "Profil", icon: <UserRound className="size-5" />, onClick: onGoToProfile },
@@ -132,7 +135,7 @@ export function HomeScreen({
           <div className="flex items-center gap-3">
             <CharacterImage
               character={activeCharacter}
-              className="size-16 shrink-0 rounded-xl border border-white/10 bg-white/10 p-2"
+              className="h-20 w-16 shrink-0 rounded-xl border border-white/10 bg-white/10"
             />
             <div className="min-w-0 flex-1">
               <p className="text-[0.68rem] font-semibold uppercase tracking-[0.16em] text-teal-200">Personnage actif</p>

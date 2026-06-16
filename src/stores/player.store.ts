@@ -15,6 +15,10 @@ export const defaultPlayer: Player = {
   activeTitleId: "guild-apprentice",
   unlockedBadgeIds: [],
   unlockedTitleIds: ["guild-apprentice", "rank-f-mage"],
+  duelStats: {
+    played: 0,
+    won: 0
+  },
   createdAt: now,
   updatedAt: now
 };

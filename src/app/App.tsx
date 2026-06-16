@@ -17,6 +17,7 @@ import { buildMissionsFromPack, type Mission } from "@/domain/services/mission.s
 import type { QuizScoreResult } from "@/domain/services/quiz.service";
 import { CharacterDetailScreen } from "@/features/character-detail/CharacterDetailScreen";
 import { CollectionScreen } from "@/features/collection/CollectionScreen";
+import { DuelScreen } from "@/features/duel/DuelScreen";
 import { GachaScreen } from "@/features/gacha/GachaScreen";
 import { BadgesScreen } from "@/features/badges/BadgesScreen";
 import { HomeScreen } from "@/features/home/HomeScreen";
@@ -57,6 +58,7 @@ type AppScreen =
   | "import-export"
   | "badges"
   | "gacha"
+  | "duel"
   | "collection"
   | "character-detail";
 
@@ -432,6 +434,24 @@ function App() {
     });
   };
 
+  const completeDuel = (xp: number, gems: number, won: boolean) => {
+    const rewardApplication = applyRewardsToPlayerDetailed(player, xp, gems);
+    const updatedPlayer: Player = {
+      ...rewardApplication.player,
+      duelStats: {
+        played: (player.duelStats?.played ?? 0) + 1,
+        won: (player.duelStats?.won ?? 0) + (won ? 1 : 0)
+      },
+      updatedAt: new Date().toISOString()
+    };
+
+    setPlayer(updatedPlayer);
+    void savePlayer(updatedPlayer).catch((error) => {
+      setPersistenceError("La recompense de duel est appliquee en memoire, mais la sauvegarde locale a echoue.");
+      console.error(error);
+    });
+  };
+
   const applyDebugPlayerUpdate = (updater: (current: Player) => Player) => {
     const updatedPlayer = updater(player);
 
@@ -503,6 +523,7 @@ function App() {
             onGoToCollection={() => setScreen("collection")}
             onGoToBadges={() => setScreen("badges")}
             onGoToSettings={() => setScreen("settings")}
+            onGoToDuel={() => setScreen("duel")}
           />
         )}
 
@@ -633,6 +654,16 @@ function App() {
           />
         )}
 
+        {screen === "duel" && (
+          <DuelScreen
+            collection={collection}
+            characters={characters}
+            onBackHome={goHome}
+            onGoToGacha={() => setScreen("gacha")}
+            onDuelReward={completeDuel}
+          />
+        )}
+
         {screen === "collection" && (
           <CollectionScreen
             collection={collection}
@@ -668,7 +699,8 @@ function normalizePlayer(player: Player): Player {
     magicDust: player.magicDust ?? 0,
     activeTitleId: player.activeTitleId ?? "guild-apprentice",
     unlockedBadgeIds: player.unlockedBadgeIds ?? [],
-    unlockedTitleIds: player.unlockedTitleIds?.length ? player.unlockedTitleIds : ["guild-apprentice", "rank-f-mage"]
+    unlockedTitleIds: player.unlockedTitleIds?.length ? player.unlockedTitleIds : ["guild-apprentice", "rank-f-mage"],
+    duelStats: player.duelStats ?? { played: 0, won: 0 }
   };
 }
 

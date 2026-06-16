@@ -105,6 +105,8 @@ export function ProfileScreen({
           <ProfileStat label="Progression Fondations" value={`${regionProgress.progressPercent}%`} />
           <ProfileStat label="Quiz valides" value={`${regionProgress.validatedQuizCount} / ${regionProgress.quizCount}`} />
           <ProfileStat label="Quiz parfaits" value={regionProgress.perfectQuizCount} />
+          <ProfileStat label="Duels joues" value={player.duelStats?.played ?? 0} />
+          <ProfileStat label="Duels gagnes" value={player.duelStats?.won ?? 0} />
           <ProfileStat label="Score moyen" value={attempted.length ? `${averageScore}%` : "Aucun"} />
           <ProfileStat label="Meilleur score" value={attempted.length ? `${bestScore}%` : "Aucun"} />
         </div>
@@ -120,7 +122,7 @@ export function ProfileScreen({
         <p className="text-sm font-bold uppercase tracking-[0.18em] text-teal-200">Personnage actif</p>
         {activeCharacter ? (
           <div className="mt-4 flex items-center gap-4">
-            <CharacterImage character={activeCharacter} className="size-16 rounded-xl border border-white/10 bg-white/10 p-2" />
+            <CharacterImage character={activeCharacter} className="h-24 w-20 rounded-xl border border-white/10 bg-white/10" />
             <div>
               <h2 className="text-xl font-black text-white">{activeCharacter.name}</h2>
               <p className="mt-1 text-sm text-slate-300">{activeCharacter.element} - Puissance {activeCharacter.power}</p>

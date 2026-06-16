@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
-import { ArrowLeft, Download, RotateCcw, Shield, SlidersHorizontal, Volume2, Zap } from "lucide-react";
+import { useState } from "react";
+import { ArrowLeft, Copy, Download, RotateCcw, Shield, Smartphone, SlidersHorizontal, Volume2, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { CharacterRegistryInfo } from "@/data/characters/characters.registry";
 import type { GameSettings, Player } from "@/domain/models";
@@ -25,6 +26,8 @@ export function SettingsScreen({
   onUpdateSettings,
   onResetAll
 }: SettingsScreenProps) {
+  const [localIp, setLocalIp] = useState("");
+  const [copyStatus, setCopyStatus] = useState("");
   const updateSettings = (patch: Partial<GameSettings>) => {
     onUpdateSettings({
       ...settings,
@@ -32,6 +35,15 @@ export function SettingsScreen({
       reducedMotion: patch.animationSpeed === "reduced" ? true : patch.reducedMotion ?? settings.reducedMotion,
       updatedAt: new Date().toISOString()
     });
+  };
+  const installUrl = localIp.trim() ? `http://${localIp.trim()}:5173` : "http://IP_DU_PC:5173";
+  const copyInstallUrl = async () => {
+    try {
+      await navigator.clipboard.writeText(installUrl);
+      setCopyStatus("URL copiee.");
+    } catch {
+      setCopyStatus("Copie indisponible, selectionne l'URL manuellement.");
+    }
   };
 
   return (
@@ -140,6 +152,38 @@ export function SettingsScreen({
           <Download className="mr-2 size-4" aria-hidden="true" />
           Import / Export
         </Button>
+      </article>
+
+      <article className="guild-card p-4">
+        <div className="flex items-center gap-2">
+          <Smartphone className="size-5 text-teal-100" aria-hidden="true" />
+          <h2 className="text-xl font-black text-white">Installer sur telephone</h2>
+        </div>
+        <div className="mt-3 space-y-2 text-sm leading-6 text-slate-300">
+          <p>Lance le serveur local avec `npm run dev -- --host 0.0.0.0`.</p>
+          <p>Connecte le telephone au meme Wi-Fi, puis ouvre l'adresse locale du PC.</p>
+          <p>Android/Chrome : menu puis Ajouter a l'ecran d'accueil.</p>
+          <p>iPhone/Safari : Partager puis Sur l'ecran d'accueil.</p>
+        </div>
+        <div className="mt-4 grid gap-2 sm:grid-cols-[1fr_auto]">
+          <input
+            value={localIp}
+            onChange={(event) => setLocalIp(event.target.value)}
+            placeholder="IP locale du PC, ex: 192.168.1.42"
+            className="h-10 rounded-lg border border-white/10 bg-slate-950/70 px-3 text-sm text-white outline-none focus:border-teal-200"
+          />
+          <Button variant="guild" onClick={copyInstallUrl}>
+            <Copy className="mr-2 size-4" aria-hidden="true" />
+            Copier l'URL
+          </Button>
+        </div>
+        <p className="mt-2 rounded-lg border border-white/10 bg-white/[0.06] p-2 text-xs font-semibold text-slate-200">
+          {installUrl}
+        </p>
+        {copyStatus && <p className="mt-2 text-xs font-semibold text-teal-100">{copyStatus}</p>}
+        <p className="mt-3 text-xs leading-5 text-amber-100">
+          Attention : si `public/private-assets` contient des images privees, ne publie pas le build `dist` tel quel.
+        </p>
       </article>
 
       <article className="rounded-xl border border-red-300/30 bg-red-400/10 p-4 shadow-[0_0_26px_rgba(248,113,113,0.1)]">

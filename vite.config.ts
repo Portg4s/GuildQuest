@@ -8,19 +8,26 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: "autoUpdate",
-      includeAssets: ["favicon.svg", "pwa.svg"],
+      includeAssets: ["favicon.svg", "pwa.svg", "icons/guildquest-icon.svg"],
       manifest: {
         name: "GuildQuest",
         short_name: "GuildQuest",
-        description: "PWA offline-first d'apprentissage gamifiee avec quetes, quiz et gacha.",
-        theme_color: "#312e81",
-        background_color: "#0f172a",
+        description: "PWA offline-first d'apprentissage gamifiee avec quetes, quiz, gacha et duel.",
+        theme_color: "#0f766e",
+        background_color: "#020617",
         display: "standalone",
         orientation: "portrait",
         start_url: "/",
+        scope: "/",
         icons: [
           {
             src: "/pwa.svg",
+            sizes: "any",
+            type: "image/svg+xml",
+            purpose: "any maskable"
+          },
+          {
+            src: "/icons/guildquest-icon.svg",
             sizes: "any",
             type: "image/svg+xml",
             purpose: "any maskable"
@@ -28,7 +35,8 @@ export default defineConfig({
         ]
       },
       workbox: {
-        globPatterns: ["**/*.{js,css,html,svg,ico,png,webp,json}"]
+        globPatterns: ["**/*.{js,css,html,svg,ico,png,json}"],
+        globIgnores: ["**/private-assets/**"]
       }
     })
   ],

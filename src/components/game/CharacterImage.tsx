@@ -9,6 +9,7 @@ type CharacterImageProps = {
   fallbackClassName?: string;
   alt?: string;
   preferPrivateImage?: boolean;
+  eager?: boolean;
 };
 
 export function CharacterImage({
@@ -16,7 +17,8 @@ export function CharacterImage({
   className,
   fallbackClassName,
   alt,
-  preferPrivateImage = true
+  preferPrivateImage = true,
+  eager = false
 }: CharacterImageProps) {
   const preferredSrc = preferPrivateImage ? character?.image : character?.placeholderImage;
   const fallbackSrc = character?.placeholderImage || "/pwa.svg";
@@ -62,7 +64,10 @@ export function CharacterImage({
       src={src}
       alt={alt ?? character?.name ?? ""}
       onError={handleError}
-      className={cn(className, !character && fallbackClassName)}
+      loading={eager ? "eager" : "lazy"}
+      decoding="async"
+      draggable={false}
+      className={cn("object-cover", className, !character && fallbackClassName)}
     />
   );
 }

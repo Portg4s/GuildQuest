@@ -27,7 +27,7 @@ export function PremiumCharacterCard({
         rarityCardClasses[result.character.rarity],
         rarityGlowClasses[result.character.rarity],
         effect.border,
-        compact ? "min-h-48" : "min-h-72 p-4"
+        compact ? "min-h-56" : "min-h-[25rem] p-4"
       )}
     >
       <div className={cn("absolute inset-0 -z-10 bg-gradient-to-br opacity-80", effect.aura)} />
@@ -46,14 +46,17 @@ export function PremiumCharacterCard({
         </span>
       </div>
 
-      <div className={cn("mx-auto mt-3 grid place-items-center rounded-xl border border-white/10 bg-black/20 ring-2", effect.ring, compact ? "size-24" : "size-36")}>
+      <div className={cn("relative mx-auto mt-3 grid place-items-center overflow-hidden rounded-xl border border-white/10 bg-black/25 ring-2", effect.ring, compact ? "h-32 w-full" : "h-56 w-full")}>
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_18%,rgba(255,255,255,0.18),transparent_32%)]" />
         <CharacterImage
           character={result.character}
-          className={cn("rounded-lg object-contain p-2", compact ? "size-20" : "size-28")}
+          eager={!compact}
+          className={cn("relative h-full w-full rounded-lg", compact ? "object-cover" : "object-cover")}
         />
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-slate-950/85 to-transparent" />
       </div>
 
-      <h2 className={cn("mt-3 font-black text-white", compact ? "line-clamp-1 text-sm" : "text-xl")}>
+      <h2 className={cn("mt-3 font-black text-white drop-shadow", compact ? "line-clamp-1 text-sm" : "text-2xl")}>
         {result.character.name}
       </h2>
       <p className={cn("mt-1 font-semibold opacity-90", compact ? "text-xs" : "text-sm")}>
@@ -61,7 +64,7 @@ export function PremiumCharacterCard({
       </p>
 
       {!result.isNew && (
-        <div className="mt-3 rounded-lg border border-white/10 bg-black/25 p-2 text-xs font-bold text-white">
+        <div className="mt-3 rounded-lg border border-white/10 bg-black/30 p-2 text-xs font-bold text-white">
           +{result.fragmentsGained} fragments
           <span className="mx-1 text-white/45">-</span>
           +{result.magicDustGained} poussiere

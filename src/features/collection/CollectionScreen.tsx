@@ -78,7 +78,7 @@ export function CollectionScreen({
         )}
       </div>
 
-      <div className="grid grid-cols-2 gap-3 lg:grid-cols-3">
+      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         {filteredCharacters.map((character) => {
           const owned = ownedByCharacterId.get(character.id);
           const isActive = activeCharacterId === character.id;
@@ -87,10 +87,11 @@ export function CollectionScreen({
             <article
               key={character.id}
               className={cn(
-                "rounded-xl border p-3 transition hover:-translate-y-0.5",
+                "relative isolate overflow-hidden rounded-xl border p-2.5 transition hover:-translate-y-0.5",
                 owned ? `${rarityCardClasses[character.rarity]} magic-border` : "border-white/10 bg-slate-900/60 text-slate-500"
               )}
             >
+              <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_50%_8%,rgba(255,255,255,0.12),transparent_34%)]" />
               <button type="button" className="block w-full text-left" onClick={() => onOpenCharacter(character)}>
                 <div className="flex items-start justify-between gap-3">
                   <span className={cn("rounded-md px-2.5 py-1 text-xs font-black", rarityBadgeClasses[character.rarity])}>
@@ -101,11 +102,11 @@ export function CollectionScreen({
                 <CharacterImage
                   character={character}
                   className={cn(
-                    "mx-auto mt-3 size-20 rounded-xl border border-white/10 bg-white/10 p-2.5",
+                    "mx-auto mt-2 h-32 w-full rounded-xl border border-white/10 bg-white/10",
                     !owned && "grayscale opacity-35"
                   )}
                 />
-                <h2 className="mt-3 truncate text-base font-black text-white">{owned ? character.name : "Silhouette inconnue"}</h2>
+                <h2 className="mt-2 truncate text-sm font-black text-white sm:text-base">{owned ? character.name : "Silhouette inconnue"}</h2>
                 <p className="mt-1 text-xs">{character.element} - Pui. {character.power}</p>
                 <p className="mt-1 text-xs font-bold">Fragments : {owned?.fragments ?? 0}</p>
               </button>
