@@ -4,142 +4,194 @@ Date : 16 juin 2026
 
 ## Resume
 
-Module gacha V1 implemente dans GuildQuest :
+La partie apprentissage/exploration de GuildQuest a ete renforcee :
 
-- Navigation Hall vers `Invocation` et `Collection`.
-- Nouveaux ecrans `gacha`, `collection`, `character-detail`.
-- Invocation x1 et x10 avec couts configures.
-- Tirage pondere par rarete.
-- Animation simple Framer Motion pendant et apres l'invocation.
-- Resultats visibles avec rarete, statut `Nouveau !` ou `Doublon`.
-- Gestion des doublons en fragments et poussiere magique.
-- Collection filtrable par rarete.
-- Detail personnage avec statut possede/non possede.
-- Definition d'un personnage actif.
-- Affichage du personnage actif dans le Hall et dans le Profil.
-- Persistance Dexie de la collection, de l'historique gacha, du joueur, des gemmes, de la poussiere magique et du personnage actif.
+- Bouton `Carte` active depuis le Hall.
+- Nouvel ecran `Carte des regions`.
+- Nouvel ecran `Detail de zone / arbre de competences`.
+- Navigation RPG : Hall -> Carte -> Zone -> Quiz.
+- L'ecran Missions reste disponible comme acces rapide aux quiz.
+- Hall enrichi avec un bloc `Progression actuelle`.
+- Profil enrichi avec progression du pack, quiz valides et quiz parfaits.
+- Pack `Fondations Web` fortement enrichi.
 
 ## Fichiers crees ou modifies
+
+Crees :
+
+- `src/domain/progression/learning-progress.service.ts`
+- `src/features/map/MapScreen.tsx`
+- `src/features/map/ZoneDetailScreen.tsx`
 
 Modifies :
 
 - `src/app/App.tsx`
-- `src/domain/models/Player.ts`
-- `src/domain/models/PlayerCharacter.ts`
-- `src/domain/models/GachaPull.ts`
+- `src/data/packs/foundations-web.example.ts`
+- `src/domain/models/SkillNode.ts`
 - `src/features/home/HomeScreen.tsx`
 - `src/features/profile/ProfileScreen.tsx`
-- `src/stores/game.store.ts`
-- `src/stores/player.store.ts`
+- `src/features/collection/CollectionScreen.tsx`
+- `src/features/gacha/GachaScreen.tsx`
 - `CODEX_REPORT.md`
 
-Crees :
+## Contenu ajoute au pack
 
-- `src/components/game/rarity-styles.ts`
-- `src/data/config/duplicates.config.ts`
-- `src/domain/gacha/gacha-rates.service.ts`
-- `src/domain/gacha/duplicate.service.ts`
-- `src/domain/gacha/gacha.service.ts`
-- `src/features/gacha/GachaScreen.tsx`
-- `src/features/collection/CollectionScreen.tsx`
-- `src/features/character-detail/CharacterDetailScreen.tsx`
-- `src/storage/repositories/collection.repository.ts`
-- `src/storage/repositories/gacha-history.repository.ts`
+Pack actif : `Fondations Web`.
 
-## Logique gacha ajoutee
+Region :
 
-- Couts :
-  - x1 : 80 gemmes ;
-  - x10 : 700 gemmes.
-- Taux utilises depuis `gacha.config.ts` :
-  - COMMON : 45 ;
-  - RARE : 30 ;
-  - EPIC : 15 ;
-  - LEGENDARY : 8 ;
-  - MYTHIC : 2.
-- Selection d'une rarete par poids cumules.
-- Selection aleatoire d'un personnage dans la rarete tiree.
-- Fallback prevu si une rarete n'a aucun personnage : tirage dans le pool global.
-- Verification des gemmes avant invocation.
-- Deduction des gemmes.
-- Ajout du personnage si nouveau.
-- Conversion en fragments et poussiere magique si doublon.
-- Creation d'une entree d'historique `GachaPull`.
+- `Plaine des Fondations`
 
-## Gestion des doublons
+Zones :
 
-Config ajoutee dans `duplicates.config.ts` :
+- Internet & Web
+- Client / Serveur
+- HTTP & HTTPS
+- HTML & CSS
+- JavaScript & APIs
 
-- COMMON : +5 fragments, +10 poussiere magique.
-- RARE : +10 fragments, +25 poussiere magique.
-- EPIC : +20 fragments, +60 poussiere magique.
-- LEGENDARY : +50 fragments, +150 poussiere magique.
-- MYTHIC : +100 fragments, +300 poussiere magique.
+Volume actuel :
 
-## Logique collection ajoutee
+- 5 zones
+- 15 quiz
+- 45 questions
+- 15 noeuds de competence
 
-- Grille responsive de tous les personnages placeholders.
-- Personnages possedes visibles normalement.
-- Personnages non possedes grises avec silhouette placeholder.
-- Filtres `Tous`, `Commun`, `Rare`, `Epique`, `Legendaire`, `Mythique`.
-- Affichage rarete, element, puissance, fragments.
-- Bouton `Definir actif` pour les personnages possedes.
-- Clic carte vers ecran detail.
-- Detail personnage avec grande carte animee, description, fragments, doublons et bouton actif.
+Chaque zone contient 3 quiz et 3 noeuds de competence. Les questions melangent :
 
-## Etat de la persistance Dexie
+- `SINGLE_CHOICE`
+- `MULTIPLE_CHOICE`
+- `TRUE_FALSE`
 
-Persistant maintenant :
+Themes couverts :
 
-- `player` :
-  - gemmes ;
-  - poussiere magique ;
-  - `activeCharacterId` ;
-  - progression joueur existante.
-- `playerCharacters` :
-  - personnage possede ;
-  - fragments ;
-  - nombre de doublons ;
-  - date d'obtention ;
-  - statut actif.
-- `gachaHistory` :
-  - personnage tire ;
-  - rarete ;
-  - cout ;
-  - doublon ou non ;
-  - fragments gagnes ;
-  - poussiere gagnee ;
-  - date de tirage.
+- difference Internet / Web
+- navigateur
+- URL
+- DNS
+- hebergement
+- client / serveur
+- requete / reponse
+- API
+- frontend / backend
+- methodes HTTP
+- codes HTTP
+- headers
+- body
+- HTTPS
+- structure HTML
+- balises semantiques
+- attributs
+- CSS
+- selecteurs
+- responsive
+- JavaScript
+- DOM
+- evenements
+- JSON
+- fetch
+- API REST
 
-Au refresh, l'application recharge joueur, collection, historique gacha et progression quiz depuis IndexedDB.
+## Logique de progression ajoutee
+
+Nouveau service : `learning-progress.service.ts`.
+
+Fonctions principales :
+
+- calcul du statut d'un quiz ;
+- calcul de progression d'une zone ;
+- calcul de progression d'une region ;
+- calcul de progression du pack ;
+- recuperation des quiz d'une zone ;
+- recuperation des noeuds de competence d'une zone ;
+- calcul de progression d'un noeud.
+
+Regles appliquees :
+
+- Quiz non tente : aucune tentative.
+- Quiz echoue : tentative avec meilleur score < 60%.
+- Quiz valide : meilleur score >= 60%.
+- Quiz parfait : meilleur score = 100%.
+- Zone non commencee : aucun quiz tente.
+- Zone en cours : au moins un quiz tente, mais tous les quiz ne sont pas valides.
+- Zone terminee : tous les quiz de la zone sont valides.
+- Progression zone : quiz valides / quiz totaux.
+- Progression region : quiz valides / quiz totaux de la region.
+
+## UI ajoutee
+
+Carte des regions :
+
+- titre `Carte des regions` ;
+- retour Hall ;
+- pack actif ;
+- region `Plaine des Fondations` ;
+- progression globale ;
+- zones terminees / total ;
+- quiz valides / total ;
+- quiz parfaits ;
+- cartes de zones avec statut, progression et bouton `Explorer`.
+
+Detail de zone :
+
+- nom et description de la zone ;
+- barre de progression ;
+- statut de zone ;
+- noeuds de competence ordonnes ;
+- quiz lies a chaque noeud ;
+- meilleur score visible ;
+- bouton `Lancer`.
+
+Hall :
+
+- bouton `Carte` ajoute ;
+- bloc `Progression actuelle` avec pack, region et pourcentage ;
+- bouton `Ouvrir la carte`.
+
+Profil :
+
+- progression `Fondations Web` ;
+- quiz valides ;
+- quiz parfaits ;
+- conservation des stats quiz, gacha et personnage actif.
+
+## Extensibilite packs
+
+La logique reste basee sur `ContentPack`, `Region`, `Zone`, `Quiz` et `SkillNode`.
+
+Simplifications actuelles :
+
+- un seul pack actif est charge directement depuis `foundations-web.example.ts` ;
+- une seule region est affichee pour la V1 ;
+- les zones sont toutes accessibles, sans verrouillage strict ;
+- les noeuds de competence portent des champs optionnels `zoneId`, `quizIds` et `order` pour preparer plusieurs zones/packs plus tard.
 
 ## Commandes executees
 
 - `Get-Content -Raw CODEX_RULES.md`
-- `Get-Content -Raw src/app/App.tsx`
-- `Get-Content -Raw src/stores/player.store.ts`
-- `Get-Content -Raw src/stores/game.store.ts`
-- `Get-Content -Raw src/storage/db.ts`
-- `Get-Content -Raw src/domain/models/Player.ts`
-- `Get-Content -Raw src/domain/models/PlayerCharacter.ts`
-- `Get-Content -Raw src/domain/models/GachaPull.ts`
-- `Get-Content -Raw src/data/config/gacha.config.ts`
-- `Get-Content -Raw src/data/characters/characters.example.ts`
+- lectures des fichiers existants `App`, `HomeScreen`, `ProfileScreen`, `MissionsScreen`, modeles et pack
 - `npm run build`
 - `npm run lint`
 - `npm run dev -- --host 127.0.0.1`
+- tentative de connexion au navigateur integre
 
 ## Resultat de `npm run build`
 
 OK.
 
-Le build Vite production passe et genere les fichiers PWA dans `dist/`.
+Le build production Vite passe et genere les fichiers PWA.
+
+Avertissement restant :
+
+- Vite signale que certains chunks depassent 500 kB apres minification.
+- Ce n'est pas bloquant pour la V1.
+- Une prochaine etape possible sera le code splitting par ecran.
 
 ## Resultat de `npm run lint`
 
 OK.
 
-Un premier passage a signale un import inutilise `Trophy` dans `GachaScreen.tsx`. L'import a ete retire, puis `npm run lint` est repasse sans erreur ni avertissement.
+Aucune erreur et aucun avertissement ESLint.
 
 ## Resultat de `npm run dev`
 
@@ -155,24 +207,23 @@ La commande a ete arretee par timeout volontaire apres quelques secondes, car le
 ## Erreurs ou limites rencontrees
 
 - Verification navigateur integre impossible : l'instance `iab` n'est pas disponible dans cette session.
-- Aucun asset protege n'a ete ajoute.
-- Aucun telechargement Internet n'a ete effectue.
+- La validation visuelle complete doit donc etre faite manuellement.
 - Aucun commit et aucun push n'ont ete faits.
+- Aucun asset protege n'a ete ajoute.
 
 ## Points a verifier manuellement
 
 - Lancer `npm run dev`.
 - Ouvrir `http://127.0.0.1:5173/`.
-- Depuis le Hall, ouvrir `Invocation`.
-- Faire une invocation x1.
-- Gagner assez de gemmes via les missions, puis tester une invocation x10.
-- Verifier la deduction des gemmes.
-- Refaire des invocations pour confirmer les doublons, fragments et poussiere magique.
-- Ouvrir `Collection`.
-- Definir un personnage actif.
-- Verifier que le personnage actif apparait dans le Hall et le Profil.
-- Rafraichir la page et confirmer que gemmes, poussiere, collection et actif persistent.
+- Depuis le Hall, ouvrir `Carte`.
+- Verifier la region `Plaine des Fondations`.
+- Explorer chaque zone.
+- Lancer un quiz depuis un noeud de competence.
+- Terminer un quiz et verifier que la progression de zone/region evolue.
+- Verifier que l'ecran Missions fonctionne toujours.
+- Verifier que le Profil affiche la progression d'apprentissage.
+- Tester le rendu mobile des cartes de zones et noeuds.
 
 ## Prochaine etape recommandee
 
-Ajouter un systeme d'evolution des personnages avec fragments, puis une petite page d'historique des invocations pour consulter les derniers tirages.
+Ajouter un vrai verrouillage progressif des zones/noeuds, puis introduire un ecran `Carte` multi-regions avec selection de pack actif.

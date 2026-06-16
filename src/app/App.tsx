@@ -4,6 +4,7 @@ import { foundationsWebPack } from "@/data/packs/foundations-web.example";
 import type { Character, Player, Quiz } from "@/domain/models";
 import { performGachaInvocation, type GachaPullResult } from "@/domain/gacha/gacha.service";
 import { applyRewardsToPlayer } from "@/domain/progression/level.service";
+import { calculatePackProgress } from "@/domain/progression/learning-progress.service";
 import { calculateMissionRewards, type RewardResult } from "@/domain/reward/reward.service";
 import { buildMissionsFromPack, type Mission } from "@/domain/services/mission.service";
 import type { QuizScoreResult } from "@/domain/services/quiz.service";
@@ -11,6 +12,8 @@ import { CharacterDetailScreen } from "@/features/character-detail/CharacterDeta
 import { CollectionScreen } from "@/features/collection/CollectionScreen";
 import { GachaScreen } from "@/features/gacha/GachaScreen";
 import { HomeScreen } from "@/features/home/HomeScreen";
+import { MapScreen } from "@/features/map/MapScreen";
+import { ZoneDetailScreen } from "@/features/map/ZoneDetailScreen";
 import { MissionsScreen } from "@/features/missions/MissionsScreen";
 import { ProfileScreen } from "@/features/profile/ProfileScreen";
 import { QuizScreen } from "@/features/quiz/QuizScreen";
@@ -22,7 +25,17 @@ import { getQuizProgressMap, recordQuizAttempt } from "@/storage/repositories/qu
 import { useGameStore } from "@/stores/game.store";
 import { defaultPlayer, usePlayerStore } from "@/stores/player.store";
 
-type AppScreen = "home" | "missions" | "quiz" | "results" | "profile" | "gacha" | "collection" | "character-detail";
+type AppScreen =
+  | "home"
+  | "missions"
+  | "map"
+  | "zone-detail"
+  | "quiz"
+  | "results"
+  | "profile"
+  | "gacha"
+  | "collection"
+  | "character-detail";
 
 type CompletedMissionResult = {
   quiz: Quiz;
@@ -33,6 +46,7 @@ type CompletedMissionResult = {
 function App() {
   const [screen, setScreen] = useState<AppScreen>("home");
   const [selectedMission, setSelectedMission] = useState<Mission | undefined>();
+  const [selectedZoneId, setSelectedZoneId] = useState<string | undefined>();
   const [selectedCharacter, setSelectedCharacter] = useState<Character | undefined>();
   const [completedResult, setCompletedResult] = useState<CompletedMissionResult | undefined>();
   const [gachaResults, setGachaResults] = useState<GachaPullResult[]>([]);
@@ -91,6 +105,15 @@ function App() {
     () => buildMissionsFromPack(foundationsWebPack, quizProgressById),
     [quizProgressById]
   );
+  const packProgress = useMemo(
+    () => calculatePackProgress(foundationsWebPack, quizProgressById),
+    [quizProgressById]
+  );
+  const regionProgress = packProgress.regions[0];
+  const selectedZone = useMemo(
+    () => foundationsWebPack.regions.flatMap((region) => region.zones).find((zone) => zone.id === selectedZoneId),
+    [selectedZoneId]
+  );
   const activeCharacter = useMemo(
     () => exampleCharacters.find((character) => character.id === player.activeCharacterId),
     [player.activeCharacterId]
@@ -106,6 +129,14 @@ function App() {
     setSelectedMission(mission);
     setCompletedResult(undefined);
     setScreen("quiz");
+  };
+
+  const startQuizFromMap = (quiz: Quiz) => {
+    const mission = missions.find((candidate) => candidate.quiz.id === quiz.id);
+
+    if (mission) {
+      startMission(mission);
+    }
   };
 
   const completeQuiz = (scoreResult: QuizScoreResult) => {
@@ -226,7 +257,9 @@ function App() {
           <HomeScreen
             player={player}
             activeCharacter={activeCharacter}
+            regionProgress={regionProgress}
             onGoToMissions={() => setScreen("missions")}
+            onGoToMap={() => setScreen("map")}
             onGoToProfile={() => setScreen("profile")}
             onGoToGacha={() => setScreen("gacha")}
             onGoToCollection={() => setScreen("collection")}
@@ -235,6 +268,28 @@ function App() {
 
         {screen === "missions" && (
           <MissionsScreen missions={missions} onBackHome={goHome} onStartQuiz={startMission} />
+        )}
+
+        {screen === "map" && (
+          <MapScreen
+            pack={foundationsWebPack}
+            regionProgress={regionProgress}
+            onBackHome={goHome}
+            onExploreZone={(zoneId) => {
+              setSelectedZoneId(zoneId);
+              setScreen("zone-detail");
+            }}
+          />
+        )}
+
+        {screen === "zone-detail" && selectedZone && (
+          <ZoneDetailScreen
+            pack={foundationsWebPack}
+            zone={selectedZone}
+            progressByQuizId={quizProgressById}
+            onBackMap={() => setScreen("map")}
+            onStartQuiz={startQuizFromMap}
+          />
         )}
 
         {screen === "quiz" && selectedMission && (
@@ -258,6 +313,7 @@ function App() {
             collection={collection}
             gachaHistory={gachaHistory}
             activeCharacter={activeCharacter}
+            regionProgress={regionProgress}
             onBackHome={goHome}
             onGoToCollection={() => setScreen("collection")}
           />

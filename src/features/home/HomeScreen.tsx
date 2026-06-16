@@ -1,14 +1,17 @@
 import { motion } from "framer-motion";
-import { Gem, Shield, Sparkles, Star, UserRound, ScrollText, Trophy } from "lucide-react";
+import { Gem, Map, Shield, Sparkles, Star, UserRound, ScrollText, Trophy } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { rarityBadgeClasses, rarityLabels } from "@/components/game/rarity-styles";
 import type { Character, Player } from "@/domain/models";
+import type { RegionProgress } from "@/domain/progression/learning-progress.service";
 import { cn } from "@/lib/utils";
 
 type HomeScreenProps = {
   player: Player;
   activeCharacter?: Character;
+  regionProgress: RegionProgress;
   onGoToMissions: () => void;
+  onGoToMap: () => void;
   onGoToProfile: () => void;
   onGoToGacha: () => void;
   onGoToCollection: () => void;
@@ -17,7 +20,9 @@ type HomeScreenProps = {
 export function HomeScreen({
   player,
   activeCharacter,
+  regionProgress,
   onGoToMissions,
+  onGoToMap,
   onGoToProfile,
   onGoToGacha,
   onGoToCollection
@@ -90,6 +95,10 @@ export function HomeScreen({
               <ScrollText className="size-6" aria-hidden="true" />
               <span>Missions</span>
             </Button>
+            <Button variant="guild" className="h-24 flex-col gap-2" onClick={onGoToMap}>
+              <Map className="size-6" aria-hidden="true" />
+              <span>Carte</span>
+            </Button>
             <Button variant="guild" className="h-24 flex-col gap-2" onClick={onGoToGacha}>
               <Sparkles className="size-6" aria-hidden="true" />
               <span>Invocation</span>
@@ -109,12 +118,37 @@ export function HomeScreen({
       <section className="rounded-lg border border-white/10 bg-slate-900/80 p-5">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-amber-200">Progression actuelle</p>
+            <h3 className="mt-1 text-2xl font-black text-white">Fondations Web</h3>
+            <p className="mt-1 text-sm text-slate-300">
+              Region : {regionProgress.region.name} - {regionProgress.validatedQuizCount} / {regionProgress.quizCount} quiz valides
+            </p>
+          </div>
+          <div className="min-w-32">
+            <p className="text-right text-3xl font-black text-white">{regionProgress.progressPercent}%</p>
+            <div className="mt-2 h-3 overflow-hidden rounded-full bg-slate-950">
+              <div
+                className="h-full rounded-full bg-gradient-to-r from-teal-300 to-amber-300"
+                style={{ width: `${regionProgress.progressPercent}%` }}
+              />
+            </div>
+          </div>
+        </div>
+        <Button className="mt-4 w-full sm:w-auto" onClick={onGoToMap}>
+          <Map className="mr-2 size-4" aria-hidden="true" />
+          Ouvrir la carte
+        </Button>
+      </section>
+
+      <section className="rounded-lg border border-white/10 bg-slate-900/80 p-5">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div>
             <p className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-200">Personnage actif</p>
             {activeCharacter ? (
               <>
                 <h3 className="mt-1 text-2xl font-black text-white">{activeCharacter.name}</h3>
                 <p className="mt-1 text-sm text-slate-300">
-                  {activeCharacter.element} · Puissance {activeCharacter.power}
+                  {activeCharacter.element} - Puissance {activeCharacter.power}
                 </p>
               </>
             ) : (

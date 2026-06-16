@@ -87,7 +87,7 @@ export function CollectionScreen({
                   )}
                 />
                 <h2 className="mt-4 text-xl font-black text-white">{owned ? character.name : "Silhouette inconnue"}</h2>
-                <p className="mt-1 text-sm">{character.element} · Puissance {character.power}</p>
+                <p className="mt-1 text-sm">{character.element} - Puissance {character.power}</p>
                 <p className="mt-2 text-sm font-bold">Fragments : {owned?.fragments ?? 0}</p>
               </button>
               {owned && (

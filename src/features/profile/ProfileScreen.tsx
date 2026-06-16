@@ -2,6 +2,7 @@ import { ArrowLeft, Gem, Sparkles, Trophy, UserRound } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { rarityBadgeClasses, rarityLabels } from "@/components/game/rarity-styles";
 import type { Character, GachaPull, Player, PlayerCharacter } from "@/domain/models";
+import type { RegionProgress } from "@/domain/progression/learning-progress.service";
 import type { QuizProgress } from "@/storage/db";
 import { cn } from "@/lib/utils";
 
@@ -11,6 +12,7 @@ type ProfileScreenProps = {
   collection: PlayerCharacter[];
   gachaHistory: GachaPull[];
   activeCharacter?: Character;
+  regionProgress: RegionProgress;
   onBackHome: () => void;
   onGoToCollection: () => void;
 };
@@ -21,6 +23,7 @@ export function ProfileScreen({
   collection,
   gachaHistory,
   activeCharacter,
+  regionProgress,
   onBackHome,
   onGoToCollection
 }: ProfileScreenProps) {
@@ -81,6 +84,9 @@ export function ProfileScreen({
           <ProfileStat label="Personnages debloques" value={collection.length} />
           <ProfileStat label="Invocations" value={gachaHistory.length} />
           <ProfileStat icon={<Trophy className="size-5" />} label="Quiz termines" value={completed.length} />
+          <ProfileStat label="Progression Fondations" value={`${regionProgress.progressPercent}%`} />
+          <ProfileStat label="Quiz valides" value={`${regionProgress.validatedQuizCount} / ${regionProgress.quizCount}`} />
+          <ProfileStat label="Quiz parfaits" value={regionProgress.perfectQuizCount} />
           <ProfileStat label="Score moyen" value={attempted.length ? `${averageScore}%` : "Aucun"} />
           <ProfileStat label="Meilleur score" value={attempted.length ? `${bestScore}%` : "Aucun"} />
         </div>
@@ -93,7 +99,7 @@ export function ProfileScreen({
             <img src={activeCharacter.placeholderImage} alt="" className="size-20 rounded-lg border border-white/10 bg-white/10 p-3" />
             <div>
               <h2 className="text-2xl font-black text-white">{activeCharacter.name}</h2>
-              <p className="mt-1 text-sm text-slate-300">{activeCharacter.element} · Puissance {activeCharacter.power}</p>
+              <p className="mt-1 text-sm text-slate-300">{activeCharacter.element} - Puissance {activeCharacter.power}</p>
               <span className={cn("mt-2 inline-block rounded-md px-2.5 py-1 text-xs font-black", rarityBadgeClasses[activeCharacter.rarity])}>
                 {rarityLabels[activeCharacter.rarity]}
               </span>

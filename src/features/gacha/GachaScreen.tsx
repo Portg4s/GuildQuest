@@ -118,10 +118,10 @@ export function GachaScreen({
                 className="mx-auto mt-4 size-24 rounded-lg border border-white/10 bg-white/10 p-3"
               />
               <h2 className="mt-4 text-xl font-black text-white">{result.character.name}</h2>
-              <p className="mt-1 text-sm opacity-85">{result.character.element} · Puissance {result.character.power}</p>
+              <p className="mt-1 text-sm opacity-85">{result.character.element} - Puissance {result.character.power}</p>
               {!result.isNew && (
                 <div className="mt-3 rounded-lg bg-black/20 p-3 text-sm font-bold">
-                  +{result.fragmentsGained} fragments · +{result.magicDustGained} poussiere
+                  +{result.fragmentsGained} fragments - +{result.magicDustGained} poussiere
                 </div>
               )}
             </motion.article>
