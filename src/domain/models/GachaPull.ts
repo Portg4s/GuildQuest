@@ -5,5 +5,8 @@ export type GachaPull = {
   characterId: string;
   rarity: CharacterRarity;
   cost: number;
+  isDuplicate: boolean;
+  fragmentsGained: number;
+  magicDustGained: number;
   pulledAt: string;
 };

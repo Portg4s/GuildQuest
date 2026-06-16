@@ -8,6 +8,7 @@ export type Player = {
   xp: number;
   nextLevelXp: number;
   gems: number;
+  magicDust: number;
   activeCharacterId?: string;
   unlockedBadgeIds: string[];
   unlockedTitleIds: string[];

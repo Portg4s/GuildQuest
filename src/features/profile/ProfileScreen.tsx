@@ -1,15 +1,29 @@
-import { ArrowLeft, Gem, Trophy, UserRound } from "lucide-react";
+import { ArrowLeft, Gem, Sparkles, Trophy, UserRound } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import type { Player } from "@/domain/models";
+import { rarityBadgeClasses, rarityLabels } from "@/components/game/rarity-styles";
+import type { Character, GachaPull, Player, PlayerCharacter } from "@/domain/models";
 import type { QuizProgress } from "@/storage/db";
+import { cn } from "@/lib/utils";
 
 type ProfileScreenProps = {
   player: Player;
   progressEntries: QuizProgress[];
+  collection: PlayerCharacter[];
+  gachaHistory: GachaPull[];
+  activeCharacter?: Character;
   onBackHome: () => void;
+  onGoToCollection: () => void;
 };
 
-export function ProfileScreen({ player, progressEntries, onBackHome }: ProfileScreenProps) {
+export function ProfileScreen({
+  player,
+  progressEntries,
+  collection,
+  gachaHistory,
+  activeCharacter,
+  onBackHome,
+  onGoToCollection
+}: ProfileScreenProps) {
   const completed = progressEntries.filter((entry) => entry.completedAt);
   const attempted = progressEntries.filter((entry) => entry.attempts > 0);
   const averageScore =
@@ -26,10 +40,13 @@ export function ProfileScreen({ player, progressEntries, onBackHome }: ProfileSc
           <p className="text-xs font-semibold uppercase tracking-[0.22em] text-teal-200">Profil</p>
           <h1 className="text-3xl font-black text-white">{player.username}</h1>
         </div>
-        <Button variant="guild" onClick={onBackHome}>
-          <ArrowLeft className="mr-2 size-4" aria-hidden="true" />
-          Hall
-        </Button>
+        <div className="flex flex-wrap gap-2">
+          <Button variant="guild" onClick={onGoToCollection}>Collection</Button>
+          <Button variant="guild" onClick={onBackHome}>
+            <ArrowLeft className="mr-2 size-4" aria-hidden="true" />
+            Hall
+          </Button>
+        </div>
       </header>
 
       <article className="rounded-lg border border-white/10 bg-slate-900/90 p-5 shadow-2xl">
@@ -60,10 +77,31 @@ export function ProfileScreen({ player, progressEntries, onBackHome }: ProfileSc
 
         <div className="mt-6 grid gap-3 sm:grid-cols-2">
           <ProfileStat icon={<Gem className="size-5" />} label="Gemmes" value={player.gems} />
+          <ProfileStat icon={<Sparkles className="size-5" />} label="Poussiere magique" value={player.magicDust ?? 0} />
+          <ProfileStat label="Personnages debloques" value={collection.length} />
+          <ProfileStat label="Invocations" value={gachaHistory.length} />
           <ProfileStat icon={<Trophy className="size-5" />} label="Quiz termines" value={completed.length} />
           <ProfileStat label="Score moyen" value={attempted.length ? `${averageScore}%` : "Aucun"} />
           <ProfileStat label="Meilleur score" value={attempted.length ? `${bestScore}%` : "Aucun"} />
         </div>
+      </article>
+
+      <article className="rounded-lg border border-white/10 bg-slate-900/90 p-5">
+        <p className="text-sm font-bold uppercase tracking-[0.18em] text-teal-200">Personnage actif</p>
+        {activeCharacter ? (
+          <div className="mt-4 flex items-center gap-4">
+            <img src={activeCharacter.placeholderImage} alt="" className="size-20 rounded-lg border border-white/10 bg-white/10 p-3" />
+            <div>
+              <h2 className="text-2xl font-black text-white">{activeCharacter.name}</h2>
+              <p className="mt-1 text-sm text-slate-300">{activeCharacter.element} · Puissance {activeCharacter.power}</p>
+              <span className={cn("mt-2 inline-block rounded-md px-2.5 py-1 text-xs font-black", rarityBadgeClasses[activeCharacter.rarity])}>
+                {rarityLabels[activeCharacter.rarity]}
+              </span>
+            </div>
+          </div>
+        ) : (
+          <p className="mt-3 text-sm text-slate-300">Aucun personnage actif pour le moment.</p>
+        )}
       </article>
     </section>
   );

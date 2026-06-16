@@ -11,6 +11,7 @@ export const defaultPlayer: Player = {
   xp: 0,
   nextLevelXp: 100,
   gems: 200,
+  magicDust: 0,
   unlockedBadgeIds: [],
   unlockedTitleIds: [],
   createdAt: now,

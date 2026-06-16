@@ -1,15 +1,27 @@
 import { motion } from "framer-motion";
-import { Gem, Shield, Sparkles, Star, UserRound, ScrollText } from "lucide-react";
+import { Gem, Shield, Sparkles, Star, UserRound, ScrollText, Trophy } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import type { Player } from "@/domain/models";
+import { rarityBadgeClasses, rarityLabels } from "@/components/game/rarity-styles";
+import type { Character, Player } from "@/domain/models";
+import { cn } from "@/lib/utils";
 
 type HomeScreenProps = {
   player: Player;
+  activeCharacter?: Character;
   onGoToMissions: () => void;
   onGoToProfile: () => void;
+  onGoToGacha: () => void;
+  onGoToCollection: () => void;
 };
 
-export function HomeScreen({ player, onGoToMissions, onGoToProfile }: HomeScreenProps) {
+export function HomeScreen({
+  player,
+  activeCharacter,
+  onGoToMissions,
+  onGoToProfile,
+  onGoToGacha,
+  onGoToCollection
+}: HomeScreenProps) {
   const xpProgress = Math.min((player.xp / player.nextLevelXp) * 100, 100);
 
   return (
@@ -78,12 +90,59 @@ export function HomeScreen({ player, onGoToMissions, onGoToProfile }: HomeScreen
               <ScrollText className="size-6" aria-hidden="true" />
               <span>Missions</span>
             </Button>
+            <Button variant="guild" className="h-24 flex-col gap-2" onClick={onGoToGacha}>
+              <Sparkles className="size-6" aria-hidden="true" />
+              <span>Invocation</span>
+            </Button>
+            <Button variant="guild" className="h-24 flex-col gap-2" onClick={onGoToCollection}>
+              <Trophy className="size-6" aria-hidden="true" />
+              <span>Collection</span>
+            </Button>
             <Button variant="guild" className="h-24 flex-col gap-2" onClick={onGoToProfile}>
               <UserRound className="size-6" aria-hidden="true" />
               <span>Profil</span>
             </Button>
           </div>
         </div>
+      </section>
+
+      <section className="rounded-lg border border-white/10 bg-slate-900/80 p-5">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-200">Personnage actif</p>
+            {activeCharacter ? (
+              <>
+                <h3 className="mt-1 text-2xl font-black text-white">{activeCharacter.name}</h3>
+                <p className="mt-1 text-sm text-slate-300">
+                  {activeCharacter.element} · Puissance {activeCharacter.power}
+                </p>
+              </>
+            ) : (
+              <>
+                <h3 className="mt-1 text-2xl font-black text-white">Aucun personnage actif</h3>
+                <p className="mt-1 text-sm text-slate-300">Invoque un allie ou choisis-en un dans ta collection.</p>
+              </>
+            )}
+          </div>
+          <div className="flex items-center gap-3">
+            {activeCharacter && (
+              <span className={cn("rounded-md px-2.5 py-1 text-xs font-black", rarityBadgeClasses[activeCharacter.rarity])}>
+                {rarityLabels[activeCharacter.rarity]}
+              </span>
+            )}
+            <img
+              src={activeCharacter?.placeholderImage ?? "/pwa.svg"}
+              alt=""
+              className="size-20 rounded-lg border border-white/10 bg-white/10 p-3"
+            />
+          </div>
+        </div>
+        {!activeCharacter && (
+          <div className="mt-4 grid gap-3 sm:grid-cols-2">
+            <Button onClick={onGoToGacha}>Invocation</Button>
+            <Button variant="guild" onClick={onGoToCollection}>Collection</Button>
+          </div>
+        )}
       </section>
 
       <footer className="flex items-center justify-center gap-2 pb-2 text-xs font-semibold text-slate-400">
