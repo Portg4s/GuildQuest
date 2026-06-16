@@ -20,13 +20,14 @@ export function CharacterImage({
   preferPrivateImage = true,
   eager = false
 }: CharacterImageProps) {
-  const preferredSrc = preferPrivateImage ? character?.image : character?.placeholderImage;
-  const fallbackSrc = character?.placeholderImage || "/pwa.svg";
+  const pwaFallbackSrc = resolvePublicAssetPath("/pwa.svg") ?? "/pwa.svg";
+  const preferredSrc = resolvePublicAssetPath(preferPrivateImage ? character?.image : character?.placeholderImage);
+  const fallbackSrc = resolvePublicAssetPath(character?.placeholderImage || "/pwa.svg") ?? pwaFallbackSrc;
   const [failedSources, setFailedSources] = useState<string[]>([]);
   const preferredFailed = preferredSrc ? failedSources.includes(preferredSrc) : true;
   const fallbackFailed = failedSources.includes(fallbackSrc);
-  const src = preferredSrc && !preferredFailed ? preferredSrc : fallbackFailed ? "/pwa.svg" : fallbackSrc;
-  const shouldUseMagicPlaceholder = !character || (preferredFailed && fallbackSrc === "/pwa.svg") || fallbackFailed;
+  const src = preferredSrc && !preferredFailed ? preferredSrc : fallbackFailed ? pwaFallbackSrc : fallbackSrc;
+  const shouldUseMagicPlaceholder = !character || (preferredFailed && fallbackSrc === pwaFallbackSrc) || fallbackFailed;
   const initials = character?.name
     .split(" ")
     .map((part) => part[0])
@@ -35,6 +36,10 @@ export function CharacterImage({
     .toUpperCase() ?? "GQ";
 
   const handleError = () => {
+    if (!src) {
+      return;
+    }
+
     setFailedSources((current) => (current.includes(src) ? current : [...current, src]));
   };
 
@@ -70,4 +75,16 @@ export function CharacterImage({
       className={cn("object-cover", className, !character && fallbackClassName)}
     />
   );
+}
+
+function resolvePublicAssetPath(src?: string) {
+  if (!src || src.startsWith("http") || src.startsWith("data:") || src.startsWith(import.meta.env.BASE_URL)) {
+    return src;
+  }
+
+  if (src.startsWith("/")) {
+    return `${import.meta.env.BASE_URL}${src.slice(1)}`;
+  }
+
+  return src;
 }

@@ -1,17 +1,18 @@
 # PRIVATE_ASSETS_GUIDE
 
-Ce guide explique comment ajouter des personnages prives locaux dans GuildQuest sans exposer d'assets dans le repo.
+Ce guide explique comment ajouter des personnages locaux ou publiables dans GuildQuest.
 
 ## Regle principale
 
-Ne commit jamais d'image privee, protegee, sous licence ou issue d'une licence existante.
+Ne commit jamais d'image que tu n'as pas le droit de publier.
 
-Ces chemins sont ignores par Git :
+Le fichier de donnees local reste ignore par Git :
 
 ```txt
-public/private-assets/
 src/data/characters/characters.local.ts
 ```
+
+Le dossier `public/private-assets/` peut etre versionne si tu decides explicitement de publier ces images sur GitHub Pages.
 
 ## A. Ou mettre les images
 
@@ -70,7 +71,7 @@ vers :
 src/data/characters/characters.local.ts
 ```
 
-Le fichier `characters.local.ts` est ignore par Git.
+Le fichier `characters.local.ts` est ignore par Git. Pour publier un pack public, utiliser un fichier versionne comme `characters.public-pack.ts`.
 
 ## D. Exemple de pack local fictif
 
@@ -185,12 +186,11 @@ Avant de commit :
 git status --short
 ```
 
-Ces fichiers ne doivent pas apparaitre :
+Ce fichier ne doit pas apparaitre :
 
-- images sous `public/private-assets/`
 - `src/data/characters/characters.local.ts`
 
-Si un asset prive apparait dans Git, ne le commit pas.
+Les images sous `public/private-assets/` peuvent apparaitre si tu veux les publier. Si une image ne doit pas etre publique, ne la commit pas.
 
 ## G. Export JSON
 
@@ -203,7 +203,7 @@ L'export JSON sauvegarde :
 - gacha ;
 - badges/titres.
 
-L'export JSON ne sauvegarde pas les images privees.
+L'export JSON ne sauvegarde pas les images.
 
 Pour changer de machine, sauvegarde separement :
 
