@@ -25,6 +25,8 @@ export type QuizProgress = {
 export type QuizProgressReward = {
   xpGained: number;
   gemsGained: number;
+  missionGemsGained?: number;
+  levelBonusGems?: number;
 };
 
 export class GuildQuestDatabase extends Dexie {

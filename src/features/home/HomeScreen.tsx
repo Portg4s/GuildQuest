@@ -1,14 +1,15 @@
 import { motion } from "framer-motion";
-import { Gem, Map, Shield, Sparkles, Star, UserRound, ScrollText, Trophy } from "lucide-react";
+import { Crown, Gem, Map, Medal, Shield, Sparkles, Star, UserRound, ScrollText, Trophy } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { CharacterImage } from "@/components/game/CharacterImage";
 import { rarityBadgeClasses, rarityLabels } from "@/components/game/rarity-styles";
-import type { Character, Player } from "@/domain/models";
+import type { Character, Player, PlayerTitle } from "@/domain/models";
 import type { RegionProgress } from "@/domain/progression/learning-progress.service";
 import { cn } from "@/lib/utils";
 
 type HomeScreenProps = {
   player: Player;
+  activeTitle?: PlayerTitle;
   activeCharacter?: Character;
   regionProgress: RegionProgress;
   onGoToMissions: () => void;
@@ -16,17 +17,20 @@ type HomeScreenProps = {
   onGoToProfile: () => void;
   onGoToGacha: () => void;
   onGoToCollection: () => void;
+  onGoToBadges: () => void;
 };
 
 export function HomeScreen({
   player,
+  activeTitle,
   activeCharacter,
   regionProgress,
   onGoToMissions,
   onGoToMap,
   onGoToProfile,
   onGoToGacha,
-  onGoToCollection
+  onGoToCollection,
+  onGoToBadges
 }: HomeScreenProps) {
   const xpProgress = Math.min((player.xp / player.nextLevelXp) * 100, 100);
 
@@ -62,6 +66,11 @@ export function HomeScreen({
             <span className="rounded-md border border-white/15 px-2.5 py-1 text-xs font-semibold text-slate-200">
               Niveau {player.level}
             </span>
+            {activeTitle && (
+              <span className="rounded-md border border-amber-200/30 bg-amber-300/10 px-2.5 py-1 text-xs font-semibold text-amber-100">
+                {activeTitle.label}
+              </span>
+            )}
           </div>
           <p className="text-lg text-slate-300">Bienvenue,</p>
           <h2 className="mt-1 text-5xl font-black leading-none text-white sm:text-7xl">{player.username}</h2>
@@ -108,6 +117,10 @@ export function HomeScreen({
               <Trophy className="size-6" aria-hidden="true" />
               <span>Collection</span>
             </Button>
+            <Button variant="guild" className="h-24 flex-col gap-2" onClick={onGoToBadges}>
+              <Medal className="size-6" aria-hidden="true" />
+              <span>Badges</span>
+            </Button>
             <Button variant="guild" className="h-24 flex-col gap-2" onClick={onGoToProfile}>
               <UserRound className="size-6" aria-hidden="true" />
               <span>Profil</span>
@@ -115,6 +128,18 @@ export function HomeScreen({
           </div>
         </div>
       </section>
+
+      {activeTitle && (
+        <section className="rounded-lg border border-amber-200/20 bg-amber-300/10 p-4">
+          <div className="flex items-center gap-3">
+            <Crown className="size-5 text-amber-100" aria-hidden="true" />
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-amber-100">Titre actif</p>
+              <p className="font-black text-white">{activeTitle.label}</p>
+            </div>
+          </div>
+        </section>
+      )}
 
       <section className="rounded-lg border border-white/10 bg-slate-900/80 p-5">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">

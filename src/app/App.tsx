@@ -1,9 +1,15 @@
 import { useEffect, useMemo, useState } from "react";
 import { getCharacters } from "@/data/characters/characters.registry";
 import { foundationsWebPack } from "@/data/packs/foundations-web.example";
-import type { Character, Player, Quiz } from "@/domain/models";
+import { titleDefinitions } from "@/data/config/titles.config";
+import type { Badge, Character, Player, PlayerTitle, Quiz } from "@/domain/models";
 import { performGachaInvocation, type GachaPullResult } from "@/domain/gacha/gacha.service";
-import { applyRewardsToPlayer } from "@/domain/progression/level.service";
+import {
+  evaluateGachaUnlocks,
+  evaluateLearningUnlocks,
+  getDefaultUnlockedTitles
+} from "@/domain/progression/achievements.service";
+import { applyRewardsToPlayerDetailed, type LevelProgressionResult } from "@/domain/progression/level.service";
 import { calculatePackProgress } from "@/domain/progression/learning-progress.service";
 import { calculateMissionRewards, type RewardResult } from "@/domain/reward/reward.service";
 import { buildMissionsFromPack, type Mission } from "@/domain/services/mission.service";
@@ -11,6 +17,7 @@ import type { QuizScoreResult } from "@/domain/services/quiz.service";
 import { CharacterDetailScreen } from "@/features/character-detail/CharacterDetailScreen";
 import { CollectionScreen } from "@/features/collection/CollectionScreen";
 import { GachaScreen } from "@/features/gacha/GachaScreen";
+import { BadgesScreen } from "@/features/badges/BadgesScreen";
 import { HomeScreen } from "@/features/home/HomeScreen";
 import { MapScreen } from "@/features/map/MapScreen";
 import { ZoneDetailScreen } from "@/features/map/ZoneDetailScreen";
@@ -20,6 +27,12 @@ import { QuizScreen } from "@/features/quiz/QuizScreen";
 import { ResultsScreen } from "@/features/results/ResultsScreen";
 import { getStoredCollection, saveCollection } from "@/storage/repositories/collection.repository";
 import { getStoredGachaHistory, saveGachaPulls } from "@/storage/repositories/gacha-history.repository";
+import {
+  getStoredBadges,
+  getStoredTitles,
+  saveUnlockedBadges,
+  saveUnlockedTitles
+} from "@/storage/repositories/achievement.repository";
 import { getStoredPlayer, savePlayer } from "@/storage/repositories/player.repository";
 import { getQuizProgressMap, recordQuizAttempt } from "@/storage/repositories/quiz-progress.repository";
 import { useGameStore } from "@/stores/game.store";
@@ -33,6 +46,7 @@ type AppScreen =
   | "quiz"
   | "results"
   | "profile"
+  | "badges"
   | "gacha"
   | "collection"
   | "character-detail";
@@ -41,6 +55,10 @@ type CompletedMissionResult = {
   quiz: Quiz;
   scoreResult: QuizScoreResult;
   rewards: RewardResult;
+  levelProgression: LevelProgressionResult;
+  totalGemsGained: number;
+  newBadges: Badge[];
+  newTitles: PlayerTitle[];
 };
 
 function App() {
@@ -57,10 +75,16 @@ function App() {
   const setPlayer = usePlayerStore((state) => state.setPlayer);
   const collection = useGameStore((state) => state.collection);
   const gachaHistory = useGameStore((state) => state.gachaHistory);
+  const unlockedBadges = useGameStore((state) => state.unlockedBadges);
+  const unlockedTitles = useGameStore((state) => state.unlockedTitles);
   const quizProgressById = useGameStore((state) => state.quizProgressById);
   const setCollection = useGameStore((state) => state.setCollection);
   const setGachaHistory = useGameStore((state) => state.setGachaHistory);
   const prependGachaHistory = useGameStore((state) => state.prependGachaHistory);
+  const setUnlockedBadges = useGameStore((state) => state.setUnlockedBadges);
+  const addUnlockedBadges = useGameStore((state) => state.addUnlockedBadges);
+  const setUnlockedTitles = useGameStore((state) => state.setUnlockedTitles);
+  const addUnlockedTitles = useGameStore((state) => state.addUnlockedTitles);
   const setActiveCharacterInCollection = useGameStore((state) => state.setActiveCharacter);
   const setQuizProgress = useGameStore((state) => state.setQuizProgress);
   const upsertQuizProgress = useGameStore((state) => state.upsertQuizProgress);
@@ -71,11 +95,13 @@ function App() {
 
     async function loadLocalState() {
       try {
-        const [storedPlayer, storedProgress, storedCollection, storedGachaHistory] = await Promise.all([
+        const [storedPlayer, storedProgress, storedCollection, storedGachaHistory, storedBadges, storedTitles] = await Promise.all([
           getStoredPlayer(),
           getQuizProgressMap(),
           getStoredCollection(),
-          getStoredGachaHistory()
+          getStoredGachaHistory(),
+          getStoredBadges(),
+          getStoredTitles()
         ]);
 
         if (cancelled) return;
@@ -89,6 +115,15 @@ function App() {
         setQuizProgress(storedProgress);
         setCollection(storedCollection);
         setGachaHistory(storedGachaHistory);
+        setUnlockedBadges(storedBadges);
+
+        if (storedTitles.length > 0) {
+          setUnlockedTitles(storedTitles);
+        } else {
+          const defaultTitles = getDefaultUnlockedTitles();
+          setUnlockedTitles(defaultTitles);
+          await saveUnlockedTitles(defaultTitles);
+        }
       } catch (error) {
         setPersistenceError("La sauvegarde locale n'a pas pu etre chargee.");
         console.error(error);
@@ -100,7 +135,7 @@ function App() {
     return () => {
       cancelled = true;
     };
-  }, [setCollection, setGachaHistory, setPlayer, setQuizProgress]);
+  }, [setCollection, setGachaHistory, setPlayer, setQuizProgress, setUnlockedBadges, setUnlockedTitles]);
 
   const missions = useMemo(
     () => buildMissionsFromPack(foundationsWebPack, quizProgressById),
@@ -118,6 +153,10 @@ function App() {
   const activeCharacter = useMemo(
     () => characters.find((character) => character.id === player.activeCharacterId),
     [characters, player.activeCharacterId]
+  );
+  const activeTitle = useMemo(
+    () => titleDefinitions.find((title) => title.id === player.activeTitleId),
+    [player.activeTitleId]
   );
   const selectedOwnedCharacter = useMemo(
     () => collection.find((playerCharacter) => playerCharacter.characterId === selectedCharacter?.id),
@@ -144,17 +183,61 @@ function App() {
     if (!selectedMission) return;
 
     const rewards = calculateMissionRewards(selectedMission.quiz.rank, scoreResult.score);
-    const updatedPlayer = applyRewardsToPlayer(player, rewards.xpGained, rewards.gemsGained);
+    const rewardApplication = applyRewardsToPlayerDetailed(player, rewards.xpGained, rewards.gemsGained);
+    const optimisticProgress = buildQuizProgressAttempt(
+      selectedMission.quiz.id,
+      scoreResult,
+      {
+        xpGained: rewards.xpGained,
+        gemsGained: rewardApplication.totalGemsGained
+      },
+      quizProgressById[selectedMission.quiz.id]
+    );
+    const nextProgressById = {
+      ...quizProgressById,
+      [selectedMission.quiz.id]: optimisticProgress
+    };
+    const nextRegionProgress = calculatePackProgress(foundationsWebPack, nextProgressById).regions[0];
+    const learningUnlocks = evaluateLearningUnlocks({
+      player: rewardApplication.player,
+      scoreResult,
+      levelProgression: rewardApplication.levelProgression,
+      regionProgress: nextRegionProgress,
+      unlockedBadgeIds: [...player.unlockedBadgeIds, ...unlockedBadges.map((badge) => badge.id)],
+      unlockedTitleIds: [...player.unlockedTitleIds, ...unlockedTitles.map((title) => title.id)]
+    });
+    const updatedPlayer: Player = {
+      ...rewardApplication.player,
+      unlockedBadgeIds: mergeIds(rewardApplication.player.unlockedBadgeIds, learningUnlocks.newBadges.map((badge) => badge.id)),
+      unlockedTitleIds: mergeIds(rewardApplication.player.unlockedTitleIds, learningUnlocks.newTitles.map((title) => title.id)),
+      activeTitleId: rewardApplication.player.activeTitleId ?? "guild-apprentice"
+    };
 
     setPlayer(updatedPlayer);
+    upsertQuizProgress(optimisticProgress);
+    addUnlockedBadges(learningUnlocks.newBadges);
+    addUnlockedTitles(learningUnlocks.newTitles);
     setCompletedResult({
       quiz: selectedMission.quiz,
       scoreResult,
-      rewards
+      rewards,
+      levelProgression: rewardApplication.levelProgression,
+      totalGemsGained: rewardApplication.totalGemsGained,
+      newBadges: learningUnlocks.newBadges,
+      newTitles: learningUnlocks.newTitles
     });
     setScreen("results");
 
-    void saveMissionProgress(selectedMission.quiz.id, scoreResult, rewards, updatedPlayer);
+    void saveMissionProgress(
+      selectedMission.quiz.id,
+      scoreResult,
+      rewards,
+      rewardApplication.levelProgression.bonusGems,
+      rewardApplication.totalGemsGained,
+      updatedPlayer,
+      learningUnlocks.newBadges,
+      learningUnlocks.newTitles
+    );
   };
 
   const invokeGacha = (count: 1 | 10) => {
@@ -176,7 +259,22 @@ function App() {
         setCollection(invocation.collection);
         prependGachaHistory(invocation.history);
         setGachaResults(invocation.results);
-        void saveGachaInvocation(invocation.player, invocation.collection, invocation.history);
+        const gachaUnlocks = evaluateGachaUnlocks({
+          pulls: invocation.history,
+          collection: invocation.collection,
+          unlockedBadgeIds: [...invocation.player.unlockedBadgeIds, ...unlockedBadges.map((badge) => badge.id)],
+          unlockedTitleIds: [...invocation.player.unlockedTitleIds, ...unlockedTitles.map((title) => title.id)]
+        });
+        const updatedPlayer = {
+          ...invocation.player,
+          unlockedBadgeIds: mergeIds(invocation.player.unlockedBadgeIds, gachaUnlocks.newBadges.map((badge) => badge.id)),
+          unlockedTitleIds: mergeIds(invocation.player.unlockedTitleIds, gachaUnlocks.newTitles.map((title) => title.id))
+        };
+
+        setPlayer(updatedPlayer);
+        addUnlockedBadges(gachaUnlocks.newBadges);
+        addUnlockedTitles(gachaUnlocks.newTitles);
+        void saveGachaInvocation(updatedPlayer, invocation.collection, invocation.history, gachaUnlocks.newBadges, gachaUnlocks.newTitles);
       } catch (error) {
         setGachaError(error instanceof Error ? error.message : "Invocation impossible.");
       } finally {
@@ -188,10 +286,18 @@ function App() {
   const saveGachaInvocation = async (
     updatedPlayer: Player,
     updatedCollection: typeof collection,
-    pulls: typeof gachaHistory
+    pulls: typeof gachaHistory,
+    newBadges: Badge[] = [],
+    newTitles: PlayerTitle[] = []
   ) => {
     try {
-      await Promise.all([savePlayer(updatedPlayer), saveCollection(updatedCollection), saveGachaPulls(pulls)]);
+      await Promise.all([
+        savePlayer(updatedPlayer),
+        saveCollection(updatedCollection),
+        saveGachaPulls(pulls),
+        saveUnlockedBadges(newBadges),
+        saveUnlockedTitles(newTitles)
+      ]);
       setPersistenceError(undefined);
     } catch (error) {
       setPersistenceError("L'invocation est appliquee en memoire, mais la sauvegarde locale a echoue.");
@@ -218,11 +324,39 @@ function App() {
     });
   };
 
+  const setActiveTitle = (titleId: string) => {
+    const updatedPlayer = {
+      ...player,
+      activeTitleId: titleId,
+      updatedAt: new Date().toISOString()
+    };
+
+    setPlayer(updatedPlayer);
+    void savePlayer(updatedPlayer).catch((error) => {
+      setPersistenceError("Le titre actif est modifie en memoire, mais la sauvegarde locale a echoue.");
+      console.error(error);
+    });
+  };
+
+  const applyDebugPlayerUpdate = (updater: (current: Player) => Player) => {
+    const updatedPlayer = updater(player);
+
+    setPlayer(updatedPlayer);
+    void savePlayer(updatedPlayer).catch((error) => {
+      setPersistenceError("Le debug local est applique en memoire, mais la sauvegarde locale a echoue.");
+      console.error(error);
+    });
+  };
+
   const saveMissionProgress = async (
     quizId: string,
     scoreResult: QuizScoreResult,
     rewards: RewardResult,
-    updatedPlayer: typeof player
+    levelBonusGems: number,
+    totalGemsGained: number,
+    updatedPlayer: typeof player,
+    newBadges: Badge[] = [],
+    newTitles: PlayerTitle[] = []
   ) => {
     try {
       await savePlayer(updatedPlayer);
@@ -233,10 +367,13 @@ function App() {
         totalQuestions: scoreResult.totalQuestions,
         rewards: {
           xpGained: rewards.xpGained,
-          gemsGained: rewards.gemsGained
+          gemsGained: totalGemsGained,
+          missionGemsGained: rewards.gemsGained,
+          levelBonusGems
         }
       });
       upsertQuizProgress(progress);
+      await Promise.all([saveUnlockedBadges(newBadges), saveUnlockedTitles(newTitles)]);
       setPersistenceError(undefined);
     } catch (error) {
       setPersistenceError("La progression a ete appliquee en memoire, mais la sauvegarde locale a echoue.");
@@ -257,6 +394,7 @@ function App() {
         {screen === "home" && (
           <HomeScreen
             player={player}
+            activeTitle={activeTitle}
             activeCharacter={activeCharacter}
             regionProgress={regionProgress}
             onGoToMissions={() => setScreen("missions")}
@@ -264,6 +402,7 @@ function App() {
             onGoToProfile={() => setScreen("profile")}
             onGoToGacha={() => setScreen("gacha")}
             onGoToCollection={() => setScreen("collection")}
+            onGoToBadges={() => setScreen("badges")}
           />
         )}
 
@@ -302,6 +441,10 @@ function App() {
             quiz={completedResult.quiz}
             scoreResult={completedResult.scoreResult}
             rewards={completedResult.rewards}
+            levelProgression={completedResult.levelProgression}
+            totalGemsGained={completedResult.totalGemsGained}
+            newBadges={completedResult.newBadges}
+            newTitles={completedResult.newTitles}
             onBackToMissions={() => setScreen("missions")}
             onBackHome={goHome}
           />
@@ -314,9 +457,43 @@ function App() {
             collection={collection}
             gachaHistory={gachaHistory}
             activeCharacter={activeCharacter}
+            activeTitle={activeTitle}
+            unlockedBadges={unlockedBadges}
+            unlockedTitles={unlockedTitles}
             regionProgress={regionProgress}
             onBackHome={goHome}
             onGoToCollection={() => setScreen("collection")}
+            onGoToBadges={() => setScreen("badges")}
+            onDebugAddGems={(amount) =>
+              applyDebugPlayerUpdate((current) => ({
+                ...current,
+                gems: current.gems + amount,
+                updatedAt: new Date().toISOString()
+              }))
+            }
+            onDebugAddXp={(amount) =>
+              applyDebugPlayerUpdate((current) => {
+                const rewardApplication = applyRewardsToPlayerDetailed(current, amount, 0);
+                return rewardApplication.player;
+              })
+            }
+            onDebugResetGems={() =>
+              applyDebugPlayerUpdate((current) => ({
+                ...current,
+                gems: 200,
+                updatedAt: new Date().toISOString()
+              }))
+            }
+          />
+        )}
+
+        {screen === "badges" && (
+          <BadgesScreen
+            unlockedBadges={unlockedBadges}
+            unlockedTitles={unlockedTitles}
+            activeTitleId={player.activeTitleId}
+            onSetActiveTitle={setActiveTitle}
+            onBackHome={goHome}
           />
         )}
 
@@ -363,7 +540,36 @@ function App() {
 function normalizePlayer(player: Player): Player {
   return {
     ...player,
-    magicDust: player.magicDust ?? 0
+    magicDust: player.magicDust ?? 0,
+    activeTitleId: player.activeTitleId ?? "guild-apprentice",
+    unlockedBadgeIds: player.unlockedBadgeIds ?? [],
+    unlockedTitleIds: player.unlockedTitleIds?.length ? player.unlockedTitleIds : ["guild-apprentice", "rank-f-mage"]
+  };
+}
+
+function mergeIds(currentIds: string[], newIds: string[]) {
+  return Array.from(new Set([...currentIds, ...newIds]));
+}
+
+function buildQuizProgressAttempt(
+  quizId: string,
+  scoreResult: QuizScoreResult,
+  rewards: { xpGained: number; gemsGained: number },
+  current?: { bestScore: number; attempts: number; completedAt?: string }
+) {
+  const now = new Date().toISOString();
+
+  return {
+    id: quizId,
+    quizId,
+    bestScore: Math.max(current?.bestScore ?? 0, scoreResult.score),
+    attempts: (current?.attempts ?? 0) + 1,
+    lastScore: scoreResult.score,
+    lastCorrectAnswers: scoreResult.correctAnswers,
+    lastTotalQuestions: scoreResult.totalQuestions,
+    lastRewards: rewards,
+    completedAt: scoreResult.score >= 60 ? now : current?.completedAt,
+    updatedAt: now
   };
 }
 

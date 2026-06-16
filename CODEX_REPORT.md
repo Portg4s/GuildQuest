@@ -4,210 +4,200 @@ Date : 16 juin 2026
 
 ## Resume
 
-Le systeme de personnages est prepare pour des assets locaux prives tout en gardant le repo propre :
+Le systeme de progression gratifiant V1 est ajoute :
 
-- registre central de personnages ;
-- liste publique placeholder enrichie ;
-- template local prive commitable ;
-- support d'un fichier local ignore par Git ;
-- fallback automatique des images cassees ;
-- integration dans gacha, collection, detail personnage, Hall et Profil ;
-- dossier local `public/private-assets/characters/` cree sans contenu suivi.
+- montee de niveau detaillee ;
+- bonus de gemmes a chaque niveau franchi ;
+- animation de level up sur l'ecran Resultat ;
+- resume clair des gains XP/gemmes ;
+- badges V1 ;
+- titres V1 ;
+- ecran `Badges & Titres` ;
+- titre actif affichable et modifiable ;
+- debug local dans le Profil pour tester niveaux et gacha x10 ;
+- persistance Dexie des badges/titres.
 
 ## Fichiers crees ou modifies
 
 Crees :
 
-- `src/components/game/CharacterImage.tsx`
-- `src/data/characters/characters.placeholder.ts`
-- `src/data/characters/characters.registry.ts`
-- `src/data/characters/characters.local.template.ts`
+- `src/data/config/level-rewards.config.ts`
+- `src/data/config/badges.config.ts`
+- `src/data/config/titles.config.ts`
+- `src/domain/progression/achievements.service.ts`
+- `src/features/badges/BadgesScreen.tsx`
+- `src/storage/repositories/achievement.repository.ts`
 
 Modifies :
 
-- `.gitignore`
-- `README.md`
 - `src/app/App.tsx`
-- `src/components/game/rarity-styles.ts`
-- `src/data/characters/characters.example.ts`
-- `src/domain/gacha/gacha.service.ts`
-- `src/domain/models/Character.ts`
-- `src/features/character-detail/CharacterDetailScreen.tsx`
-- `src/features/collection/CollectionScreen.tsx`
-- `src/features/gacha/GachaScreen.tsx`
+- `src/domain/progression/level.service.ts`
 - `src/features/home/HomeScreen.tsx`
 - `src/features/profile/ProfileScreen.tsx`
+- `src/features/results/ResultsScreen.tsx`
+- `src/storage/db.ts`
+- `src/stores/game.store.ts`
+- `src/stores/player.store.ts`
 - `CODEX_REPORT.md`
 
-## Nouvelle strategie des personnages
+## Formule de bonus gemmes
 
-La source publique principale est maintenant :
+Config ajoutee :
 
-- `src/data/characters/characters.placeholder.ts`
+- `src/data/config/level-rewards.config.ts`
 
-Le registre central est :
+Formule :
 
-- `src/data/characters/characters.registry.ts`
+```ts
+Math.round(75 * Math.pow(levelReached, 1.15))
+```
 
-Il fusionne :
+Le bonus est donne pour chaque niveau franchi. Si plusieurs niveaux sont gagnes d'un coup, les bonus sont cumules.
 
-- les personnages placeholders publics ;
-- un fichier local optionnel `src/data/characters/characters.local.ts` si present.
+## Logique de montee de niveau
 
-Le fichier local reel `characters.local.ts` est ignore par Git. Il peut exporter :
+La regle XP reste :
 
-- `localCharacters`
-- ou un export `default`
+- XP necessaire niveau suivant = `level * 100`
 
-Les personnages locaux qui ont le meme `id` qu'un placeholder remplacent la version publique. Cela prepare un futur import/remplacement JSON sans changer la logique gacha/collection.
+Le service retourne maintenant :
 
-`characters.example.ts` reste present comme alias de compatibilite vers la liste placeholder.
+- ancien niveau ;
+- nouveau niveau ;
+- nombre de niveaux gagnes ;
+- XP actuelle ;
+- XP necessaire prochain niveau ;
+- gemmes bonus gagnees ;
+- liste des niveaux franchis.
 
-## Personnages placeholders
+L'application ajoute au joueur :
 
-La liste publique contient maintenant 30 personnages generiques :
+- gemmes de mission ;
+- gemmes bonus de niveau ;
+- XP restante apres montee ;
+- nouveau niveau ;
+- prochain seuil XP.
 
-- 10 COMMON
-- 8 RARE
-- 6 EPIC
-- 4 LEGENDARY
-- 2 MYTHIC
+## Ecran Resultat
 
-Les anciens IDs ont ete conserves pour limiter l'impact sur les collections Dexie existantes :
+L'ecran Resultat affiche maintenant :
 
-- `apprentice-luma`
-- `scribe-novan`
-- `forge-mira`
-- `rune-tarek`
-- `aera-sentinel`
-- `kael-architect`
-- `naya-oracle`
-- `solen-warden`
-- `elys-celestial`
-- `orion-voidsmith`
+- XP de mission ;
+- gemmes de mission ;
+- bonus gemmes de niveau ;
+- total gemmes gagnees ;
+- animation `Niveau superieur !` si applicable ;
+- badges debloques ;
+- titres debloques.
 
-Les puissances ont ete ajustees pour respecter les fourchettes par rarete.
+## Badges V1
 
-## Modele Character
+Config ajoutee :
 
-Le modele accepte maintenant les champs optionnels :
+- `src/data/config/badges.config.ts`
 
-- `category`
-- `variant`
-- `isPrivate`
-- `source`
+Badges declares :
 
-Les champs existants restent compatibles :
+- Premier quiz reussi
+- Premier sans-faute
+- 5 quiz termines
+- 10 quiz termines
+- Premier niveau superieur
+- Niveau 5 atteint
+- Niveau 10 atteint
+- Premiere invocation
+- Premier personnage rare
+- Premier personnage legendaire
+- Explorateur des Fondations
+- Maitre des Fondations
 
-- `id`
-- `name`
-- `rarity`
-- `element`
-- `power`
-- `description`
-- `image`
-- `placeholderImage`
+Branches maintenant :
 
-## Fallback image
+- badges quiz ;
+- badges niveau ;
+- badges progression Fondations ;
+- badges gacha de base apres invocation.
 
-Nouveau composant :
+## Titres V1
 
-- `CharacterImage`
+Config ajoutee :
 
-Comportement :
+- `src/data/config/titles.config.ts`
 
-- tente d'abord `character.image`, par exemple `/private-assets/characters/...` ;
-- si l'image est absente ou invalide, utilise `character.placeholderImage` ;
-- si le placeholder echoue aussi, utilise `/pwa.svg` ;
-- evite les images cassees dans l'UI.
+Titres declares :
 
-Le composant est utilise dans :
+- Apprenti de la Guilde
+- Chasseur de Competences
+- Mage du Web
+- Invocateur Debutant
+- Collectionneur de Guilde
+- Stratege des Fondations
+- Etoile Montante
+- Mage de Rang F
 
-- Invocation ;
-- Collection ;
-- Detail personnage ;
-- Hall ;
-- Profil.
+Fonctionnel maintenant :
 
-## Raretes
+- titres debloques ;
+- titres par defaut ;
+- titre actif ;
+- changement du titre actif depuis `Badges & Titres` ;
+- affichage dans Hall et Profil.
 
-Le helper `rarity-styles.ts` contient maintenant :
+## Persistance Dexie
 
-- labels francais ;
-- classes de carte ;
-- classes de badge ;
-- classes de glow ;
-- poids de tri ;
-- poids visuel ;
-- fonction `compareRarity`.
+Tables utilisees :
 
-Les raretes restent :
+- `unlockedBadges`
+- `unlockedTitles`
+- `player`
 
-- COMMON
-- RARE
-- EPIC
-- LEGENDARY
-- MYTHIC
+Persistant :
 
-## Assets prives
+- badges debloques ;
+- titres debloques ;
+- `activeTitleId` sur le joueur ;
+- ids de badges/titres sur le joueur ;
+- bonus de gemmes via la valeur `player.gems` ;
+- dernieres recompenses quiz avec total gemmes, gemmes de mission et bonus niveau.
 
-`.gitignore` ignore :
+## Debug local
 
-- `/public/private-assets/`
-- `/src/data/characters/characters.local.ts`
+Ajoute dans le Profil, section `Debug local` :
 
-Le dossier local suivant a ete cree vide :
+- `+500 gemmes`
+- `+2000 gemmes`
+- `+1000 XP`
+- `Gemmes = 200`
 
-- `public/private-assets/characters/`
-
-Aucun asset prive ou protege n'a ete ajoute.
-
-Le README documente :
-
-- ou placer les images privees ;
-- comment copier le template local ;
-- le fallback automatique vers les placeholders.
-
-## Impact sur la collection existante
-
-Impact limite :
-
-- les 10 premiers IDs existants sont conserves ;
-- les personnages deja obtenus avec ces IDs restent compatibles ;
-- les nouvelles entrees ajoutent simplement plus de personnages au pool gacha.
-
-Attention :
-
-- si un futur fichier local remplace un personnage avec un ID existant, la collection Dexie pointera vers cette nouvelle definition ;
-- si un personnage obtenu a un ID retire d'une future liste, il pourrait ne plus etre affichable sans migration.
+Ces actions modifient le joueur localement et persistent via Dexie. Elles servent a tester rapidement les invocations x10 et les niveaux.
 
 ## Commandes executees
 
-- `Get-Content -Raw .gitignore`
-- lectures des fichiers personnages, gacha, collection, Hall, Profil et detail personnage
-- `New-Item -ItemType Directory -Force -Path public/private-assets/characters`
-- `git check-ignore -v public/private-assets/characters`
-- `git check-ignore -v src/data/characters/characters.local.ts`
+- `Get-Content -Raw CODEX_RULES.md`
+- lectures des fichiers `App`, `ResultsScreen`, stores, repositories, modeles et services de progression
+- `Get-Content src/features/results/ResultsScreen.tsx | Select-Object -Index 72..88`
+- `Get-Content src/features/results/ResultsScreen.tsx | Select-Object -Skip 72 -First 20`
 - `npm run build`
 - `npm run lint`
 - `npm run dev -- --host 127.0.0.1`
+- `git status --short`
 
 ## Resultat de `npm run build`
 
 OK.
 
-Le build production Vite passe et genere les fichiers PWA.
+Le build production Vite passe.
 
 Avertissement restant :
 
-- Vite signale que certains chunks depassent 500 kB apres minification.
-- Ce n'est pas bloquant.
+- certains chunks depassent 500 kB apres minification.
+- avertissement non bloquant deja present sur les versions precedentes.
 
 ## Resultat de `npm run lint`
 
 OK.
 
-Un premier passage a signale `react-hooks/set-state-in-effect` dans `CharacterImage`. Le composant a ete corrige pour suivre les sources en erreur sans effet React, puis le lint est repasse sans erreur.
+Aucune erreur et aucun avertissement ESLint.
 
 ## Resultat de `npm run dev`
 
@@ -222,22 +212,25 @@ La commande a ete arretee par timeout volontaire apres quelques secondes, car le
 
 ## Erreurs ou limites rencontrees
 
-- Aucune erreur restante cote build ou lint.
-- Aucune verification visuelle navigateur n'a ete effectuee dans cette tache.
-- Aucun telechargement Internet n'a ete effectue.
+- Une commande de lecture PowerShell avec `Select-Object -Index 72..88` a echoue car la plage n'etait pas convertie en tableau d'entiers. Relance reussie avec `-Skip 72 -First 20`.
+- Un premier build a echoue sur `->` dans du JSX. Correction : rendu sous forme de chaine `{"->"}`.
+- La verification visuelle navigateur integre n'a pas ete tentee dans cette tache.
 - Aucun commit et aucun push n'ont ete faits.
 
 ## Points a verifier manuellement
 
 - Lancer `npm run dev`.
-- Ouvrir `http://127.0.0.1:5173/`.
-- Verifier Invocation et Collection avec les 30 placeholders.
-- Placer une image locale dans `public/private-assets/characters/`.
-- Copier `characters.local.template.ts` vers `characters.local.ts` et adapter un personnage.
-- Verifier que l'image privee s'affiche.
-- Renommer ou supprimer l'image privee et verifier le fallback vers `/pwa.svg`.
-- Verifier que le personnage actif s'affiche toujours dans le Hall et le Profil.
+- Terminer un quiz avec assez d'XP pour monter de niveau.
+- Verifier l'animation `Niveau superieur !`.
+- Verifier que les gemmes bonus sont ajoutees.
+- Verifier l'ecran Resultat et le detail des gains.
+- Ouvrir `Badges & Titres`.
+- Changer le titre actif.
+- Verifier le titre actif dans Hall et Profil.
+- Utiliser le debug local `+2000 gemmes`.
+- Tester une invocation x10.
+- Rafraichir la page et verifier que joueur, badges, titres et titre actif persistent.
 
 ## Prochaine etape recommandee
 
-Ajouter un import JSON local pour personnages et un petit ecran de validation listant les IDs remplaces, les images manquantes et les raretes disponibles.
+Ajouter une notification globale de recompenses/deblocages reutilisable pour le gacha, les badges, les titres et les futures evolutions de personnages.

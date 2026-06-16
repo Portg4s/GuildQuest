@@ -1,8 +1,8 @@
-import { ArrowLeft, Gem, Sparkles, Trophy, UserRound } from "lucide-react";
+import { ArrowLeft, Crown, Gem, Medal, Sparkles, Trophy, UserRound } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { CharacterImage } from "@/components/game/CharacterImage";
 import { rarityBadgeClasses, rarityLabels } from "@/components/game/rarity-styles";
-import type { Character, GachaPull, Player, PlayerCharacter } from "@/domain/models";
+import type { Badge, Character, GachaPull, Player, PlayerCharacter, PlayerTitle } from "@/domain/models";
 import type { RegionProgress } from "@/domain/progression/learning-progress.service";
 import type { QuizProgress } from "@/storage/db";
 import { cn } from "@/lib/utils";
@@ -13,9 +13,16 @@ type ProfileScreenProps = {
   collection: PlayerCharacter[];
   gachaHistory: GachaPull[];
   activeCharacter?: Character;
+  activeTitle?: PlayerTitle;
+  unlockedBadges: Badge[];
+  unlockedTitles: PlayerTitle[];
   regionProgress: RegionProgress;
   onBackHome: () => void;
   onGoToCollection: () => void;
+  onGoToBadges: () => void;
+  onDebugAddGems: (amount: number) => void;
+  onDebugAddXp: (amount: number) => void;
+  onDebugResetGems: () => void;
 };
 
 export function ProfileScreen({
@@ -24,9 +31,16 @@ export function ProfileScreen({
   collection,
   gachaHistory,
   activeCharacter,
+  activeTitle,
+  unlockedBadges,
+  unlockedTitles,
   regionProgress,
   onBackHome,
-  onGoToCollection
+  onGoToCollection,
+  onGoToBadges,
+  onDebugAddGems,
+  onDebugAddXp,
+  onDebugResetGems
 }: ProfileScreenProps) {
   const completed = progressEntries.filter((entry) => entry.completedAt);
   const attempted = progressEntries.filter((entry) => entry.attempts > 0);
@@ -45,6 +59,7 @@ export function ProfileScreen({
           <h1 className="text-3xl font-black text-white">{player.username}</h1>
         </div>
         <div className="flex flex-wrap gap-2">
+          <Button variant="guild" onClick={onGoToBadges}>Badges</Button>
           <Button variant="guild" onClick={onGoToCollection}>Collection</Button>
           <Button variant="guild" onClick={onBackHome}>
             <ArrowLeft className="mr-2 size-4" aria-hidden="true" />
@@ -84,6 +99,8 @@ export function ProfileScreen({
           <ProfileStat icon={<Sparkles className="size-5" />} label="Poussiere magique" value={player.magicDust ?? 0} />
           <ProfileStat label="Personnages debloques" value={collection.length} />
           <ProfileStat label="Invocations" value={gachaHistory.length} />
+          <ProfileStat icon={<Medal className="size-5" />} label="Badges" value={unlockedBadges.length} />
+          <ProfileStat icon={<Crown className="size-5" />} label="Titres" value={unlockedTitles.length} />
           <ProfileStat icon={<Trophy className="size-5" />} label="Quiz termines" value={completed.length} />
           <ProfileStat label="Progression Fondations" value={`${regionProgress.progressPercent}%`} />
           <ProfileStat label="Quiz valides" value={`${regionProgress.validatedQuizCount} / ${regionProgress.quizCount}`} />
@@ -91,6 +108,12 @@ export function ProfileScreen({
           <ProfileStat label="Score moyen" value={attempted.length ? `${averageScore}%` : "Aucun"} />
           <ProfileStat label="Meilleur score" value={attempted.length ? `${bestScore}%` : "Aucun"} />
         </div>
+      </article>
+
+      <article className="rounded-lg border border-amber-200/20 bg-amber-300/10 p-5">
+        <p className="text-sm font-bold uppercase tracking-[0.18em] text-amber-100">Titre actif</p>
+        <h2 className="mt-2 text-2xl font-black text-white">{activeTitle?.label ?? "Aucun titre actif"}</h2>
+        <p className="mt-1 text-sm text-slate-200">{activeTitle?.description ?? "Debloque un titre pour l'afficher ici."}</p>
       </article>
 
       <article className="rounded-lg border border-white/10 bg-slate-900/90 p-5">
@@ -109,6 +132,17 @@ export function ProfileScreen({
         ) : (
           <p className="mt-3 text-sm text-slate-300">Aucun personnage actif pour le moment.</p>
         )}
+      </article>
+
+      <article className="rounded-lg border border-red-300/20 bg-red-400/10 p-5">
+        <p className="text-sm font-bold uppercase tracking-[0.18em] text-red-100">Debug local</p>
+        <p className="mt-1 text-sm text-slate-300">Outils locaux pour tester les invocations et les niveaux.</p>
+        <div className="mt-4 grid gap-2 sm:grid-cols-2">
+          <Button variant="guild" onClick={() => onDebugAddGems(500)}>+500 gemmes</Button>
+          <Button variant="guild" onClick={() => onDebugAddGems(2000)}>+2000 gemmes</Button>
+          <Button variant="guild" onClick={() => onDebugAddXp(1000)}>+1000 XP</Button>
+          <Button variant="secondary" onClick={onDebugResetGems}>Gemmes = 200</Button>
+        </div>
       </article>
     </section>
   );

@@ -12,8 +12,9 @@ export const defaultPlayer: Player = {
   nextLevelXp: 100,
   gems: 200,
   magicDust: 0,
+  activeTitleId: "guild-apprentice",
   unlockedBadgeIds: [],
-  unlockedTitleIds: [],
+  unlockedTitleIds: ["guild-apprentice", "rank-f-mage"],
   createdAt: now,
   updatedAt: now
 };

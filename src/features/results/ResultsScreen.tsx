@@ -1,7 +1,8 @@
 import { motion } from "framer-motion";
-import { Gem, RotateCcw, ScrollText, Trophy } from "lucide-react";
+import { Crown, Gem, Medal, RotateCcw, ScrollText, Sparkles, Trophy } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import type { Quiz } from "@/domain/models";
+import type { Badge, PlayerTitle, Quiz } from "@/domain/models";
+import type { LevelProgressionResult } from "@/domain/progression/level.service";
 import type { RewardResult } from "@/domain/reward/reward.service";
 import { getResultStatus, type QuizScoreResult } from "@/domain/services/quiz.service";
 
@@ -9,6 +10,10 @@ type ResultsScreenProps = {
   quiz: Quiz;
   scoreResult: QuizScoreResult;
   rewards: RewardResult;
+  levelProgression: LevelProgressionResult;
+  totalGemsGained: number;
+  newBadges: Badge[];
+  newTitles: PlayerTitle[];
   onBackToMissions: () => void;
   onBackHome: () => void;
 };
@@ -17,6 +22,10 @@ export function ResultsScreen({
   quiz,
   scoreResult,
   rewards,
+  levelProgression,
+  totalGemsGained,
+  newBadges,
+  newTitles,
   onBackToMissions,
   onBackHome
 }: ResultsScreenProps) {
@@ -59,6 +68,44 @@ export function ResultsScreen({
         </p>
       </article>
 
+      {levelProgression.levelsGained > 0 && (
+        <motion.article
+          initial={{ opacity: 0, scale: 0.92, y: 12 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          transition={{ delay: 0.12, duration: 0.38, ease: "easeOut" }}
+          className="rounded-lg border border-amber-200/30 bg-amber-300/10 p-5 text-center shadow-[0_0_42px_rgba(252,211,77,0.22)]"
+        >
+          <Sparkles className="mx-auto size-8 text-amber-100" aria-hidden="true" />
+          <p className="mt-2 text-sm font-black uppercase tracking-[0.22em] text-amber-100">Niveau superieur !</p>
+          <p className="mt-2 text-4xl font-black text-white">
+            {levelProgression.previousLevel} {"->"} {levelProgression.newLevel}
+          </p>
+          <p className="mt-2 text-sm text-amber-50">
+            +{levelProgression.levelsGained} niveau{levelProgression.levelsGained > 1 ? "x" : ""} - +{levelProgression.bonusGems} gemmes bonus
+          </p>
+        </motion.article>
+      )}
+
+      <article className="rounded-lg border border-white/10 bg-slate-900/90 p-5">
+        <h2 className="text-xl font-black text-white">Resume des recompenses</h2>
+        <div className="mt-4 grid gap-3 sm:grid-cols-2">
+          <RewardLine label="XP de mission" value={`+${rewards.xpGained}`} />
+          <RewardLine label="Gemmes de mission" value={`+${rewards.gemsGained}`} />
+          <RewardLine label="Bonus gemmes de niveau" value={`+${levelProgression.bonusGems}`} />
+          <RewardLine label="Total gemmes gagnees" value={`+${totalGemsGained}`} />
+        </div>
+        {(newBadges.length > 0 || newTitles.length > 0) && (
+          <div className="mt-5 grid gap-3 sm:grid-cols-2">
+            {newBadges.length > 0 && (
+              <UnlockList icon={<Medal className="size-5" />} title="Badges debloques" items={newBadges.map((badge) => badge.name)} />
+            )}
+            {newTitles.length > 0 && (
+              <UnlockList icon={<Crown className="size-5" />} title="Titres debloques" items={newTitles.map((title) => title.label)} />
+            )}
+          </div>
+        )}
+      </article>
+
       <div className="grid gap-3 sm:grid-cols-2">
         <Button variant="guild" size="lg" onClick={onBackToMissions}>
           <ScrollText className="mr-2 size-4" aria-hidden="true" />
@@ -70,5 +117,30 @@ export function ResultsScreen({
         </Button>
       </div>
     </motion.section>
+  );
+}
+
+function RewardLine({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="rounded-lg bg-white/[0.06] p-3">
+      <p className="text-sm text-slate-400">{label}</p>
+      <p className="mt-1 text-2xl font-black text-white">{value}</p>
+    </div>
+  );
+}
+
+function UnlockList({ icon, title, items }: { icon: React.ReactNode; title: string; items: string[] }) {
+  return (
+    <div className="rounded-lg border border-teal-200/20 bg-teal-300/10 p-3">
+      <div className="flex items-center gap-2 text-teal-100">
+        {icon}
+        <p className="font-black">{title}</p>
+      </div>
+      <ul className="mt-2 space-y-1 text-sm text-slate-100">
+        {items.map((item) => (
+          <li key={item}>{item}</li>
+        ))}
+      </ul>
+    </div>
   );
 }
