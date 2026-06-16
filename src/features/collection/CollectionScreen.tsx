@@ -36,12 +36,12 @@ export function CollectionScreen({
     : characters.filter((character) => character.rarity === filter);
 
   return (
-    <section className="space-y-5">
-      <header className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+    <section className="space-y-3">
+      <header className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.22em] text-teal-200">Archives de guilde</p>
-          <h1 className="text-3xl font-black text-white">Collection</h1>
-          <p className="mt-2 text-sm text-slate-300">
+          <h1 className="text-2xl font-black text-white">Collection</h1>
+          <p className="mt-1 text-sm text-slate-300">
             {collection.length} / {characters.length} personnages debloques
           </p>
         </div>
@@ -51,7 +51,7 @@ export function CollectionScreen({
         </Button>
       </header>
 
-      <div className="flex gap-2 overflow-x-auto pb-1">
+      <div className="flex gap-1.5 overflow-x-auto pb-1">
         <FilterButton active={filter === "ALL"} onClick={() => setFilter("ALL")}>Tous</FilterButton>
         {getRarityOrder().map((rarity) => (
           <FilterButton key={rarity} active={filter === rarity} onClick={() => setFilter(rarity)}>
@@ -60,12 +60,12 @@ export function CollectionScreen({
         ))}
       </div>
 
-      <div className="rounded-lg border border-teal-200/20 bg-teal-300/10 p-3 text-sm text-teal-50">
+      <div className="rounded-lg border border-teal-200/20 bg-teal-300/10 p-2.5 text-xs text-teal-50">
         Les images privees locales sont chargees si elles existent dans /public/private-assets/characters/.
         Sinon, GuildQuest utilise les placeholders.
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="grid grid-cols-2 gap-3 lg:grid-cols-3">
         {filteredCharacters.map((character) => {
           const owned = ownedByCharacterId.get(character.id);
           const isActive = activeCharacterId === character.id;
@@ -74,7 +74,7 @@ export function CollectionScreen({
             <article
               key={character.id}
               className={cn(
-                "rounded-lg border p-4 transition",
+                "rounded-lg border p-3 transition",
                 owned ? rarityCardClasses[character.rarity] : "border-white/10 bg-slate-900/60 text-slate-500"
               )}
             >
@@ -88,17 +88,17 @@ export function CollectionScreen({
                 <CharacterImage
                   character={character}
                   className={cn(
-                    "mx-auto mt-4 size-24 rounded-lg border border-white/10 bg-white/10 p-3",
+                    "mx-auto mt-3 size-20 rounded-lg border border-white/10 bg-white/10 p-2.5",
                     !owned && "grayscale opacity-35"
                   )}
                 />
-                <h2 className="mt-4 text-xl font-black text-white">{owned ? character.name : "Silhouette inconnue"}</h2>
-                <p className="mt-1 text-sm">{character.element} - Puissance {character.power}</p>
-                <p className="mt-2 text-sm font-bold">Fragments : {owned?.fragments ?? 0}</p>
+                <h2 className="mt-3 truncate text-base font-black text-white">{owned ? character.name : "Silhouette inconnue"}</h2>
+                <p className="mt-1 text-xs">{character.element} - Pui. {character.power}</p>
+                <p className="mt-1 text-xs font-bold">Fragments : {owned?.fragments ?? 0}</p>
               </button>
               {owned && (
                 <Button
-                  className="mt-4 w-full"
+                  className="mt-3 h-8 w-full px-2 text-xs"
                   variant={isActive ? "secondary" : "guild"}
                   onClick={() => onSetActive(character.id)}
                   disabled={isActive}
@@ -120,7 +120,7 @@ function FilterButton({ active, onClick, children }: { active: boolean; onClick:
       type="button"
       onClick={onClick}
       className={cn(
-        "shrink-0 rounded-lg border px-3 py-2 text-sm font-bold transition",
+        "shrink-0 rounded-lg border px-2.5 py-1.5 text-xs font-bold transition",
         active ? "border-teal-200 bg-teal-300 text-slate-950" : "border-white/10 bg-white/[0.06] text-slate-200"
       )}
     >

@@ -52,11 +52,11 @@ export function ProfileScreen({
   const xpProgress = Math.min((player.xp / player.nextLevelXp) * 100, 100);
 
   return (
-    <section className="mx-auto max-w-3xl space-y-5">
-      <header className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+    <section className="mx-auto max-w-4xl space-y-3">
+      <header className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.22em] text-teal-200">Profil</p>
-          <h1 className="text-3xl font-black text-white">{player.username}</h1>
+          <h1 className="text-2xl font-black text-white">{player.username}</h1>
         </div>
         <div className="flex flex-wrap gap-2">
           <Button variant="guild" onClick={onGoToBadges}>Badges</Button>
@@ -68,18 +68,18 @@ export function ProfileScreen({
         </div>
       </header>
 
-      <article className="rounded-lg border border-white/10 bg-slate-900/90 p-5 shadow-2xl">
-        <div className="flex items-center gap-4">
-          <div className="grid size-16 place-items-center rounded-lg bg-teal-300/15 text-teal-100">
-            <UserRound className="size-8" aria-hidden="true" />
+      <article className="rounded-lg border border-white/10 bg-slate-900/90 p-4 shadow-2xl">
+        <div className="flex items-center gap-3">
+          <div className="grid size-12 place-items-center rounded-lg bg-teal-300/15 text-teal-100">
+            <UserRound className="size-6" aria-hidden="true" />
           </div>
           <div>
             <p className="text-sm text-slate-400">Rang actuel</p>
-            <h2 className="text-2xl font-black text-white">{player.rank}</h2>
+            <h2 className="text-xl font-black text-white">{player.rank}</h2>
           </div>
         </div>
 
-        <div className="mt-6 space-y-2">
+        <div className="mt-4 space-y-2">
           <div className="flex items-center justify-between text-sm text-slate-300">
             <span>Niveau {player.level}</span>
             <span className="font-bold text-white">
@@ -94,7 +94,7 @@ export function ProfileScreen({
           </div>
         </div>
 
-        <div className="mt-6 grid gap-3 sm:grid-cols-2">
+        <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-3">
           <ProfileStat icon={<Gem className="size-5" />} label="Gemmes" value={player.gems} />
           <ProfileStat icon={<Sparkles className="size-5" />} label="Poussiere magique" value={player.magicDust ?? 0} />
           <ProfileStat label="Personnages debloques" value={collection.length} />
@@ -110,19 +110,19 @@ export function ProfileScreen({
         </div>
       </article>
 
-      <article className="rounded-lg border border-amber-200/20 bg-amber-300/10 p-5">
+      <article className="rounded-lg border border-amber-200/20 bg-amber-300/10 p-4">
         <p className="text-sm font-bold uppercase tracking-[0.18em] text-amber-100">Titre actif</p>
-        <h2 className="mt-2 text-2xl font-black text-white">{activeTitle?.label ?? "Aucun titre actif"}</h2>
+        <h2 className="mt-1 text-xl font-black text-white">{activeTitle?.label ?? "Aucun titre actif"}</h2>
         <p className="mt-1 text-sm text-slate-200">{activeTitle?.description ?? "Debloque un titre pour l'afficher ici."}</p>
       </article>
 
-      <article className="rounded-lg border border-white/10 bg-slate-900/90 p-5">
+      <article className="rounded-lg border border-white/10 bg-slate-900/90 p-4">
         <p className="text-sm font-bold uppercase tracking-[0.18em] text-teal-200">Personnage actif</p>
         {activeCharacter ? (
           <div className="mt-4 flex items-center gap-4">
-            <CharacterImage character={activeCharacter} className="size-20 rounded-lg border border-white/10 bg-white/10 p-3" />
+            <CharacterImage character={activeCharacter} className="size-16 rounded-lg border border-white/10 bg-white/10 p-2" />
             <div>
-              <h2 className="text-2xl font-black text-white">{activeCharacter.name}</h2>
+              <h2 className="text-xl font-black text-white">{activeCharacter.name}</h2>
               <p className="mt-1 text-sm text-slate-300">{activeCharacter.element} - Puissance {activeCharacter.power}</p>
               <span className={cn("mt-2 inline-block rounded-md px-2.5 py-1 text-xs font-black", rarityBadgeClasses[activeCharacter.rarity])}>
                 {rarityLabels[activeCharacter.rarity]}
@@ -134,10 +134,10 @@ export function ProfileScreen({
         )}
       </article>
 
-      <article className="rounded-lg border border-red-300/20 bg-red-400/10 p-5">
+      <article className="rounded-lg border border-red-300/20 bg-red-400/10 p-4">
         <p className="text-sm font-bold uppercase tracking-[0.18em] text-red-100">Debug local</p>
         <p className="mt-1 text-sm text-slate-300">Outils locaux pour tester les invocations et les niveaux.</p>
-        <div className="mt-4 grid gap-2 sm:grid-cols-2">
+        <div className="mt-3 grid grid-cols-2 gap-2">
           <Button variant="guild" onClick={() => onDebugAddGems(500)}>+500 gemmes</Button>
           <Button variant="guild" onClick={() => onDebugAddGems(2000)}>+2000 gemmes</Button>
           <Button variant="guild" onClick={() => onDebugAddXp(1000)}>+1000 XP</Button>
@@ -150,12 +150,12 @@ export function ProfileScreen({
 
 function ProfileStat({ label, value, icon }: { label: string; value: string | number; icon?: React.ReactNode }) {
   return (
-    <div className="rounded-lg bg-white/[0.06] p-4">
+    <div className="rounded-lg bg-white/[0.06] p-3">
       <div className="flex items-center gap-2 text-slate-400">
         {icon}
         <p className="text-sm">{label}</p>
       </div>
-      <p className="mt-2 text-2xl font-black text-white">{value}</p>
+      <p className="mt-1 text-xl font-black text-white">{value}</p>
     </div>
   );
 }

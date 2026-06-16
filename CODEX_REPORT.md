@@ -4,146 +4,122 @@ Date : 16 juin 2026
 
 ## Resume
 
-La couche de gestion locale des donnees est ajoutee :
+Refonte UX mobile effectuee avec une priorite forte sur le Hall :
 
-- ecran `Parametres` ;
-- ecran `Import / Export` ;
-- export JSON complet ;
-- import JSON complet avec validation et confirmation ;
-- reset local complet ;
-- preferences UI sons/animations/vitesse ;
-- rechargement des stores Zustand apres import/reset ;
-- documentation README.
+- Hall beaucoup plus compact ;
+- header sticky compact ;
+- carte joueur reduite ;
+- grille d'actions rapide ;
+- progression actuelle compacte ;
+- personnage actif compact ;
+- profil plus dense ;
+- missions plus courtes visuellement ;
+- invocation plus compacte ;
+- collection plus lisible en grille mobile ;
+- parametres moins verticaux.
 
 ## Fichiers crees ou modifies
 
 Crees :
 
-- `src/features/settings/SettingsScreen.tsx`
-- `src/features/import-export/ImportExportScreen.tsx`
-- `src/storage/repositories/backup.repository.ts`
-- `src/storage/repositories/settings.repository.ts`
+- `src/components/game/StatPill.tsx`
+- `src/components/game/QuickActionGrid.tsx`
+- `src/components/game/CompactProgressCard.tsx`
 
 Modifies :
 
-- `README.md`
-- `src/app/App.tsx`
-- `src/domain/models/GameSettings.ts`
 - `src/features/home/HomeScreen.tsx`
-- `src/stores/ui.store.ts`
+- `src/features/profile/ProfileScreen.tsx`
+- `src/features/missions/MissionsScreen.tsx`
+- `src/features/gacha/GachaScreen.tsx`
+- `src/features/collection/CollectionScreen.tsx`
+- `src/features/settings/SettingsScreen.tsx`
 - `CODEX_REPORT.md`
 
-## Tables exportees
+## Changements Hall
 
-L'export complet JSON inclut :
+Le Hall a ete restructure en hub mobile RPG compact :
 
-- `player`
-- `playerCharacters`
-- `quizProgress`
-- `gachaHistory`
-- `unlockedBadges`
-- `unlockedTitles`
-- `settings`
-- `installedPacks`
+- header sticky avec icone, nom GuildQuest, gemmes et bouton parametres ;
+- carte joueur plus basse avec pseudo, rang, titre actif, niveau et XP ;
+- grille d'actions 3 colonnes mobile :
+  - Missions ;
+  - Carte ;
+  - Invocation ;
+  - Collection ;
+  - Badges ;
+  - Profil ;
+  - Parametres.
+- bloc progression compact avec pourcentage, quiz valides et bouton Carte ;
+- bloc personnage actif horizontal avec image, nom, rarete, puissance et action courte ;
+- espacement vertical fortement reduit.
 
-Metadata incluse :
+## Changements Profil
 
-- `appName: GuildQuest`
-- `backupVersion`
-- `exportedAt`
-- `schemaVersion`
+- largeur max augmentee pour mieux utiliser l'espace ;
+- stats en grille mobile 2 colonnes ;
+- cartes plus compactes ;
+- avatar et personnage actif reduits ;
+- section debug local plus dense avec boutons en grille 2 colonnes ;
+- titres et compteurs conserves.
 
-Nom de fichier :
+## Changements Missions
 
-- `guildquest-backup-YYYY-MM-DD-HH-mm.json`
+- cartes de mission plus compactes ;
+- descriptions limitees visuellement ;
+- stats questions/score plus petites ;
+- recompenses et bouton Lancer rapproches ;
+- informations conservees.
 
-Les assets prives dans `public/private-assets/characters/` ne sont pas inclus. Seuls les chemins/references stockes dans les donnees sont exportes.
+## Changements Invocation
 
-## Tables importees
+- ressources gemmes/poussiere plus compactes ;
+- boutons x1/x10 reduits ;
+- animation de tirage moins haute ;
+- resultats en grille mobile 2 colonnes ;
+- cartes de resultat plus petites.
 
-L'import complet remplace les memes tables :
+## Changements Collection
 
-- `player`
-- `playerCharacters`
-- `quizProgress`
-- `gachaHistory`
-- `unlockedBadges`
-- `unlockedTitles`
-- `settings`
-- `installedPacks`
+- filtres plus compacts ;
+- message assets prives reduit ;
+- grille mobile 2 colonnes ;
+- cartes personnage reduites ;
+- images et textes plus petits ;
+- detail personnage et action actif conserves.
 
-Apres import, les stores Zustand sont recharges depuis Dexie :
+## Changements Parametres
 
-- joueur ;
-- collection ;
-- historique gacha ;
-- progression quiz ;
-- badges ;
-- titres ;
-- preferences UI.
+- sections moins espacees ;
+- cartes internes plus compactes ;
+- stats profil en grille 2 colonnes ;
+- preferences conservees.
 
-## Validation JSON
+## Navigation mobile
 
-La validation verifie :
+Choix fait : pas de dock bas persistant pour cette etape.
 
-- JSON lisible ;
-- presence d'un objet `metadata` ;
-- `metadata.appName === "GuildQuest"` ;
-- `backupVersion` numerique ;
-- presence d'un objet `data` ;
-- presence de tableaux pour les tables attendues.
+Raison :
 
-Un fichier invalide affiche un message clair et n'est pas importe.
+- la navigation actuelle est geree par etat local dans `App.tsx` ;
+- ajouter un dock global demanderait de verifier les recouvrements sur tous les ecrans ;
+- le probleme principal venait surtout du Hall trop vertical.
 
-Avant import, une confirmation navigateur demande :
+Solution appliquee :
 
-`Cette action remplacera ta progression locale actuelle. Continuer ?`
+- grille d'actions rapide compacte dans le Hall ;
+- bouton Parametres toujours visible dans le header du Hall ;
+- les flux existants restent inchanges.
 
-## Reset local
+## Limites eventuelles
 
-Le reset complet :
-
-- vide les tables GuildQuest ;
-- recree le joueur `leb` ;
-- niveau 1 ;
-- XP 0 ;
-- gemmes 200 ;
-- rang `Mage de Rang F` ;
-- restaure les titres par defaut ;
-- restaure les parametres par defaut.
-
-L'app recharge les stores apres reset et revient au Hall.
-
-## Parametres
-
-L'ecran `Parametres` affiche :
-
-- pseudo ;
-- rang ;
-- niveau ;
-- version app ;
-- sons actives/desactives ;
-- animations activees/desactivees ;
-- vitesse animations : normale, rapide, reduite ;
-- acces Import / Export ;
-- zone danger pour reset complet ;
-- rappel offline/local.
-
-Les preferences sont persistees dans la table Dexie `settings`.
-
-## README
-
-Ajout d'une section `Sauvegarde et restauration` :
-
-- export JSON ;
-- import JSON ;
-- reset local ;
-- assets prives non inclus ;
-- recommandation d'export avant changement majeur ou voyage.
+- Pas de verification visuelle navigateur integre dans cette tache.
+- Le dock mobile global reste une prochaine amelioration possible.
+- Certains ecrans profonds comme Carte/Zone/Quiz n'ont pas ete refondus completement, seulement preserves.
 
 ## Commandes executees
 
-- lectures des fichiers stores, App, db, README et modeles
+- lectures des ecrans Hall, Missions, Profil, Invocation, Collection et Parametres
 - `npm run build`
 - `npm run lint`
 - `npm run dev -- --host 127.0.0.1`
@@ -157,14 +133,14 @@ Le build production Vite passe.
 
 Avertissement restant :
 
-- certains chunks depassent 500 kB apres minification.
+- certains chunks depassent 500 kB apres minification ;
 - avertissement non bloquant deja connu.
 
 ## Resultat de `npm run lint`
 
 OK.
 
-Un premier lint a signale `react-hooks/set-state-in-effect` dans `App.tsx`. Le rechargement initial est maintenant decale via `setTimeout`, puis le lint est repasse sans erreur.
+Aucune erreur et aucun avertissement ESLint.
 
 ## Resultat de `npm run dev`
 
@@ -177,27 +153,16 @@ Vite annonce :
 
 La commande a ete arretee par timeout volontaire apres quelques secondes, car le serveur de dev reste ouvert en continu.
 
-## Limites eventuelles
-
-- Export partiel progression/collection non implemente pour cette etape.
-- Le reset partiel quiz ou gacha n'est pas encore separe : seul le reset complet est implemente.
-- Les images privees ne sont pas exportees, volontairement.
-- La verification visuelle navigateur integre n'a pas ete effectuee dans cette tache.
-
 ## Points a verifier manuellement
 
-- Ouvrir le Hall.
-- Aller dans `Parametres`.
-- Changer sons/animations/vitesse et verifier la persistance apres refresh.
-- Ouvrir `Import / Export`.
-- Exporter un JSON complet.
-- Verifier que le fichier contient metadata et data.
-- Importer une sauvegarde valide et confirmer.
-- Tenter un JSON invalide et verifier le message d'erreur.
-- Faire un reset complet.
-- Verifier que `leb` revient niveau 1, XP 0, 200 gemmes.
-- Verifier que Missions, Gacha, Collection, Carte, Profil restent utilisables apres import/reset.
+- Ouvrir le Hall sur mobile.
+- Verifier que les actions principales sont visibles rapidement.
+- Tester Missions, Carte, Invocation, Collection, Badges, Profil et Parametres depuis la grille.
+- Verifier que le header sticky ne masque pas le contenu.
+- Verifier le Profil sur mobile avec les stats en grille.
+- Verifier Missions et Collection sur petit ecran.
+- Confirmer que quiz, gacha, import/export, debug local et persistance fonctionnent toujours.
 
 ## Prochaine etape recommandee
 
-Ajouter des exports partiels `progression seulement` et `collection seulement`, puis un ecran d'inspection de sauvegarde plus detaille avant import.
+Tester le Hall sur un vrai viewport mobile puis ajouter, si necessaire, un dock bas global avec Hall, Missions, Carte, Invocation et Profil.

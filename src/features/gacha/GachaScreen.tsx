@@ -28,12 +28,12 @@ export function GachaScreen({
   onGoToCollection
 }: GachaScreenProps) {
   return (
-    <section className="space-y-5">
-      <header className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+    <section className="space-y-3">
+      <header className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.22em] text-teal-200">Autel des etoiles</p>
-          <h1 className="text-3xl font-black text-white">Invocation</h1>
-          <p className="mt-2 text-sm text-slate-300">Invoque des allies de guilde et complete ta collection.</p>
+          <h1 className="text-2xl font-black text-white">Invocation</h1>
+          <p className="mt-1 text-sm text-slate-300">Invoque des allies et complete ta collection.</p>
         </div>
         <div className="flex flex-wrap gap-2">
           <Button variant="guild" onClick={onGoToCollection}>Collection</Button>
@@ -49,10 +49,10 @@ export function GachaScreen({
         <ResourceCard icon={<Sparkles className="size-5" />} label="Poussiere magique" value={player.magicDust ?? 0} />
       </div>
 
-      <article className="rounded-lg border border-white/10 bg-slate-900/90 p-5 shadow-2xl">
-        <div className="grid gap-3 sm:grid-cols-2">
+      <article className="rounded-lg border border-white/10 bg-slate-900/90 p-4 shadow-2xl">
+        <div className="grid grid-cols-2 gap-2">
           <Button
-            className="h-20 flex-col gap-1"
+            className="h-16 flex-col gap-1"
             onClick={() => onInvoke(1)}
             disabled={isInvoking || player.gems < gachaCosts.singlePullCost}
           >
@@ -60,7 +60,7 @@ export function GachaScreen({
             <span className="text-xs opacity-80">{gachaCosts.singlePullCost} gemmes</span>
           </Button>
           <Button
-            className="h-20 flex-col gap-1"
+            className="h-16 flex-col gap-1"
             onClick={() => onInvoke(10)}
             disabled={isInvoking || player.gems < gachaCosts.tenPullCost}
           >
@@ -84,15 +84,15 @@ export function GachaScreen({
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: [0.95, 1.04, 1] }}
-          className="rounded-lg border border-teal-300/30 bg-teal-300/10 p-8 text-center shadow-glow"
+          className="rounded-lg border border-teal-300/30 bg-teal-300/10 p-5 text-center shadow-glow"
         >
-          <Sparkles className="mx-auto size-10 text-teal-100" aria-hidden="true" />
-          <p className="mt-3 text-lg font-black text-white">Les runes s'alignent...</p>
+          <Sparkles className="mx-auto size-8 text-teal-100" aria-hidden="true" />
+          <p className="mt-2 text-base font-black text-white">Les runes s'alignent...</p>
         </motion.div>
       )}
 
       {results.length > 0 && (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid grid-cols-2 gap-3 lg:grid-cols-3">
           {results.map((result, index) => (
             <motion.article
               key={result.pull.id}
@@ -100,7 +100,7 @@ export function GachaScreen({
               animate={{ opacity: 1, y: 0, rotate: 0 }}
               transition={{ delay: index * 0.05, duration: 0.35 }}
               className={cn(
-                "rounded-lg border p-4",
+                "rounded-lg border p-3",
                 rarityCardClasses[result.character.rarity],
                 rarityGlowClasses[result.character.rarity]
               )}
@@ -115,12 +115,12 @@ export function GachaScreen({
               </div>
               <CharacterImage
                 character={result.character}
-                className="mx-auto mt-4 size-24 rounded-lg border border-white/10 bg-white/10 p-3"
+                className="mx-auto mt-3 size-20 rounded-lg border border-white/10 bg-white/10 p-2.5"
               />
-              <h2 className="mt-4 text-xl font-black text-white">{result.character.name}</h2>
+              <h2 className="mt-3 text-base font-black text-white">{result.character.name}</h2>
               <p className="mt-1 text-sm opacity-85">{result.character.element} - Puissance {result.character.power}</p>
               {!result.isNew && (
-                <div className="mt-3 rounded-lg bg-black/20 p-3 text-sm font-bold">
+                <div className="mt-2 rounded-lg bg-black/20 p-2 text-xs font-bold">
                   +{result.fragmentsGained} fragments - +{result.magicDustGained} poussiere
                 </div>
               )}
@@ -134,12 +134,12 @@ export function GachaScreen({
 
 function ResourceCard({ icon, label, value }: { icon: React.ReactNode; label: string; value: number }) {
   return (
-    <div className="rounded-lg border border-white/10 bg-white/[0.07] p-4">
+    <div className="rounded-lg border border-white/10 bg-white/[0.07] p-3">
       <div className="flex items-center gap-2 text-slate-300">
         {icon}
         <p className="text-sm">{label}</p>
       </div>
-      <p className="mt-2 text-3xl font-black text-white">{value}</p>
+      <p className="mt-1 text-2xl font-black text-white">{value}</p>
     </div>
   );
 }
