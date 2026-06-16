@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="GuildQuest">
+  <rect width="512" height="512" rx="112" fill="#0f172a"/>
+  <circle cx="256" cy="256" r="186" fill="#312e81"/>
+  <path d="M256 74 397 150v118c0 93-55 154-141 180-86-26-141-87-141-180V150L256 74Z" fill="#14b8a6"/>
+  <path d="M184 251h144M256 151v214" stroke="#f8fafc" stroke-width="38" stroke-linecap="round"/>
+  <path d="M203 176h106l-53-68-53 68Z" fill="#facc15"/>
+</svg>
